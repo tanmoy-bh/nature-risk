@@ -1,0 +1,12 @@
+{
+  "name": "nature-risk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Nature Risk Desk: a proof of concept that turns open nature data into a financial signal for lenders.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && npx --yes wrangler@4.40.0 pages dev dist",
+    "test": "node --test"
+  }
+}

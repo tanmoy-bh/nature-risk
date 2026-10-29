@@ -1,0 +1,852 @@
+<style>
+[hidden]{display:none!important}
+/* Layout: Apple HIG — translucent nav bar, large titles, inset grouped cards on a grouped background, system colors, segmented controls */
+:root{
+  --bg:#F2F2F7; --surface:#FFFFFF; --soft:#F2F2F7; --fill:rgba(118,118,128,.12); --ink:#000000; --muted:#6E6E73; --line:#E5E5EA;
+  --accent:#248A3D; --accent-ink:#FFFFFF; --link:#007AFF;
+  --risk:#FF3B30; --risk-bg:#FFE9E7; --risk-ink:#D70015;
+  --stable:#FF9500; --stable-bg:#FFF2DF; --stable-ink:#C93400;
+  --gain:#34C759; --gain-bg:#E4F8E9; --gain-ink:#248A3D;
+  --real:#0071E3; --real-bg:#E5F0FD; --sample:#8944AB; --sample-bg:#F4EAFB;
+  --sea:#CFE5F3; --land:#FFFFFF; --land-dim:#ECEBE7; --border:#C7C7CC; --maplabel:#8E8E93;
+  --navbg:rgba(249,249,251,.82);
+  --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+  --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+  --font-data:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#1C1C1E; --soft:#2C2C2E; --fill:rgba(118,118,128,.24); --ink:#FFFFFF; --muted:#98989F; --line:#38383A;
+  --accent:#30D158; --accent-ink:#000000; --link:#0A84FF;
+  --risk:#FF453A; --risk-bg:#3B1714; --risk-ink:#FF6961;
+  --stable:#FF9F0A; --stable-bg:#3A2809; --stable-ink:#FFB340;
+  --gain:#30D158; --gain-bg:#10331C; --gain-ink:#4CD964;
+  --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
+  --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
+  --navbg:rgba(22,22,24,.78);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --soft:#2C2C2E; --fill:rgba(118,118,128,.24); --ink:#FFFFFF; --muted:#98989F; --line:#38383A;
+  --accent:#30D158; --accent-ink:#000000; --link:#0A84FF;
+  --risk:#FF453A; --risk-bg:#3B1714; --risk-ink:#FF6961;
+  --stable:#FF9F0A; --stable-bg:#3A2809; --stable-ink:#FFB340;
+  --gain:#30D158; --gain-bg:#10331C; --gain-ink:#4CD964;
+  --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
+  --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
+  --navbg:rgba(22,22,24,.78);
+  color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.47;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navbg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance}
+h1{font-size:34px;line-height:1.12;font-weight:700;letter-spacing:-.022em}
+h2{font-size:22px;line-height:1.2;font-weight:700;letter-spacing:-.018em}
+h3{font-size:17px;font-weight:600;letter-spacing:-.016em}
+p{margin:0}
+.num{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.02em;color:var(--muted);font-weight:500}
+button,select{font:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--link) 55%,transparent);outline-offset:2px;border-radius:8px}
+
+/* data provenance pills */
+.dp,.tag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:none;line-height:1;padding:3px 7px;border-radius:999px;vertical-align:2px;margin-left:6px;white-space:nowrap}
+.dp::before,.tag::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.dp.sample,.tag{color:var(--sample);background:var(--sample-bg)}
+.dp.real,.tag.real{color:var(--real);background:var(--real-bg)}
+
+/* nav bar */
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navbg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topnav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:8px 24px;flex-wrap:wrap;min-height:52px}
+.brand{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);text-decoration:none;padding-block:8px}
+.brand svg{color:var(--accent)}
+.navlinks{display:inline-flex;gap:2px;background:var(--fill);border-radius:9px;padding:2px}
+.navlinks a{display:flex;align-items:center;font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;padding:5px 14px;border-radius:7px;min-height:28px}
+.navlinks a[aria-selected="true"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);font-weight:600}
+.navnote{margin-left:auto;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap}
+.navnote .dp{margin-left:8px}
+@media (max-width:760px){.navnote{display:none}.navlinks a{padding:5px 10px}}
+
+main{max-width:1180px;margin:0 auto;padding-top:32px}
+.page{display:flex;flex-direction:column;gap:20px}
+.pagehead{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between}
+.pagehead .lede{color:var(--muted);max-width:62ch;margin-top:6px;font-size:17px;line-height:1.41}
+.scen{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.select{appearance:none;-webkit-appearance:none;background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='14' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%238E8E93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border:0;border-radius:8px;padding:7px 30px 7px 12px;color:var(--ink);font-size:14px;cursor:pointer;min-height:32px}
+.scen-note{font-size:13px;color:var(--muted);background:var(--surface);border-radius:12px;padding:10px 14px}
+.panel{background:var(--surface);border-radius:14px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:1.5fr repeat(3,minmax(0,1fr))}
+.stat{padding:16px 18px;display:flex;flex-direction:column;gap:3px;min-width:0;border-left:.5px solid var(--line)}
+.stat:first-child{border-left:0}
+.stat .big{font-family:var(--font-display);font-size:28px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.stat .sub{font-size:13px;color:var(--muted)}
+.stat .sub.up{color:var(--risk-ink)}
+.mixbar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--fill);margin-top:10px;gap:2px}
+.mixbar span{display:block;height:100%;transition:width .4s ease}
+.keys{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;margin-top:8px;color:var(--muted)}
+.keys i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.keys .dia{border-radius:1.5px;transform:rotate(45deg)}
+
+/* desk */
+.desk{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.tablehead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--line)}
+.tablehead .sel{display:flex;gap:8px;flex-wrap:wrap}
+.chips{display:inline-flex;gap:2px;flex-wrap:wrap;background:var(--fill);border-radius:9px;padding:2px}
+.chip{font-size:13px;border:0;background:transparent;color:var(--ink);border-radius:7px;padding:4px 12px;cursor:pointer;min-height:28px}
+.chip[aria-pressed="true"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);font-weight:600}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-size:12px;color:var(--muted);font-weight:500;text-align:left;padding:10px 16px;border-bottom:.5px solid var(--line);white-space:nowrap}
+td{padding:11px 16px;border-bottom:.5px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th.r,td.r{text-align:right}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:var(--soft)}
+tbody tr[aria-selected="true"]{background:color-mix(in srgb,var(--link) 10%,transparent)}
+tbody tr[aria-selected="true"] td:first-child{box-shadow:inset 3px 0 0 var(--link)}
+.bname{font-weight:600;white-space:nowrap}
+.bmeta{font-size:13px;color:var(--muted);white-space:nowrap}
+.dot{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:14px}
+.dot i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.was{font-size:12px;color:var(--muted)}
+.lowc{color:var(--risk-ink)}
+
+/* detail / site card */
+.card{padding:20px;display:flex;flex-direction:column;gap:18px}
+.desk .card{position:sticky;top:calc(env(safe-area-inset-top,0px) + 68px)}
+.chead{display:flex;flex-direction:column;gap:3px}
+.verdict{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.verdict .score{font-family:var(--font-display);font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.pill.risk{color:var(--risk-ink);background:var(--risk-bg)}
+.pill.stable{color:var(--stable-ink);background:var(--stable-bg)}
+.pill.gain{color:var(--gain-ink);background:var(--gain-bg)}
+.conf{font-size:13px;color:var(--muted)}
+.scenline{font-size:13px;color:var(--muted);margin-top:-8px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:160px 1fr 28px;gap:10px;align-items:center;font-size:14px}
+.track{height:6px;background:var(--fill);border-radius:3px;position:relative;overflow:hidden}
+.track span{position:absolute;inset:0 auto 0 0;border-radius:3px;transition:width .35s ease}
+.facts{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.note{font-size:14px;line-height:1.5}
+.action{font-size:14px;line-height:1.5;background:var(--soft);border-radius:10px;padding:12px 14px}
+.action .label{display:inline-flex;align-items:center;margin-bottom:4px}
+details{border-top:.5px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"Show";font-weight:400;color:var(--link)}
+details[open] summary::after{content:"Hide"}
+.ev{display:grid;grid-template-columns:1fr auto;gap:1px 12px;padding:9px 0;border-bottom:.5px solid var(--line);font-size:13px}
+.ev:last-child{border-bottom:0}
+.ev .src{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.flag{font-size:12px;font-weight:600;color:var(--risk-ink)}
+
+/* map */
+.mapshell{display:grid;grid-template-columns:minmax(0,1fr) 360px;overflow:hidden}
+.mapside{position:relative;height:620px;background:var(--sea);min-width:0}
+.mapside svg{width:100%;height:100%;display:block}
+.mapshell .card{border-left:.5px solid var(--line);max-height:620px;overflow-y:auto}
+.zoomctl{position:absolute;top:12px;left:12px;display:flex;gap:2px;background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:9px;padding:2px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.zoomctl button{border:0;background:transparent;color:var(--ink);font-size:13px;padding:5px 12px;border-radius:7px;cursor:pointer;min-height:28px}
+.zoomctl button[aria-pressed="true"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12);font-weight:600}
+.zoombtns{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
+.zoombtns button{width:40px;height:40px;border:0;background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.zoombtns button+button{border-top:.5px solid var(--line)}
+.zoombtns button:hover:not(:disabled){background:var(--fill)}
+.zoombtns button:disabled{color:var(--border);cursor:default}
+.maphint{position:absolute;right:12px;bottom:12px;font-size:11.5px;color:var(--muted);background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:8px;padding:5px 9px}
+#map{cursor:grab;touch-action:none}
+#map.dragging{cursor:grabbing}
+@media (pointer:coarse){#map{touch-action:pan-y}}
+@media (max-width:700px){.maphint{display:none}}
+.mapkey{position:absolute;left:12px;bottom:12px;background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:10px;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.mapkey .keys{margin:0}
+.land{fill:var(--land-dim);stroke:var(--border);stroke-width:.6;vector-effect:non-scaling-stroke}
+.land.home{fill:var(--land)}
+.lbl{fill:var(--maplabel);font-family:var(--font-body);text-anchor:middle;pointer-events:none}
+.lbl.country{font-weight:600;letter-spacing:.1em}
+.gapline{stroke:var(--border);stroke-dasharray:6 6;vector-effect:non-scaling-stroke}
+.pin{cursor:pointer}
+.pin .mark{stroke:var(--surface)}
+.pin .ring{fill:none;stroke:var(--link)}
+.pinlbl{fill:var(--ink);font-family:var(--font-body);font-weight:600;paint-order:stroke;stroke:var(--land);pointer-events:none}
+
+/* architecture */
+.archwrap{overflow-x:auto;padding:14px}
+.arch{display:block;width:100%;min-width:760px;height:auto}
+.arch .abox{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.arch .abox.poc{stroke:var(--accent);stroke-width:2}
+.arch .abox.users{fill:var(--soft);stroke:var(--line)}
+.arch .band{fill:var(--soft);stroke:none}
+.arch .at{fill:var(--ink);font-family:var(--font-body);font-weight:600;font-size:14px}
+.arch .as{fill:var(--muted);font-family:var(--font-body);font-size:11.5px}
+.arch .ah{fill:var(--muted);font-family:var(--font-body);font-weight:600;font-size:11px;letter-spacing:.04em}
+.arch .anum{fill:var(--ink);font-family:var(--font-display);font-weight:600;font-size:14px}
+.arch .ar{stroke:var(--border);stroke-width:1.5;fill:none}
+.arch .ahead{fill:var(--border)}
+.arch .pocdot{fill:var(--accent)}
+.archfoot{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);padding:12px 16px;border-top:.5px solid var(--line)}
+.archfoot i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.col{display:flex;flex-direction:column;gap:6px;min-width:0;background:var(--surface);border-radius:14px;padding:18px}
+.col p,.col ul{font-size:14px;color:var(--muted)}
+.col ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.rules{font-size:14px;display:flex;flex-direction:column;gap:6px;color:var(--muted);background:var(--surface);border-radius:14px;padding:18px}
+.rules b{color:var(--ink)}
+.rules code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;background:var(--fill);padding:1px 5px;border-radius:4px;color:var(--ink)}
+
+/* sources */
+.srctable tbody tr{cursor:default}
+.srctable tbody tr:hover{background:transparent}
+.srctable td{vertical-align:top}
+.srctable a{color:var(--link);text-decoration:none}
+.srctable a:hover{text-decoration:underline}
+.st{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;white-space:nowrap;color:var(--muted);background:var(--fill);border-radius:999px;padding:3px 8px}
+.st::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.st.real{color:var(--real);background:var(--real-bg)}
+.st.sample{color:var(--sample);background:var(--sample-bg)}
+
+/* trends */
+.trendpanel{padding:20px;display:flex;flex-direction:column;gap:16px}
+.trendpanel .thead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.trendgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tchart.wide{grid-column:1/-1}
+.tchart{background:var(--soft);border-radius:12px;padding:16px 18px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tchart h3{font-size:17px}
+.tchart .tsum{font-size:14px;color:var(--muted)}
+.tchart .tsum b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.tchart svg{width:100%;height:auto;display:block;margin-top:6px}
+.tchart .grid{stroke:var(--line)}
+.tchart .axl{fill:var(--muted);font-family:var(--font-data);font-size:11px;font-variant-numeric:tabular-nums}
+.tchart .vl{fill:var(--ink);font-family:var(--font-data);font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.tchart .src{font-size:12px;color:var(--muted);margin-top:2px}
+
+footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+
+@media (max-width:960px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat:nth-child(3){border-left:0}
+  .stat:nth-child(n+3){border-top:.5px solid var(--line)}
+  .desk{grid-template-columns:minmax(0,1fr)}
+  .desk .card{position:static}
+  .mapshell{grid-template-columns:minmax(0,1fr)}
+  .mapside{height:440px}
+  .mapshell .card{border-left:0;border-top:.5px solid var(--line);max-height:none}
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .trendgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:480px){
+  h1{font-size:28px}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .stat{border-left:0;border-top:.5px solid var(--line)}
+  .stat:first-child{border-top:0}
+  .mapside{height:380px}
+  .bar{grid-template-columns:130px 1fr 26px}
+  .mapkey{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<nav class="topnav" aria-label="Pages">
+  <div class="topnav-in">
+    <a class="brand" href="#lender-desk" data-screen="desk"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3c-4 3-6.5 6.4-6.5 10A6.5 6.5 0 0 0 12 19.5 6.5 6.5 0 0 0 18.5 13C18.5 9.4 16 6 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v13" stroke="currentColor" stroke-width="1.8"/></svg>Nature Risk Desk</a>
+    <div class="navlinks" role="tablist">
+      <a id="scr-desk" role="tab" href="#lender-desk" aria-selected="true" data-screen="desk">Lender desk</a>
+      <a id="scr-map" role="tab" href="#nature-map" aria-selected="false" data-screen="map">Nature map</a>
+      <a id="scr-arch" role="tab" href="#architecture" aria-selected="false" data-screen="arch">Architecture</a>
+    </div>
+    <span class="navnote">Proof of concept <span class="dp real" title="Pulled from public open data">Real</span> open nature data <span class="dp sample" title="Sample value, not real data">Sample</span> loans and partner data</span>
+  </div>
+</nav>
+
+<main>
+  <!-- PAGE 1 -->
+  <section class="page" id="screen-desk">
+    <div class="pagehead">
+      <div><h1>Lender desk</h1><p class="lede">An agri and commodities loan book scored with one nature signal: a label, the evidence behind it, and a suggested credit action for each loan.</p><p class="bmeta" style="white-space:normal;margin-top:8px">Borrowers, exposures, pricing and livelihood data are samples<span class="dp sample" title="Sample value, not real data">Sample</span> Labels and scores come mostly from real nature data<span class="dp real" title="Pulled from public open data">Real</span></p></div>
+      <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-desk"></select></label>
+    </div>
+    <p class="scen-note" hidden></p>
+    <div class="panel stats">
+      <div class="stat"><span class="label">Exposure by label<span class="dp sample" title="Sample value, not real data">Sample</span></span><div class="mixbar" id="mixbar" role="img"></div><div class="keys" id="mixkeys"></div></div>
+      <div class="stat"><span class="label">Book<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-total"></span><span class="sub" id="s-count"></span></div>
+      <div class="stat"><span class="label">In Nature Risk<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-risk"></span><span class="sub" id="s-riskshare"></span></div>
+      <div class="stat"><span class="label">Pricing signal<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-bps"></span><span class="sub">bps, exposure-weighted</span></div>
+    </div>
+    <div class="desk">
+      <div class="panel">
+        <div class="tablehead">
+          <div class="sel">
+            <select class="select" id="book-select" aria-label="Book"><option value="agri">Agri &amp; commodities</option><option value="renew">Renewables (add-on)</option></select>
+            <select class="select" id="region-select" aria-label="Region"><option value="all">All APAC</option><option value="mysg">Malaysia &amp; Singapore</option></select>
+          </div>
+          <div class="chips" role="group" aria-label="Filter by label">
+            <button class="chip" id="f-all" type="button" aria-pressed="true" data-f="all">All</button>
+            <button class="chip" id="f-risk" type="button" aria-pressed="false" data-f="risk">Risk</button>
+            <button class="chip" id="f-stable" type="button" aria-pressed="false" data-f="stable">Stable</button>
+            <button class="chip" id="f-gain" type="button" aria-pressed="false" data-f="gain">Gain</button>
+          </div>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Borrower<span class="dp sample" title="Sample value, not real data">Sample</span></th><th class="r">Exposure<span class="dp sample" title="Sample value, not real data">Sample</span></th><th>Label</th><th class="r">Score</th><th class="r">Pricing<span class="dp sample" title="Sample value, not real data">Sample</span></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="panel card" id="detail" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="page" id="screen-map" hidden>
+    <div class="pagehead">
+      <div><h1>Nature map</h1><p class="lede">What the data says about each place in Malaysia and Singapore: forest, vegetation, water, biodiversity and livelihoods. No loans, no pricing.</p><p class="bmeta" style="white-space:normal;margin-top:8px">Nature indicators and 5-year trends are real<span class="dp real" title="Pulled from public open data">Real</span> Livelihoods and confidence depend on partner data, so they are samples<span class="dp sample" title="Sample value, not real data">Sample</span></p></div>
+      <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-map"></select></label>
+    </div>
+    <p class="scen-note" hidden></p>
+    <div class="panel mapshell">
+      <div class="mapside">
+        <svg id="map" role="img" aria-label="Map of Malaysia and Singapore with scored places" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="zoomctl" role="group" aria-label="Zoom">
+          <button id="zm-all" type="button" aria-pressed="true" data-zoom="all">All</button>
+          <button id="zm-pen" type="button" aria-pressed="false" data-zoom="pen">Peninsula</button>
+          <button id="zm-sg" type="button" aria-pressed="false" data-zoom="sg">Singapore</button>
+          <button id="zm-bor" type="button" aria-pressed="false" data-zoom="bor">Borneo</button>
+        </div>
+        <div class="zoombtns" role="group" aria-label="Zoom controls">
+          <button id="zm-in" type="button" aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button id="zm-out" type="button" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button id="zm-reset" type="button" aria-label="Reset map view" title="Reset view"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.2 6.2A5 5 0 1 1 3 9.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.6 2.8v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="maphint">Click a place to zoom in · drag to pan · pinch or ⌘/Ctrl + scroll to zoom</div>
+        <div class="mapkey"><div class="keys" id="mapkeys"></div></div>
+      </div>
+      <aside class="card" id="ndetail" aria-live="polite"></aside>
+    </div>
+    <section class="panel trendpanel" id="ntrends" aria-live="polite"></section>
+    <div class="panel">
+      <div class="tablehead"><h2>Data sources</h2><span class="bmeta" style="white-space:normal">Nature data on the map is real, pulled from these sources on 28 Oct 2026. Livelihoods and traceability need partner data, so they stay as samples. Hansen forest loss counts any tree cover removal, including plantation harvest cycles, so planted estates can trip the deforestation trigger.</span></div>
+      <div class="tablewrap">
+        <table class="srctable">
+          <thead><tr><th>Indicator</th><th>Source</th><th>Resolution · update</th><th>Access</th><th>Licence</th><th>Status</th></tr></thead>
+          <tbody>
+          <tr><td><div class="bname">Forest loss</div></td><td><a href="https://glad.earthengine.app/view/global-forest-change" target="_blank" rel="noopener">Hansen/UMD Global Forest Change v1.12</a></td><td class="bmeta">30 m · annual, 2001–2024</td><td class="bmeta">Open cloud files</td><td class="bmeta">CC BY 4.0</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Vegetation trend</div></td><td><a href="https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a" target="_blank" rel="noopener">Sentinel-2 L2A via Planetary Computer</a></td><td class="bmeta">10 m · clear scenes, 2019 vs 2025</td><td class="bmeta">Open STAC + data API</td><td class="bmeta">Open (Copernicus)</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Water stress</div></td><td><a href="https://www.wri.org/aqueduct" target="_blank" rel="noopener">WRI Aqueduct baseline water stress via Resource Watch</a></td><td class="bmeta">Sub-basin</td><td class="bmeta">Open SQL API</td><td class="bmeta">CC BY 4.0</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Protected areas</div></td><td><a href="https://www.protectedplanet.net" target="_blank" rel="noopener">World Database on Protected Areas (UNEP-WCMC)</a></td><td class="bmeta">Polygons · latest release</td><td class="bmeta">Open map service</td><td class="bmeta">Non-commercial</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Threatened species</div></td><td><a href="https://www.gbif.org" target="_blank" rel="noopener">GBIF records with IUCN Red List status</a></td><td class="bmeta">Point records · live</td><td class="bmeta">Open API</td><td class="bmeta">Per record (CC0 / CC BY / CC BY-NC)</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Mangroves</div></td><td><a href="https://planetarycomputer.microsoft.com/dataset/esa-worldcover" target="_blank" rel="noopener">ESA WorldCover (mangrove class) via Planetary Computer</a></td><td class="bmeta">10 m · 2021</td><td class="bmeta">Open STAC + data API</td><td class="bmeta">CC BY 4.0</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Rainfall and drought scenario</div></td><td><a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">ERA5 reanalysis via Open-Meteo</a></td><td class="bmeta">~25 km · daily, 2001–2025</td><td class="bmeta">Open API, no key</td><td class="bmeta">CC BY 4.0 · API free for non-commercial use</td><td><span class="st real">Real</span></td></tr>
+          <tr><td><div class="bname">Livelihoods, traceability</div></td><td>Partner surveys and supply-chain data</td><td class="bmeta">Plot to district</td><td class="bmeta">Partner agreement</td><td class="bmeta">Partner terms</td><td><span class="st sample">Sample</span></td></tr>
+          <tr><td><div class="bname">Boundaries</div></td><td><a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a></td><td class="bmeta">1:10m</td><td class="bmeta">Download</td><td class="bmeta">Public domain</td><td><span class="st real">Real</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3 -->
+  <section class="page" id="screen-arch" hidden>
+    <div class="pagehead">
+      <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens, in Nature Signal's own three layers.</p></div>
+    </div>
+    <div class="panel">
+      <div class="archwrap">/*__ARCH__*/</div>
+      <div class="archfoot"><span><i></i>Built in this proof of concept</span><span>Everything else is the production plan</span></div>
+    </div>
+    <div class="cols">
+      <div class="col"><h3>Explainable before clever</h3><p>Transparent rules a credit committee can read first. ML only once there are outcome labels to train and back-test on.</p></div>
+      <div class="col"><h3>Evidence on every number</h3><p>Each value carries its source, date, resolution and licence, so every label and note traces back to data.</p></div>
+      <div class="col"><h3>Meet clients where they work</h3><p>API and MCP server first, so the signal lands inside a bank's own credit and portfolio tools.</p></div>
+    </div>
+    <div class="cols">
+      <div class="col"><span class="label">Days 1–30</span><h3>Foundation</h3><ul><li>Pipeline for five core open datasets</li><li>Evidence store with lineage and licences</li><li>Signal v0.1 behind an API</li></ul></div>
+      <div class="col"><span class="label">Days 31–60</span><h3>Co-pilot data</h3><ul><li>First partner plots and supply chains</li><li>Confidence scoring and scenarios</li><li>MCP server for analysts</li></ul></div>
+      <div class="col"><span class="label">Days 61–90</span><h3>First pilot</h3><ul><li>Live pilot with one bank or insurer</li><li>AI credit notes behind an eval gate</li><li>TNFD-aligned export, security review</li></ul></div>
+    </div>
+    <div class="rules">
+      <span class="label">Methodology v0.1 (my sketch)</span>
+      <p>Score = weighted mean of sub-scores, 0–100, higher is healthier: forest 30% (Hansen loss 2021–2024), vegetation 20% (NDVI trend), water 20% (Aqueduct), biodiversity 20% (protected-area distance and threatened species), livelihoods 10%.</p>
+      <p><b>Nature Risk</b> if score &lt; 45, or ≥ <code>2%</code> of the area lost tree cover in 2021–2024 (<code>0.5%</code> under the stricter rule). <b>Nature Gain</b> if score ≥ 62, vegetation improving and forest loss &lt; 0.5%. Otherwise <b>Nature Stable</b>.</p>
+      <p>Confidence = 60% supply-chain traceability + 40% cloud-free satellite coverage.</p>
+    </div>
+  </section>
+</main>
+
+<footer><span><span class="dp real" style="margin-left:0">Real</span> pulled from public open data on 28 Oct 2026 · <span class="dp sample">Sample</span> fictional or placeholder, shown only to demonstrate the workflow</span><span>Built by Tanmoy Bhattacharjee, October 2026, as a conversation starter for Nature Signal. Nature indicators are real open data retrieved 28 Oct 2026, measured in a 2–4 km box around each site point. Borrowers, exposures, livelihoods and traceability are samples. Scoring rules are my own sketch, not Nature Signal's methodology. Boundaries: Natural Earth.</span><span><a href="__logout" style="color:var(--link);text-decoration:none">Lock this page</a></span></footer>
+
+<script>
+const GEO = /*__PATHS__*/[];
+
+const ASSETS = [
+  {id:"A01",what:"Palm oil plantation",where:"Riau, Indonesia",cc:"ID",kind:"agri",exp:42,lat:0.5,lon:101.4,raw:{loss:4.1,slope:-0.006,stress:1.8,dist:4,species:0.8,dep:0.7,trace:"mill",cloud:0.55}},
+  {id:"A02",what:"Palm oil plantation",where:"Central Kalimantan, Indonesia",cc:"ID",kind:"agri",exp:55,lat:-1.7,lon:113.4,raw:{loss:6.3,slope:-0.008,stress:1.5,dist:2,species:0.85,dep:0.6,trace:"mill",cloud:0.5}},
+  {id:"A03",what:"Palm oil estate",where:"Tawau, Sabah, Malaysia",cc:"MY",kind:"agri",exp:38,lat:4.55,lon:117.85,raw:{loss:0.4,slope:0.002,stress:1.2,dist:18,species:0.7,dep:0.5,trace:"plot",cloud:0.6}},
+  {id:"A04",what:"Smallholder palm co-op",where:"Jambi, Indonesia",cc:"ID",kind:"agri",exp:12,lat:-1.6,lon:103.6,raw:{loss:1.1,slope:-0.002,stress:1.5,dist:12,species:0.6,dep:0.9,trace:"district",cloud:0.5}},
+  {id:"A05",what:"Robusta coffee",where:"Dak Lak, Vietnam",cc:"VN",kind:"agri",exp:18,lat:12.7,lon:108.1,raw:{loss:0.2,slope:-0.004,stress:3.9,dist:25,species:0.4,dep:0.8,trace:"plot",cloud:0.8}},
+  {id:"A06",what:"Arabica coffee",where:"Lam Dong, Vietnam",cc:"VN",kind:"agri",exp:9,lat:11.9,lon:108.4,raw:{loss:0.8,slope:0.001,stress:3.2,dist:9,species:0.5,dep:0.7,trace:"mill",cloud:0.75}},
+  {id:"A07",what:"Cocoa",where:"South Sulawesi, Indonesia",cc:"ID",kind:"agri",exp:11,lat:-3.7,lon:120.1,raw:{loss:1.6,slope:-0.003,stress:2.0,dist:7,species:0.7,dep:0.85,trace:"district",cloud:0.6}},
+  {id:"A08",what:"Rubber",where:"Surat Thani, Thailand",cc:"TH",kind:"agri",exp:20,lat:9.1,lon:99.3,raw:{loss:0.3,slope:0.003,stress:1.6,dist:30,species:0.35,dep:0.6,trace:"plot",cloud:0.65}},
+  {id:"A09",what:"Rice",where:"An Giang, Mekong Delta, Vietnam",cc:"VN",kind:"agri",exp:26,lat:10.5,lon:105.2,raw:{loss:0,slope:-0.002,stress:2.8,dist:40,species:0.3,dep:0.8,trace:"district",cloud:0.7}},
+  {id:"A10",what:"Rice",where:"Central Luzon, Philippines",cc:"PH",kind:"agri",exp:14,lat:15.5,lon:120.9,raw:{loss:0,slope:0.001,stress:2.4,dist:35,species:0.25,dep:0.75,trace:"district",cloud:0.6}},
+  {id:"A11",what:"Beef cattle",where:"Fitzroy basin, Queensland",cc:"AU",kind:"agri",exp:48,lat:-23.4,lon:149.5,raw:{loss:2.6,slope:-0.003,stress:2.2,dist:15,species:0.5,dep:0.2,trace:"plot",cloud:0.9}},
+  {id:"A12",what:"Sugarcane",where:"Burdekin, Queensland (reef catchment)",cc:"AU",kind:"agri",exp:30,lat:-19.6,lon:147.4,raw:{loss:0.1,slope:0.002,stress:2.9,dist:6,species:0.75,dep:0.2,trace:"plot",cloud:0.9}},
+  {id:"A13",what:"Plantation forestry",where:"Gippsland, Victoria",cc:"AU",kind:"agri",exp:22,lat:-38.1,lon:146.5,raw:{loss:0,slope:0.006,stress:1.1,dist:20,species:0.4,dep:0.2,trace:"plot",cloud:0.9}},
+  {id:"A14",what:"Agroforestry coffee",where:"Aceh, Sumatra, Indonesia",cc:"ID",kind:"agri",exp:7,lat:4.6,lon:96.8,raw:{loss:0.1,slope:0.007,stress:1.0,dist:10,species:0.6,dep:0.8,trace:"plot",cloud:0.7}},
+  {id:"A15",what:"Tea estate",where:"Central Highlands, Sri Lanka",cc:"LK",kind:"agri",exp:10,lat:6.95,lon:80.8,raw:{loss:0,slope:0.004,stress:1.4,dist:14,species:0.55,dep:0.7,trace:"plot",cloud:0.7}},
+  {id:"A16",what:"Shrimp aquaculture",where:"Ca Mau, Vietnam (mangrove belt)",cc:"VN",kind:"agri",exp:8,lat:8.9,lon:105.0,raw:{loss:3.0,slope:-0.005,stress:2.5,dist:5,species:0.65,dep:0.85,trace:"district",cloud:0.5}},
+  {id:"A17",what:"Certified palm oil, restoring",where:"Bintulu, Sarawak, Malaysia",cc:"MY",kind:"agri",exp:33,lat:3.35,lon:113.35,raw:{loss:0,slope:0.005,stress:1.0,dist:22,species:0.55,dep:0.4,trace:"plot",cloud:0.7}},
+  {id:"A18",what:"Pulpwood supplier",where:"Riau, Indonesia",cc:"ID",kind:"agri",exp:60,lat:0.2,lon:102.3,raw:{loss:1.8,slope:-0.001,stress:1.7,dist:3,species:0.85,dep:0.5,trace:"mill",cloud:0.55}},
+  {id:"A19",what:"Palm oil estate",where:"Kinabatangan floodplain, Sabah, Malaysia",cc:"MY",kind:"agri",exp:28,lat:5.45,lon:118.15,raw:{loss:0.9,slope:-0.002,stress:1.0,dist:1,species:0.9,dep:0.5,trace:"plot",cloud:0.55}},
+  {id:"A20",what:"Palm oil on peatland",where:"Mukah, Sarawak, Malaysia",cc:"MY",kind:"agri",exp:24,lat:2.85,lon:112.2,raw:{loss:2.4,slope:-0.005,stress:1.1,dist:8,species:0.7,dep:0.5,trace:"mill",cloud:0.5}},
+  {id:"A21",what:"Palm oil estate",where:"Kluang, Johor, Malaysia",cc:"MY",kind:"agri",exp:35,lat:2.03,lon:103.32,raw:{loss:0,slope:-0.001,stress:1.9,dist:20,species:0.4,dep:0.4,trace:"plot",cloud:0.6}},
+  {id:"A22",what:"Palm oil estate",where:"Rompin, Pahang, Malaysia",cc:"MY",kind:"agri",exp:19,lat:2.75,lon:103.4,raw:{loss:1.3,slope:-0.003,stress:1.6,dist:6,species:0.75,dep:0.6,trace:"mill",cloud:0.55}},
+  {id:"A23",what:"Rubber smallholders",where:"Kelantan, Malaysia",cc:"MY",kind:"agri",exp:6,lat:5.55,lon:102.05,raw:{loss:0.6,slope:0.001,stress:1.8,dist:12,species:0.6,dep:0.9,trace:"district",cloud:0.5}},
+  {id:"A24",what:"Highland vegetables & tea",where:"Cameron Highlands, Pahang, Malaysia",cc:"MY",kind:"agri",exp:9,lat:4.5,lon:101.4,raw:{loss:1.9,slope:-0.004,stress:1.3,dist:3,species:0.8,dep:0.7,trace:"district",cloud:0.6}},
+  {id:"A25",what:"Rice",where:"Muda scheme, Kedah, Malaysia",cc:"MY",kind:"agri",exp:15,lat:6.1,lon:100.4,raw:{loss:0,slope:0.001,stress:3.0,dist:30,species:0.3,dep:0.8,trace:"district",cloud:0.7}},
+  {id:"A26",what:"Coastal aquaculture",where:"Matang mangroves, Perak, Malaysia",cc:"MY",kind:"agri",exp:7,lat:4.83,lon:100.62,raw:{loss:0.3,slope:0.002,stress:1.5,dist:1,species:0.7,dep:0.8,trace:"district",cloud:0.6}},
+  {id:"A27",what:"Vertical farm",where:"Lim Chu Kang, Singapore",cc:"SG",kind:"agri",exp:5,lat:1.43,lon:103.71,raw:{loss:0,slope:0,stress:2.5,dist:1,species:0.6,dep:0.1,trace:"plot",cloud:0.6}},
+  // renewables (add-on lens)
+  {id:"R01",what:"Solar farm, 150 MW",where:"Ninh Thuan, Vietnam (beside a national park)",cc:"VN",kind:"renew",exp:70,lat:11.6,lon:108.9,raw:{loss:0,slope:-0.001,stress:3.5,dist:4,species:0.6,dep:0.3,trace:"plot",cloud:0.9}},
+  {id:"R02",what:"Nearshore wind, 120 MW",where:"Bac Lieu, Vietnam (mangrove coast)",cc:"VN",kind:"renew",exp:65,lat:9.2,lon:105.7,raw:{loss:0.6,slope:-0.002,stress:2.6,dist:6,species:0.7,dep:0.5,trace:"plot",cloud:0.85}},
+  {id:"R03",what:"Geothermal, 55 MW",where:"North Sumatra, Indonesia (forest edge)",cc:"ID",kind:"renew",exp:85,lat:2.0,lon:99.0,raw:{loss:0.9,slope:-0.001,stress:1.2,dist:2,species:0.8,dep:0.4,trace:"plot",cloud:0.7}},
+  {id:"R04",what:"Agrivoltaic solar, 40 MW",where:"Central Luzon, Philippines",cc:"PH",kind:"renew",exp:25,lat:15.3,lon:120.7,raw:{loss:0,slope:0.002,stress:2.3,dist:30,species:0.2,dep:0.6,trace:"plot",cloud:0.9}},
+  {id:"R05",what:"Run-of-river hydro, 30 MW",where:"Mindanao, Philippines",cc:"PH",kind:"renew",exp:40,lat:8.0,lon:125.0,raw:{loss:1.4,slope:-0.002,stress:1.3,dist:3,species:0.8,dep:0.7,trace:"plot",cloud:0.7}},
+  {id:"R06",what:"Solar farm, 200 MW",where:"Darling Downs, Queensland (former grazing land)",cc:"AU",kind:"renew",exp:90,lat:-27.5,lon:151.3,raw:{loss:0,slope:0.001,stress:2.0,dist:35,species:0.3,dep:0.1,trace:"plot",cloud:0.95}},
+  {id:"R07",what:"Floating solar on reservoir",where:"Western Singapore",cc:"SG",kind:"renew",exp:45,lat:1.335,lon:103.65,raw:{loss:0,slope:0,stress:2.5,dist:4,species:0.4,dep:0.1,trace:"plot",cloud:0.6}},
+  {id:"R08",what:"Large-scale solar, 50 MW",where:"Perak, Malaysia (former rubber land)",cc:"MY",kind:"renew",exp:30,lat:4.3,lon:101.1,raw:{loss:0,slope:0.002,stress:2.2,dist:15,species:0.35,dep:0.2,trace:"plot",cloud:0.85}},
+  {id:"R09",what:"Hydropower reservoir",where:"Interior Sarawak, Malaysia",cc:"MY",kind:"renew",exp:120,lat:2.2,lon:114.1,raw:{loss:4.5,slope:-0.006,stress:1.0,dist:10,species:0.85,dep:0.7,trace:"plot",cloud:0.6}},
+  {id:"R10",what:"Solar farm, 30 MW",where:"Kota Tinggi, Johor, Malaysia (former palm land)",cc:"MY",kind:"renew",exp:22,lat:1.75,lon:103.9,raw:{loss:0,slope:0.003,stress:1.8,dist:18,species:0.35,dep:0.3,trace:"plot",cloud:0.8}},
+];
+ASSETS.forEach(a=>a.name=(a.kind==="renew"?"Project ":"Borrower ")+a.id);
+const REAL = {"A01":{"id":"A01","lat":0.9,"lon":101.5,"t21":0.277,"t23":0.726,"n19":0.674,"n25":0.781,"n19n":3,"n25n":3,"clear":0.91,"bws":0,"basin":"Siak / Tapung","paKm":35,"paName":"Giam Siak Kecil","paDesig":"Wildlife Reserve","spp":1,"cr":0},"A02":{"id":"A02","lat":-1.7,"lon":113.4,"t21":0.917,"t23":0.835,"n19":0.744,"n25":0.597,"n19n":3,"n25n":3,"clear":0.92,"bws":0,"basin":"Mendawai / Samba","paKm":35,"paName":"Sebangau","paDesig":"National Park","spp":6,"cr":1},"A03":{"id":"A03","lat":4.55,"lon":117.85,"t21":1,"t23":1,"n19":0.85,"n25":0.882,"n19n":3,"n25n":3,"clear":0.95,"bws":0,"basin":"Borneo East Coast","paKm":0,"paName":"Ulu Kalumpang","paDesig":"Forest Reserve","spp":17,"cr":1},"A04":{"id":"A04","lat":-1.75,"lon":103.95,"t21":0.611,"t23":0.817,"n19":0.763,"n25":0.76,"n19n":3,"n25n":3,"clear":0.97,"bws":0,"basin":"Batanghari","paKm":35,"paName":"Berbak","paDesig":"National Park","spp":0,"cr":0},"A05":{"id":"A05","lat":12.8,"lon":107.95,"t21":0.164,"t23":0.117,"n19":0.675,"n25":0.506,"n19n":3,"n25n":3,"clear":0.96,"bws":0,"basin":"Sre Pok","paKm":20,"paName":"Yok Don","paDesig":"National Park","spp":0,"cr":0},"A06":{"id":"A06","lat":11.9,"lon":108.4,"t21":0.807,"t23":0.834,"n19":0.857,"n25":0.83,"n19n":3,"n25n":3,"clear":1,"bws":1.48,"basin":"Saigon","paKm":2,"paName":"Rung Thong Da Lat","paDesig":"Cultural and Historical Site","spp":38,"cr":5},"A07":{"id":"A07","lat":-3.7,"lon":120.1,"t21":0.998,"t23":0.997,"n19":0.741,"n25":0.875,"n19n":3,"n25n":3,"clear":0.81,"bws":2.52,"basin":"Awo","paKm":35,"paName":"Sidrap","paDesig":"Nature Recreation Park","spp":0,"cr":0},"A08":{"id":"A08","lat":9,"lon":99.15,"t21":0.883,"t23":0.828,"n19":0.766,"n25":0.776,"n19n":3,"n25n":3,"clear":1,"bws":0,"basin":"Muang","paKm":35,"paName":"Khlong Saeng","paDesig":"Wildlife Sanctuary","spp":4,"cr":0},"A09":{"id":"A09","lat":10.5,"lon":105.2,"t21":0,"t23":0,"n19":0.715,"n25":0.696,"n19n":3,"n25n":3,"clear":0.87,"bws":0,"basin":"Delta","paKm":35,"paName":"Kien Giang","paDesig":"UNESCO-MAB Biosphere Reserve","spp":1,"cr":0},"A10":{"id":"A10","lat":15.5,"lon":120.9,"t21":0,"t23":0,"n19":0.777,"n25":0.268,"n19n":3,"n25n":3,"clear":0.85,"bws":2.8,"basin":"Angat","paKm":35,"paName":"Mt. Arayat National Park","paDesig":"National Park","spp":2,"cr":0},"A11":{"id":"A11","lat":-23.4,"lon":149.5,"t21":0.028,"t23":0.062,"n19":0.211,"n25":0.29,"n19n":3,"n25n":3,"clear":1,"bws":0,"basin":"Fitzroy","paKm":null,"paName":null,"paDesig":null,"spp":2,"cr":0},"A12":{"id":"A12","lat":-19.6,"lon":147.4,"t21":0.018,"t23":0.02,"n19":0.483,"n25":0.683,"n19n":3,"n25n":3,"clear":0.99,"bws":1.43,"basin":"Haughton","paKm":20,"paName":"Bowling Green Bay","paDesig":"National Park","spp":11,"cr":0},"A13":{"id":"A13","lat":-38.1,"lon":146.5,"t21":0.925,"t23":0.971,"n19":0.711,"n25":0.794,"n19n":3,"n25n":3,"clear":1,"bws":2.77,"basin":"Latrobe","paKm":5,"paName":"Moondarra","paDesig":"State Park","spp":32,"cr":5},"A14":{"id":"A14","lat":4.6,"lon":96.8,"t21":0.575,"t23":0.609,"n19":0.771,"n25":0.738,"n19n":3,"n25n":3,"clear":0.99,"bws":0.26,"basin":"Teunom","paKm":10,"paName":"Lingga Isaq","paDesig":"Hunting Park","spp":7,"cr":2},"A15":{"id":"A15","lat":6.95,"lon":80.8,"t21":0.567,"t23":0.567,"n19":0.661,"n25":0.668,"n19n":3,"n25n":3,"clear":1,"bws":1.65,"basin":"Parangi Aru / Yan Oya","paKm":1,"paName":"Kandapola","paDesig":"Conservation Forest","spp":56,"cr":3},"A16":{"id":"A16","lat":8.9,"lon":105,"t21":0,"t23":0,"n19":null,"n25":null,"n19n":0,"n25n":0,"clear":null,"bws":0,"basin":"Delta","paKm":5,"paName":"Mui Ca Mau","paDesig":"UNESCO-MAB Biosphere Reserve","spp":0,"cr":0},"A17":{"id":"A17","lat":3.35,"lon":113.35,"t21":0.809,"t23":0.939,"n19":0.737,"n25":0.836,"n19n":3,"n25n":3,"clear":0.92,"bws":0,"basin":"Rajang 1","paKm":20,"paName":"Similajau National Park","paDesig":"National Park","spp":18,"cr":1},"A18":{"id":"A18","lat":0.2,"lon":102.3,"t21":0.725,"t23":0.836,"n19":0.63,"n25":0.765,"n19n":3,"n25n":3,"clear":0.9,"bws":0,"basin":"Kamparkiri","paKm":20,"paName":"Kerumutan","paDesig":"Wildlife Reserve","spp":4,"cr":0},"A19":{"id":"A19","lat":5.45,"lon":118.15,"t21":0.796,"t23":0.709,"n19":0.795,"n25":0.78,"n19n":3,"n25n":3,"clear":0.75,"bws":0,"basin":"Lokan / Kinabatangan / Kuamut","paKm":2,"paName":"Lower Kinabatangan","paDesig":"Wildlife Sanctuary","spp":49,"cr":4},"A20":{"id":"A20","lat":2.85,"lon":112.2,"t21":0.673,"t23":0.653,"n19":0.874,"n25":0.831,"n19n":3,"n25n":3,"clear":0.78,"bws":0,"basin":"Rajang 1","paKm":null,"paName":null,"paDesig":null,"spp":7,"cr":1},"A21":{"id":"A21","lat":1.95,"lon":103.18,"t21":0.844,"t23":0.888,"n19":0.729,"n25":0.732,"n19n":3,"n25n":3,"clear":0.84,"bws":0.01,"basin":"Muar","paKm":35,"paName":"Banang","paDesig":"Forest Reserve","spp":10,"cr":0},"A22":{"id":"A22","lat":2.75,"lon":103.4,"t21":0.534,"t23":0.594,"n19":0.556,"n25":0.78,"n19n":3,"n25n":3,"clear":0.83,"bws":0,"basin":"Endau","paKm":10,"paName":"Pontian","paDesig":"Forest Reserve","spp":16,"cr":2},"A23":{"id":"A23","lat":5.55,"lon":102.05,"t21":0.911,"t23":0.85,"n19":0.795,"n25":0.82,"n19n":3,"n25n":3,"clear":0.9,"bws":0,"basin":"Puian / Nenggiri / Yai","paKm":35,"paName":"Jedok","paDesig":"Forest Reserve","spp":2,"cr":0},"A24":{"id":"A24","lat":4.5,"lon":101.4,"t21":0.66,"t23":0.646,"n19":0.674,"n25":0.697,"n19n":2,"n25n":3,"clear":0.84,"bws":0,"basin":"Tasik Bera","paKm":1,"paName":"Gunung Siku, Terla, Batu Gangan, Ulu Bertam, Mentigi, Ringlet","paDesig":"Forest Reserve","spp":52,"cr":5},"A25":{"id":"A25","lat":6.2,"lon":100.3,"t21":0,"t23":0,"n19":0.446,"n25":0.55,"n19n":3,"n25n":3,"clear":0.98,"bws":0.97,"basin":"West Coast 6","paKm":20,"paName":"Sidam Kanan Tuntung Reserve","paDesig":"Wildlife Reserve","spp":7,"cr":0},"A26":{"id":"A26","lat":4.83,"lon":100.62,"t21":0.788,"t23":0.812,"n19":0.755,"n25":0.833,"n19n":3,"n25n":3,"clear":0.79,"bws":0,"basin":"Kurau/Beruas","paKm":20,"paName":"Bukit Larut","paDesig":"Forest Reserve","spp":15,"cr":0},"A27":{"id":"A27","lat":1.43,"lon":103.71,"t21":0.37,"t23":0.399,"n19":0.586,"n25":0.66,"n19n":3,"n25n":3,"clear":0.91,"bws":0.01,"basin":"Muar","paKm":2,"paName":"Sungei Buloh Wetland Reserve","paDesig":"Nature Reserve","spp":94,"cr":14},"R01":{"id":"R01","lat":11.55,"lon":108.85,"t21":0.097,"t23":0.099,"n19":0.489,"n25":0.492,"n19n":3,"n25n":3,"clear":0.98,"bws":0,"basin":"Song Ca Tot","paKm":35,"paName":"Kalon Song Mao","paDesig":"Nature Reserve","spp":2,"cr":0},"R02":{"id":"R02","lat":9.2,"lon":105.7,"t21":0.05,"t23":0.071,"n19":null,"n25":0.169,"n19n":0,"n25n":3,"clear":0.59,"bws":0,"basin":"Delta","paKm":5,"paName":"Bac Lieu Bird Sanctuary","paDesig":"Nature Reserve","spp":0,"cr":0},"R03":{"id":"R03","lat":2,"lon":99,"t21":0.556,"t23":0.565,"n19":0.723,"n25":0.79,"n19n":3,"n25n":3,"clear":0.95,"bws":0,"basin":"Geumapang","paKm":35,"paName":"Dolok Saut","paDesig":"Nature Reserve","spp":2,"cr":1},"R04":{"id":"R04","lat":15.3,"lon":120.7,"t21":0,"t23":0,"n19":0.492,"n25":0.692,"n19n":3,"n25n":3,"clear":0.92,"bws":2.8,"basin":"Angat","paKm":10,"paName":"Mt. Arayat National Park","paDesig":"National Park","spp":0,"cr":0},"R05":{"id":"R05","lat":8,"lon":125,"t21":0.092,"t23":0.062,"n19":0.739,"n25":0.746,"n19n":3,"n25n":3,"clear":0.99,"bws":0.16,"basin":"Pulangi / Banga / Kakal","paKm":10,"paName":"Mt. Kitanglad Range Natural Park","paDesig":"Natural Park","spp":17,"cr":1},"R06":{"id":"R06","lat":-27.5,"lon":151.3,"t21":0,"t23":0,"n19":null,"n25":0.195,"n19n":0,"n25n":3,"clear":0.72,"bws":2.16,"basin":"Condamine / Culgoa","paKm":35,"paName":"Myall Park","paDesig":"Nature Refuge","spp":5,"cr":0},"R07":{"id":"R07","lat":1.335,"lon":103.65,"t21":0.26,"t23":0.269,"n19":0.379,"n25":0.333,"n19n":3,"n25n":3,"clear":0.86,"bws":0.01,"basin":"Muar","paKm":20,"paName":"Bukit Timah Nature Reserve","paDesig":"Nature Reserve","spp":78,"cr":16},"R08":{"id":"R08","lat":4.3,"lon":101.1,"t21":0.262,"t23":0.327,"n19":0.441,"n25":0.521,"n19n":3,"n25n":3,"clear":0.7,"bws":0,"basin":"Kinta","paKm":10,"paName":"Bujang Melaka","paDesig":"Forest Reserve","spp":6,"cr":0},"R09":{"id":"R09","lat":2.2,"lon":114.1,"t21":1,"t23":0.999,"n19":0.816,"n25":0.85,"n19n":3,"n25n":3,"clear":0.81,"bws":0,"basin":"Plieran","paKm":null,"paName":null,"paDesig":null,"spp":1,"cr":0},"R10":{"id":"R10","lat":1.75,"lon":103.9,"t21":0.513,"t23":0.523,"n19":0.62,"n25":0.641,"n19n":3,"n25n":3,"clear":0.81,"bws":0.01,"basin":"Muar","paKm":35,"paName":"Ulu Sedili","paDesig":"Forest Reserve","spp":61,"cr":5}};
+const FETCHED = "28 Oct 2026";
+const REAL2 = {"A01":{"hF":0.95,"hAll":0.9157,"h21":0.0112,"hPeak":2012,"mang":0,"rain":2789,"dryYr":2019,"dryMm":2053,"deficit":26.4},"A02":{"hF":1,"hAll":0.3538,"h21":0.1657,"hPeak":2023,"mang":0,"rain":3010,"dryYr":2002,"dryMm":2049,"deficit":31.9},"A03":{"hF":0.985,"hAll":0.0928,"h21":0,"hPeak":2005,"mang":0,"rain":2452,"dryYr":2002,"dryMm":1614,"deficit":34.2},"A04":{"hF":0.891,"hAll":0.7886,"h21":0.1226,"hPeak":2004,"mang":0,"rain":2366,"dryYr":2002,"dryMm":1370,"deficit":42.1},"A05":{"hF":0.064,"hAll":0.0563,"h21":0.0346,"hPeak":2023,"mang":0,"rain":1087,"dryYr":2014,"dryMm":248,"deficit":77.2},"A06":{"hF":0.713,"hAll":0.0464,"h21":0.004,"hPeak":2017,"mang":0,"rain":1255,"dryYr":2014,"dryMm":562,"deficit":55.2},"A07":{"hF":1,"hAll":0.0555,"h21":0.0009,"hPeak":2003,"mang":0,"rain":2937,"dryYr":2015,"dryMm":2188,"deficit":25.5},"A08":{"hF":0.78,"hAll":0.6309,"h21":0.1803,"hPeak":2017,"mang":0,"rain":2379,"dryYr":2004,"dryMm":1735,"deficit":27.1},"A09":{"hF":0.075,"hAll":0.0005,"h21":0,"hPeak":2018,"mang":0,"rain":1526,"dryYr":2002,"dryMm":917,"deficit":39.9},"A10":{"hF":0.027,"hAll":0.0011,"h21":0,"hPeak":2001,"mang":0,"rain":2778,"dryYr":2001,"dryMm":2016,"deficit":27.4},"A11":{"hF":0.004,"hAll":0.0002,"h21":0,"hPeak":2010,"mang":0,"rain":642,"dryYr":2019,"dryMm":289,"deficit":55.1},"A12":{"hF":0.007,"hAll":0.0002,"h21":0,"hPeak":2011,"mang":0,"rain":836,"dryYr":2001,"dryMm":387,"deficit":53.7},"A13":{"hF":0.909,"hAll":0.3284,"h21":0.0166,"hPeak":2002,"mang":0,"rain":885,"dryYr":2018,"dryMm":555,"deficit":37.3},"A14":{"hF":0.704,"hAll":0.0597,"h21":0.0195,"hPeak":2024,"mang":0,"rain":2908,"dryYr":2019,"dryMm":2082,"deficit":28.4},"A15":{"hF":0.613,"hAll":0.0307,"h21":0.007,"hPeak":2007,"mang":0,"rain":1880,"dryYr":2003,"dryMm":1110,"deficit":40.9},"A16":{"hF":0.006,"hAll":0.0001,"h21":0,"hPeak":2001,"mang":0,"rain":1890,"dryYr":2015,"dryMm":1556,"deficit":17.7},"A17":{"hF":0.747,"hAll":0.4128,"h21":0.0341,"hPeak":2016,"mang":0,"rain":3377,"dryYr":2016,"dryMm":2411,"deficit":28.6},"A18":{"hF":0.994,"hAll":0.942,"h21":0.036,"hPeak":2001,"mang":0,"rain":2622,"dryYr":2019,"dryMm":1910,"deficit":27.1},"A19":{"hF":0.727,"hAll":0.2243,"h21":0.1318,"hPeak":2021,"mang":0,"rain":2871,"dryYr":2015,"dryMm":1987,"deficit":30.8},"A20":{"hF":0.81,"hAll":0.4984,"h21":0.0943,"hPeak":2001,"mang":0,"rain":3578,"dryYr":2005,"dryMm":2699,"deficit":24.6},"A21":{"hF":0.722,"hAll":0.2795,"h21":0.0213,"hPeak":2011,"mang":0,"rain":2674,"dryYr":2019,"dryMm":1914,"deficit":28.4},"A22":{"hF":0.871,"hAll":0.7359,"h21":0.0003,"hPeak":2017,"mang":0,"rain":2695,"dryYr":2019,"dryMm":1980,"deficit":26.5},"A23":{"hF":1,"hAll":0.6281,"h21":0.1617,"hPeak":2018,"mang":0,"rain":2590,"dryYr":2002,"dryMm":1980,"deficit":23.6},"A24":{"hF":0.769,"hAll":0.0829,"h21":0.0133,"hPeak":2014,"mang":0,"rain":2576,"dryYr":2002,"dryMm":2034,"deficit":21},"A25":{"hF":0.386,"hAll":0.0023,"h21":0.0006,"hPeak":2014,"mang":0,"rain":2303,"dryYr":2002,"dryMm":1702,"deficit":26.1},"A26":{"hF":0.832,"hAll":0.4125,"h21":0.0594,"hPeak":2019,"mang":0.7515,"rain":2466,"dryYr":2002,"dryMm":1801,"deficit":27},"A27":{"hF":0.379,"hAll":0.1152,"h21":0.041,"hPeak":2018,"mang":0.0324,"rain":2959,"dryYr":2015,"dryMm":1779,"deficit":39.9},"R01":{"hF":0.01,"hAll":0.027,"h21":0.0042,"hPeak":2002,"mang":0,"rain":1514,"dryYr":2004,"dryMm":822,"deficit":45.7},"R02":{"hF":0.029,"hAll":0.0002,"h21":0,"hPeak":2002,"mang":0.1359,"rain":1907,"dryYr":2015,"dryMm":1435,"deficit":24.7},"R03":{"hF":0.59,"hAll":0.0375,"h21":0.0069,"hPeak":2007,"mang":0,"rain":4096,"dryYr":2004,"dryMm":3273,"deficit":20.1},"R04":{"hF":0.03,"hAll":0.002,"h21":0,"hPeak":2001,"mang":0,"rain":2778,"dryYr":2001,"dryMm":2016,"deficit":27.4},"R05":{"hF":0.346,"hAll":0.0282,"h21":0.0017,"hPeak":2013,"mang":0,"rain":2408,"dryYr":2019,"dryMm":1790,"deficit":25.7},"R06":{"hF":0.001,"hAll":0.0012,"h21":0,"hPeak":2004,"mang":0,"rain":575,"dryYr":2019,"dryMm":161,"deficit":72.1},"R07":{"hF":0.234,"hAll":0.0098,"h21":0.0017,"hPeak":2019,"mang":0,"rain":2959,"dryYr":2015,"dryMm":1779,"deficit":39.9},"R08":{"hF":0.271,"hAll":0.1939,"h21":0.0394,"hPeak":2018,"mang":0,"rain":2576,"dryYr":2002,"dryMm":2034,"deficit":21},"R09":{"hF":0.985,"hAll":0.1086,"h21":0.0002,"hPeak":2018,"mang":0,"rain":3596,"dryYr":2004,"dryMm":2655,"deficit":26.1},"R10":{"hF":0.546,"hAll":0.4155,"h21":0.0423,"hPeak":2002,"mang":0,"rain":2910,"dryYr":2015,"dryMm":1797,"deficit":38.2}};
+Object.keys(REAL2).forEach(id=>Object.assign(REAL[id],REAL2[id]));
+// ERA5 rainfall (replaces NASA POWER, whose recent years break from its own history) + 5-year series
+const TRENDS = {"A01":{"rain":2620,"dryYr":2005,"dryMm":1948,"deficit":25.6,"r5":[2802,2956,3029,3277,2798]},"A02":{"rain":3362,"dryYr":2006,"dryMm":2369,"deficit":29.5,"r5":[4473,4937,4125,4815,4275]},"A03":{"rain":2663,"dryYr":2002,"dryMm":1586,"deficit":40.4,"r5":[3502,4212,3107,3078,3292],"f5":[0,0,0,0,0],"n5":[0.792,0.892,0.89,0.897,0.882]},"A04":{"rain":2649,"dryYr":2015,"dryMm":1966,"deficit":25.8,"r5":[2899,2751,2632,3052,3269]},"A05":{"rain":1421,"dryYr":2004,"dryMm":646,"deficit":54.5,"r5":[1830,2248,2002,1769,2335]},"A06":{"rain":1980,"dryYr":2018,"dryMm":1288,"deficit":34.9,"r5":[2003,1654,1555,1765,2091]},"A07":{"rain":2908,"dryYr":2018,"dryMm":1935,"deficit":33.5,"r5":[2501,2838,2099,2717,2447]},"A08":{"rain":1993,"dryYr":2004,"dryMm":1371,"deficit":31.2,"r5":[2093,2839,1898,2172,2237]},"A09":{"rain":1825,"dryYr":2002,"dryMm":1282,"deficit":29.8,"r5":[2232,2460,2176,2167,2584]},"A10":{"rain":2373,"dryYr":2003,"dryMm":1642,"deficit":30.8,"r5":[2329,3106,2674,2600,3182]},"A11":{"rain":576,"dryYr":2001,"dryMm":303,"deficit":47.4,"r5":[662,905,734,779,715]},"A12":{"rain":1118,"dryYr":2015,"dryMm":355,"deficit":68.2,"r5":[1809,1445,1135,1552,2341]},"A13":{"rain":809,"dryYr":2006,"dryMm":442,"deficit":45.4,"r5":[1187,1203,999,821,989]},"A14":{"rain":2936,"dryYr":2018,"dryMm":2464,"deficit":16.1,"r5":[2871,2812,2806,2781,2579]},"A15":{"rain":2299,"dryYr":2017,"dryMm":1314,"deficit":42.8,"r5":[2101,1607,2217,1790,2522]},"A16":{"rain":2449,"dryYr":2002,"dryMm":1802,"deficit":26.4,"r5":[2482,2845,2712,2618,2487]},"A17":{"rain":3525,"dryYr":2004,"dryMm":2460,"deficit":30.2,"r5":[4097,5710,4073,4213,3768],"f5":[1.01,0.42,0.56,1.99,0.45],"n5":[0.813,0.829,0.827,0.829,0.836]},"A18":{"rain":2603,"dryYr":2006,"dryMm":2173,"deficit":16.5,"r5":[2691,3084,2931,3579,2707]},"A19":{"rain":3002,"dryYr":2004,"dryMm":2271,"deficit":24.4,"r5":[3112,4200,3288,2605,3633],"f5":[2.37,8.86,0.24,4.03,0.05],"n5":[0.809,0.866,0.824,0.783,0.78]},"A20":{"rain":3650,"dryYr":2004,"dryMm":2719,"deficit":25.5,"r5":[3768,4794,3507,4459,3875],"f5":[0.07,8.43,0.83,0.02,0.15],"n5":[0.802,0.822,0.784,0.836,0.831]},"A21":{"rain":2570,"dryYr":2005,"dryMm":1946,"deficit":24.3,"r5":[2884,2797,3001,2879,2209],"f5":[0.59,0.63,0.29,0.59,0.62],"n5":[0.747,0.758,0.588,0.783,0.732]},"A22":{"rain":2734,"dryYr":2002,"dryMm":1554,"deficit":43.2,"r5":[3295,3565,3576,3354,3247],"f5":[0,0.01,0,0,0.02],"n5":[0.733,0.793,0.701,0.733,0.78]},"A23":{"rain":2655,"dryYr":2002,"dryMm":1691,"deficit":36.3,"r5":[3119,3546,3305,3273,2751],"f5":[3.22,1.34,9.83,4.95,0.04],"n5":[0.822,0.806,0.763,0.797,0.82]},"A24":{"rain":2684,"dryYr":2022,"dryMm":2075,"deficit":22.7,"r5":[2862,2075,2082,2240,2086],"f5":[0.22,0.23,0.19,0.53,0.38],"n5":[0.712,0.701,0.699,0.688,0.697]},"A25":{"rain":2387,"dryYr":2002,"dryMm":1482,"deficit":37.9,"r5":[2570,3011,3200,3289,2636],"f5":[0,0,0,0,0.06],"n5":[0.297,0.789,0.485,0.71,0.55]},"A26":{"rain":2699,"dryYr":2005,"dryMm":1901,"deficit":29.6,"r5":[2694,2533,2942,3856,3139],"f5":[3.96,2.29,0.67,1.8,1.18],"n5":[0.784,0.81,0.812,0.829,0.833]},"A27":{"rain":2757,"dryYr":2005,"dryMm":2092,"deficit":24.1,"r5":[3531,3057,3290,3553,2444],"f5":[0.53,0.3,1.25,1.63,0.93],"n5":[0.609,0.624,0.633,0.637,0.66]},"R01":{"rain":1394,"dryYr":2004,"dryMm":826,"deficit":40.7,"r5":[1453,1815,1122,1229,1719]},"R02":{"rain":1993,"dryYr":2004,"dryMm":1586,"deficit":20.4,"r5":[1996,2166,2299,2202,1934]},"R03":{"rain":3132,"dryYr":2022,"dryMm":2520,"deficit":19.5,"r5":[2932,2520,2695,2958,2585]},"R04":{"rain":1950,"dryYr":2003,"dryMm":1334,"deficit":31.6,"r5":[2002,3097,2095,2300,2726]},"R05":{"rain":2890,"dryYr":2004,"dryMm":1638,"deficit":43.3,"r5":[4266,4411,5733,3266,3973]},"R06":{"rain":633,"dryYr":2019,"dryMm":214,"deficit":66.2,"r5":[987,942,569,1073,814]},"R07":{"rain":2618,"dryYr":2005,"dryMm":2092,"deficit":20.1,"r5":[2981,2669,2862,3147,2393],"f5":[0.02,0.12,0.02,0.03,0],"n5":[0.33,0.324,0.311,0.337,0.333]},"R08":{"rain":2715,"dryYr":2005,"dryMm":1325,"deficit":51.2,"r5":[4081,3536,4318,4807,3290],"f5":[0.83,1.85,0.68,1.07,0.33],"n5":[0.513,0.496,0.512,0.524,0.521]},"R09":{"rain":4181,"dryYr":2014,"dryMm":3452,"deficit":17.4,"r5":[4264,4950,3590,4023,3627],"f5":[0.2,0,0,0,0.02],"n5":[0.761,0.827,0.838,0.797,0.85]},"R10":{"rain":2568,"dryYr":2002,"dryMm":1715,"deficit":33.2,"r5":[3845,3404,3295,3347,2637],"f5":[0.85,0.96,1.19,1.97,0.11],"n5":[0.584,0.59,0.629,0.643,0.641]}};
+Object.keys(TRENDS).forEach(id=>Object.assign(REAL[id],TRENDS[id]));
+// merge real nature data into each site; livelihoods and traceability stay sample (partner data)
+ASSETS.forEach(a=>{
+  const R = REAL[a.id]; if(!R) return;
+  a.real = R; a.lat = R.lat; a.lon = R.lon;
+  a.raw.loss = (R.h21||0)*100;
+  a.raw.deficit = R.deficit||0;
+  a.raw.slope = (R.n19!=null && R.n25!=null) ? (R.n25-R.n19)/6 : null;
+  a.raw.stress = R.bws ?? a.raw.stress;
+  a.raw.dist = R.paKm==null ? 60 : R.paKm;
+  a.raw.species = Math.min(1, Math.log1p(R.spp||0)/Math.log1p(60));
+  a.raw.cloud = R.clear ?? 0.5;
+});
+
+
+const SCEN = {
+  base:{label:"Baseline",desc:"Current indicator values. A site is Nature Risk if 2% or more of its area lost tree cover in 2021–2024.",stress:0,slope:0,trigger:2},
+  drought:{label:"Repeat of driest year",desc:"Each site relives its driest year since 2001 from ERA5 rainfall. Water stress rises by up to 2 points and vegetation trend falls in proportion to that year's rainfall deficit.",site:true,stress:0,slope:0,trigger:2},
+  defor:{label:"Stricter deforestation rule",desc:"Buyers and regulators tighten deforestation-free sourcing: any site where 0.5% or more of the area lost tree cover in 2021–2024 becomes Nature Risk.",stress:0,slope:0,trigger:0.5},
+};
+const WEIGHTS = {forest:0.30,vegetation:0.20,water:0.20,biodiversity:0.20,livelihood:0.10};
+const SUBNAME = {forest:"Forest integrity",vegetation:"Vegetation trend",water:"Water security",biodiversity:"Biodiversity",livelihood:"Livelihoods"};
+const LABELNAME = {risk:"Nature Risk",stable:"Nature Stable",gain:"Nature Gain"};
+const COLORS = {risk:"var(--risk)",stable:"var(--stable)",gain:"var(--gain)"};
+const clamp = (v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+
+function subScores(r){
+  return {
+    forest: clamp(100 - r.loss*12),
+    vegetation: r.slope==null ? 50 : clamp(55 + r.slope*2500),
+    water: clamp(100 - r.stress*20),
+    biodiversity: clamp(Math.min(r.dist,50)/50*60 + (1-r.species)*40),
+    livelihood: clamp(100 - r.dep*70),
+  };
+}
+function evaluate(asset,scenKey){
+  const s = SCEN[scenKey];
+  const dS = s.site ? Math.min(2,(asset.raw.deficit||0)/20) : s.stress, dV = s.site ? -0.0002*(asset.raw.deficit||0) : s.slope;
+  const r = {...asset.raw, stress:Math.min(5,asset.raw.stress+dS), slope:asset.raw.slope==null?null:asset.raw.slope+dV};
+  const subs = subScores(r);
+  const score = Object.keys(WEIGHTS).reduce((t,k)=>t+subs[k]*WEIGHTS[k],0);
+  let label, reason;
+  if (r.loss >= s.trigger){ label="risk"; reason="trigger"; }
+  else if (score < 45){ label="risk"; reason="score"; }
+  else if (score >= 62 && r.slope != null && r.slope > 0 && r.loss < 0.5){ label="gain"; reason="score"; }
+  else { label="stable"; reason="score"; }
+  const confVal = 0.6*{plot:1,mill:0.6,district:0.35}[r.trace] + 0.4*r.cloud;
+  const conf = confVal>=0.75?"High":confVal>=0.5?"Medium":"Low";
+  let bps = 0;
+  if (label==="risk") bps = Math.min(60, 25 + Math.round(Math.max(0,60-score)*0.8));
+  if (label==="gain") bps = -Math.min(20, 10 + Math.round((score-62)*0.5));
+  const weakest = Object.keys(subs).reduce((a,b)=>subs[a]<=subs[b]?a:b);
+  const greenOnGreen = asset.kind==="renew" && (label==="risk" || subs.biodiversity<40);
+  return {r,subs,score,label,reason,conf,bps,weakest,greenOnGreen};
+}
+
+// ---------- state ----------
+let state = {screen:"desk", book:"agri", region:"all", scen:"base", filter:"all", sel:"A01", zoom:"all", nsel:"A19"};
+try{ const saved = JSON.parse(localStorage.getItem("nrd-state5")||"null"); if(saved) state = {...state, ...saved}; }catch(e){}
+function fromHash(){
+  if (location.hash==="#nature-map") state.screen="map";
+  else if (location.hash==="#architecture") state.screen="arch";
+  else if (location.hash==="#lender-desk") state.screen="desk";
+}
+fromHash();
+const save = ()=>{ try{ localStorage.setItem("nrd-state5", JSON.stringify(state)); }catch(e){} };
+const fmtM = v=>"$"+(Math.round(v*10)/10).toLocaleString("en-US")+"m";
+const fmtBps = v=> v===0 ? "0" : (v>0?"+":"−")+Math.abs(v);
+const isMYSG = a=> a.cc==="MY"||a.cc==="SG";
+const short = l=>LABELNAME[l].replace("Nature ","");
+const place = a=> a.where.split(" (")[0];
+
+// ---------- shared pieces ----------
+function evidence(a,r){
+  const R=a.real, pct=x=>Math.round(x*100)+"%";
+  const pa = R.paKm==null ? "None within 50 km" : R.paKm===0 ? `Inside ${R.paName}` : `Within ${R.paKm} km · ${R.paName}`;
+  const veg = R.n19==null || R.n25==null ? "Not enough cloud-free scenes" : `${R.n19.toFixed(2)} → ${R.n25.toFixed(2)}`;
+  return [
+    ["Forest loss 2021–2024", `${(R.h21*100).toFixed(1)}% of area`, `Hansen/UMD Global Forest Change v1.12 · 30 m · 4 km box · ${Math.round(R.hF*100)}% forest in 2000${R.hAll>0.005?" · worst year "+R.hPeak:""}`, true],
+    ["Vegetation (NDVI) 2019 → 2025", veg, `Sentinel-2 L2A, cloud-masked · median of clear scenes · 2 km box · ${Math.round((R.clear||0)*100)}% clear`, true],
+    ["Baseline water stress", `${(R.bws??0).toFixed(1)} / 5`, "WRI Aqueduct baseline water stress · sub-basin", true],
+    ["Protected area", pa, `WDPA, UNEP-WCMC${R.paDesig?" · "+R.paDesig:""}`, true],
+    ["Threatened species", `${R.spp} species (${R.cr} critically endangered)`, "GBIF records with IUCN CR, EN or VU status · 10 km radius", true],
+    ["Mangrove cover 2021", `${(R.mang*100).toFixed(1)}%`, "ESA WorldCover 10 m · mangrove class · 4 km box", true],
+    ["Rainfall", `${R.rain.toLocaleString("en-US")} mm/yr · driest ${R.dryYr}: ${R.deficit}% below`, "ERA5 reanalysis via Open-Meteo · daily 2001–2025 · ~25 km", true],
+    ["Livelihood dependence", `${Math.round(r.dep*100)}%`, "Partner survey or agri census", false],
+    ["Traceability", r.trace==="plot"?"Plot":r.trace==="mill"?"Mill":"District", "Supply-chain data", false],
+  ];
+}
+function facts(a,e){
+  const r=e.r, R=a.real, out=[];
+  out.push(r.loss>=2?`${r.loss.toFixed(1)}% of the area lost tree cover in 2021–2024.`:r.loss>=0.5?`Small tree cover loss in 2021–2024 (${r.loss.toFixed(1)}% of area).`:"No material tree cover loss in 2021–2024.");
+  out.push(r.slope==null?"Not enough cloud-free imagery to measure vegetation trend.":r.slope>0.005?"Vegetation is greener than in 2019.":r.slope<-0.005?"Vegetation is less green than in 2019.":"Vegetation is about the same as in 2019.");
+  out.push(r.stress>=3?"High water stress.":r.stress>=2?"Medium-high water stress.":r.stress>=1?"Low to medium water stress.":"Low water stress.");
+  if (R.paKm===0) out.push(`Inside ${R.paName} (${R.paDesig}).`);
+  else if (R.paKm!=null && R.paKm<=5) out.push(`Within ${R.paKm} km of ${R.paName} (${R.paDesig}).`);
+  if (R.mang>=0.05) out.push(`${Math.round(R.mang*100)}% of the area is mangrove.`);
+  if (R.deficit>=35) out.push(`Drought-prone: ${R.dryYr} rainfall was ${R.deficit}% below average.`);
+  if (R.spp>=15) out.push(`${R.spp} threatened species recorded within 10 km${R.cr?`, ${R.cr} critically endangered`:""}.`);
+  return out;
+}
+function spark(vals, years, kind, opt={}){
+  const W=148,H=34,P=4, ok=vals.filter(v=>v!=null);
+  if (!ok.length) return "";
+  const lo = kind==="bar" ? 0 : Math.min(...ok, opt.ref ?? Infinity), hi = Math.max(...ok, opt.ref ?? -Infinity, opt.minHi ?? 0);
+  const span = (hi-lo)||1, x=i=>P+i*(W-2*P)/(vals.length-1), y=v=>H-2-(v-lo)/span*(H-6);
+  let g="";
+  if (opt.ref!=null) g+=`<line x1="0" x2="${W}" y1="${y(opt.ref).toFixed(1)}" y2="${y(opt.ref).toFixed(1)}" stroke="var(--border)" stroke-dasharray="3 3"/>`;
+  if (kind==="bar"){
+    const bw=(W-2*P)/vals.length-6;
+    vals.forEach((v,i)=>{ if(v==null) return; const cx=P+i*(W-2*P)/vals.length+3; const h=Math.max(1,(v-lo)/span*(H-6)); g+=`<rect x="${cx.toFixed(1)}" y="${(H-2-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${opt.color(v)}"><title>${years[i]}: ${opt.fmt(v)}</title></rect>`; });
+  } else {
+    const pts=vals.map((v,i)=>v==null?null:[x(i),y(v)]).filter(Boolean);
+    g+=`<polyline points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>`;
+    vals.forEach((v,i)=>{ if(v==null) return; const last=i===vals.length-1; g+=`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${last?3:2}" fill="${last?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="1.5"><title>${years[i]}: ${opt.fmt(v)}</title></circle>`; });
+  }
+  g+=`<text class="ax" x="0" y="${H+10}">${years[0]}</text><text class="ax" x="${W}" y="${H+10}" text-anchor="end">${years[years.length-1]}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H+10}" role="img" aria-label="${opt.label}">${g}</svg>`;
+}
+function bigChart(vals, years, kind, o){
+  const W=o.W||380,H=o.H||220,L=44,R=10,T=22,B=26, iw=W-L-R, ih=H-T-B;
+  const ok=vals.filter(v=>v!=null);
+  let lo = kind==="bar" ? 0 : Math.min(...ok), hi = Math.max(...ok, o.ref ?? -Infinity, o.minHi ?? -Infinity);
+  if (kind!=="bar"){ const pad=Math.max((hi-lo)*0.25,0.02); lo=Math.max(0,lo-pad); hi=hi+pad; }
+  else hi=hi*1.15||1;
+  const y=v=>T+ih-(v-lo)/(hi-lo)*ih, slot=iw/vals.length, cx=i=>L+slot*(i+0.5);
+  let g="";
+  for (let k=0;k<=3;k++){ const v=lo+(hi-lo)*k/3, yy=y(v); g+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}"/><text class="axl" x="${L-6}" y="${(yy+4).toFixed(1)}" text-anchor="end">${o.tick(v)}</text>`; }
+  if (o.ref!=null){ const yy=y(o.ref); g+=`<line x1="${L}" x2="${W-R}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="var(--ink)" stroke-dasharray="4 4" stroke-width="1.2"/>`; }
+  years.forEach((yr,i)=>{ g+=`<text class="axl" x="${cx(i).toFixed(1)}" y="${H-6}" text-anchor="middle">${yr}</text>`; });
+  if (kind==="bar"){
+    const bw=Math.min(40,slot*0.56);
+    vals.forEach((v,i)=>{ if(v==null) return; const top=y(v), h=Math.max(1.5,T+ih-top);
+      g+=`<rect x="${(cx(i)-bw/2).toFixed(1)}" y="${(T+ih-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${o.color(v)}"><title>${years[i]}: ${o.fmt(v)}</title></rect>`;
+      g+=`<text class="vl" x="${cx(i).toFixed(1)}" y="${(T+ih-h-5).toFixed(1)}" text-anchor="middle">${o.lab(v)}</text>`; });
+  } else {
+    const pts=vals.map((v,i)=>v==null?null:[cx(i),y(v)]).filter(Boolean);
+    g+=`<polygon points="${pts[0][0]},${T+ih} ${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")} ${pts[pts.length-1][0]},${T+ih}" fill="var(--accent)" opacity=".1"/>`;
+    g+=`<polyline points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/>`;
+    vals.forEach((v,i)=>{ if(v==null) return; const last=i===vals.length-1;
+      g+=`<circle cx="${cx(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${last?5:4}" fill="${last?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"><title>${years[i]}: ${o.fmt(v)}</title></circle>`;
+      g+=`<text class="vl" x="${cx(i).toFixed(1)}" y="${(y(v)-12).toFixed(1)}" text-anchor="middle" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${o.lab(v)}</text>`; });
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label}">${g}</svg>`;
+}
+function trendPanel(a){
+  const R=a.real;
+  if(!R || !R.f5) return `<div class="thead"><h2>Last 5 years</h2></div><p class="muted">No yearly series for this site yet.</p>`;
+  const fy=[2020,2021,2022,2023,2024], y5=[2021,2022,2023,2024,2025];
+  const fTot=R.f5.reduce((t,v)=>t+v,0), peak=fy[R.f5.indexOf(Math.max(...R.f5))];
+  const n0=R.n5.find(v=>v!=null), n1=[...R.n5].reverse().find(v=>v!=null), nd=n1-n0;
+  const rDiff=Math.round((R.r5[4]/R.rain-1)*100), below=R.r5.filter(v=>v<R.rain).length;
+  const fc=v=> v>=2?"var(--risk)":v>=0.5?"var(--stable)":"var(--gain)";
+  return `<div class="thead"><h2>Last 5 years · ${place(a).split(",")[0]}</h2><span class="bmeta">Yearly values from public open data <span class="dp real">Real</span></span></div>
+  <div class="trendgrid">
+    <div class="tchart"><h3>Forest loss per year</h3>
+      <p class="tsum"><b>${fTot.toFixed(1)}%</b> of the area lost tree cover in 2020–2024${fTot>0.05?`, worst in <b>${peak}</b>`:""}.</p>
+      ${bigChart(R.f5,fy,"bar",{color:fc,minHi:1,tick:v=>v.toFixed(v<10?1:0)+"%",lab:v=>v.toFixed(1),fmt:v=>v.toFixed(2)+"% of area",label:"Forest loss per year, 2020 to 2024"})}
+      <p class="src">Hansen/UMD Global Forest Change v1.12 · 30 m · % of 4 km box</p></div>
+    <div class="tchart"><h3>Vegetation health (NDVI)</h3>
+      <p class="tsum"><b>${n0.toFixed(2)} → ${n1.toFixed(2)}</b>, ${Math.abs(nd)<0.02?"broadly flat":nd>0?"greener":"less green"} since 2021.</p>
+      ${bigChart(R.n5,y5,"line",{tick:v=>v.toFixed(2),lab:v=>v.toFixed(2),fmt:v=>v.toFixed(3),label:"NDVI, 2021 to 2025"})}
+      <p class="src">Sentinel-2 L2A, cloud-masked · median of clear scenes per year</p></div>
+    <div class="tchart wide"><h3>Rainfall vs long-term average</h3>
+      <p class="tsum">2025 was <b>${rDiff>=0?"+":""}${rDiff}%</b> vs the 2001–2025 average of <b>${R.rain.toLocaleString("en-US")} mm</b> (dashed line)${below?`; ${below} of 5 years below it`:""}.</p>
+      ${bigChart(R.r5,y5,"bar",{W:780,H:220,ref:R.rain,refLabel:`avg ${R.rain.toLocaleString("en-US")}`,color:v=>v<R.rain*0.85?"var(--stable)":"var(--accent)",tick:v=>(v/1000).toFixed(1)+"k",lab:v=>(v/1000).toFixed(1)+"k",fmt:v=>v.toLocaleString("en-US")+" mm",label:"Annual rainfall 2021 to 2025 against the long-term average"})}
+      <p class="src">ERA5 reanalysis via Open-Meteo · mm per year</p></div>
+  </div>`;
+}
+function trends(a){
+  const R=a.real; if(!R || !R.f5) return "";
+  const fy=[2020,2021,2022,2023,2024], y5=[2021,2022,2023,2024,2025];
+  const fTot=R.f5.reduce((t,v)=>t+v,0);
+  const n0=R.n5.find(v=>v!=null), n1=[...R.n5].reverse().find(v=>v!=null);
+  const rLast=R.r5[4], rDiff=Math.round((rLast/R.rain-1)*100);
+  const fc=v=> v>=2?"var(--risk)":v>=0.5?"var(--stable)":"var(--gain)";
+  return `<div class="trends">
+    <div class="trendhead"><span class="label">Last 5 years</span><span class="tag real">Real</span></div>
+    <div class="trend"><span class="tname">Forest loss per year</span>${spark(R.f5,fy,"bar",{color:fc,fmt:v=>v.toFixed(1)+"% of area",minHi:2,label:"Forest loss per year 2020 to 2024"})}<span class="tval num">${fTot.toFixed(1)}% in 5 years · peak ${fy[R.f5.indexOf(Math.max(...R.f5))]}</span></div>
+    <div class="trend"><span class="tname">Vegetation (NDVI)</span>${spark(R.n5,y5,"line",{fmt:v=>v.toFixed(2),label:"NDVI 2021 to 2025"})}<span class="tval num">${n0.toFixed(2)} → ${n1.toFixed(2)}</span></div>
+    <div class="trend"><span class="tname">Rainfall vs average</span>${spark(R.r5,y5,"bar",{ref:R.rain,color:v=>v<R.rain*0.85?"var(--stable)":"var(--accent)",fmt:v=>v.toLocaleString("en-US")+" mm",label:"Annual rainfall 2021 to 2025 against the 2001 to 2025 average"})}<span class="tval num">2025: ${rDiff>=0?"+":""}${rDiff}% vs ${R.rain.toLocaleString("en-US")} mm avg</span></div>
+  </div>`;
+}
+function verdict(a,e){
+  const base = evaluate(a,"base");
+  const scen = state.scen==="base" ? "" :
+    `<p class="scenline">${SCEN[state.scen].label}: ${base.score.toFixed(0)} → ${e.score.toFixed(0)}${base.label!==e.label?` · was ${short(base.label)}`:""}</p>`;
+  return `<div class="verdict"><span class="score" style="color:${COLORS[e.label]}">${e.score.toFixed(0)}</span><span class="pill ${e.label}">${LABELNAME[e.label]}</span><span class="conf">${e.conf} confidence<span class="dp sample" title="Uses sample supply-chain traceability">Sample</span></span></div>${scen}`;
+}
+function bars(e){
+  const c = v=> v<45?"var(--risk)":v<62?"var(--stable)":"var(--gain)";
+  return `<div class="bars">${Object.keys(WEIGHTS).map(k=>`<div class="bar"><span>${SUBNAME[k]}${k==="livelihood"?`<span class="dp sample" title="Sample value: needs partner survey data">Sample</span>`:""}</span><span class="track"><span style="width:${e.subs[k]}%;background:${c(e.subs[k])}"></span></span><span class="num" style="text-align:right">${e.subs[k].toFixed(0)}</span></div>`).join("")}</div>`;
+}
+function evidenceBlock(a,e){
+  return `<details><summary>Evidence trail · 7 real, 2 sample</summary><div style="margin-top:6px">${evidence(a,e.r).map(([k,v,s,real])=>`<div class="ev"><span>${k}<span class="tag ${real?"real":""}">${real?"Real":"Sample"}</span></span><span class="num">${v}</span><span class="src">${s}${real?" · retrieved "+FETCHED:""}</span></div>`).join("")}</div></details>`;
+}
+
+// ---------- page 1: lender desk ----------
+function action(a,e){
+  let t;
+  if (e.label==="risk" && e.reason==="trigger") t = `Price ${fmtBps(e.bps)} bps. Require a time-bound no-deforestation plan with plot-level geolocation before renewal.`;
+  else if (e.label==="risk") t = `Price ${fmtBps(e.bps)} bps. Add a covenant on ${SUBNAME[e.weakest].toLowerCase()}, reviewed annually.`;
+  else if (e.label==="gain") t = `Eligible for a ${Math.abs(e.bps)} bps sustainability-linked step-down while the Gain label holds.`;
+  else t = `Hold pricing. Monitor quarterly and engage on ${SUBNAME[e.weakest].toLowerCase()}.`;
+  if (e.conf==="Low") t += " Request plot-level data first: confidence is low.";
+  if (e.greenOnGreen) t += " Green-on-green: ask for a biodiversity plan and siting review before drawdown.";
+  return t;
+}
+function note(a,e){
+  const top = Object.keys(e.subs).sort((p,q)=>e.subs[p]-e.subs[q]).slice(0,2);
+  return e.reason==="trigger"
+    ? `${e.r.loss.toFixed(1)}% of the area lost tree cover in 2021–2024, above the ${SCEN[state.scen].trigger}% trigger.`
+    : `Weakest areas: ${SUBNAME[top[0]].toLowerCase()} (${e.subs[top[0]].toFixed(0)}) and ${SUBNAME[top[1]].toLowerCase()} (${e.subs[top[1]].toFixed(0)}).`;
+}
+function renderDesk(){
+  document.getElementById("book-select").value = state.book;
+  document.getElementById("region-select").value = state.region;
+  const book = ASSETS.filter(a=>a.kind===state.book && (state.region==="all" || isMYSG(a)));
+  const evals = book.map(a=>({a, e:evaluate(a,state.scen), b:evaluate(a,"base")}));
+  const total = book.reduce((t,a)=>t+a.exp,0);
+  const by = {risk:0,stable:0,gain:0}; evals.forEach(x=>by[x.e.label]+=x.a.exp);
+  const baseRisk = evals.filter(x=>x.b.label==="risk").reduce((t,x)=>t+x.a.exp,0);
+  const moved = evals.filter(x=>x.e.label==="risk" && x.b.label!=="risk").length;
+  const wbps = total ? evals.reduce((t,x)=>t+x.e.bps*x.a.exp,0)/total : 0;
+  const mb = document.getElementById("mixbar");
+  mb.innerHTML = ["risk","stable","gain"].map(k=>`<span style="width:${total?by[k]/total*100:0}%;background:${COLORS[k]}"></span>`).join("");
+  mb.setAttribute("aria-label", ["risk","stable","gain"].map(k=>`${LABELNAME[k]} ${total?Math.round(by[k]/total*100):0}%`).join(", "));
+  document.getElementById("mixkeys").innerHTML = ["risk","stable","gain"].map(k=>`<span><i style="background:${COLORS[k]}"></i>${short(k)} <span class="num">${total?Math.round(by[k]/total*100):0}%</span></span>`).join("");
+  document.getElementById("s-total").textContent = fmtM(total);
+  document.getElementById("s-count").textContent = `${book.length} ${state.book==="renew"?"projects":"loans"}`;
+  document.getElementById("s-risk").textContent = fmtM(by.risk);
+  const rs = document.getElementById("s-riskshare");
+  if (state.scen!=="base" && by.risk>baseRisk){ rs.textContent = `+${fmtM(by.risk-baseRisk)} · ${moved} moved in`; rs.className="sub up"; }
+  else { rs.textContent = `${total?Math.round(by.risk/total*100):0}% of book`; rs.className="sub"; }
+  document.getElementById("s-bps").textContent = fmtBps(Math.round(wbps*10)/10);
+
+  const shown = evals.filter(x=>state.filter==="all" || x.e.label===state.filter).sort((p,q)=>q.a.exp-p.a.exp);
+  if (!book.some(a=>a.id===state.sel)) state.sel = [...evals].sort((p,q)=>q.a.exp-p.a.exp)[0].a.id;
+  document.getElementById("rows").innerHTML = shown.length ? shown.map(({a,e,b})=>`
+    <tr tabindex="0" data-id="${a.id}" aria-selected="${a.id===state.sel}">
+      <td><div class="bname">${a.what}</div><div class="bmeta">${place(a)}</div></td>
+      <td class="r num">${fmtM(a.exp)}</td>
+      <td><span class="dot"><i style="background:${COLORS[e.label]}"></i>${short(e.label)}${e.label!==b.label?` <span class="was">was ${short(b.label)}</span>`:""}</span></td>
+      <td class="r num">${e.score.toFixed(0)}</td>
+      <td class="r num">${fmtBps(e.bps)}</td>
+    </tr>`).join("") : `<tr><td colspan="5" class="muted">No loans with this label in this scenario.</td></tr>`;
+  document.querySelectorAll("#rows tr[data-id]").forEach(tr=>{
+    const pick=()=>{state.sel=tr.dataset.id; render();};
+    tr.addEventListener("click",pick);
+    tr.addEventListener("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pick();} });
+  });
+  const a = book.find(x=>x.id===state.sel), e = evaluate(a,state.scen);
+  document.getElementById("detail").innerHTML = `
+    <div class="chead"><span class="label">${a.name} · ${fmtM(a.exp)}<span class="dp sample" title="Fictional borrower and exposure">Sample</span></span><h2>${a.what}</h2><span class="bmeta" style="white-space:normal">${a.where}</span></div>
+    ${verdict(a,e)}
+    ${e.greenOnGreen?'<span class="flag">Green-on-green: good for climate, risky for nature</span>':""}
+    <div class="action"><span class="label">Suggested action<span class="dp sample" title="Illustrative rule, not real credit policy">Sample</span></span><br>${action(a,e)}</div>
+    <p class="note muted">${note(a,e)}</p>
+    ${bars(e)}
+    ${evidenceBlock(a,e)}`;
+}
+
+// ---------- page 2: nature map ----------
+const K=100, TOP=7.5;
+function proj(lon,lat){ return lon<108 ? [(lon-99.5)*K,(TOP-lat)*K] : [560+(lon-109.6)*K,(TOP-lat)*K]; }
+const VIEWS = {all:[-10,-10,1560,690], pen:[-5,-10,535,690], sg:[392,582,92,62], bor:[555,-10,995,690]};
+let vbNow = [...(VIEWS[state.zoom]||VIEWS.all)];
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const mapSites = ()=> ASSETS.filter(isMYSG);
+function inView(a,vb){ const [x,y]=proj(a.lon,a.lat); return x>=vb[0]&&x<=vb[0]+vb[2]&&y>=vb[1]&&y<=vb[1]+vb[3]; }
+
+function drawBase(){
+  const svg = document.getElementById("map");
+  const SHOW = new Set(["Sabah","Sarawak","Johor","Pahang","Perak","Kelantan","Terengganu","Kedah","Selangor"]);
+  const land = GEO.map(g=>`<path class="land ${g.c==="MYS"||g.c==="SGP"?"home":""}" d="${g.d}"></path>`).join("");
+  const st = GEO.filter(g=>g.c==="MYS" && SHOW.has(g.n)).map(g=>`<text class="lbl" data-fs="11" x="${g.lx}" y="${g.ly}">${g.n}</text>`).join("");
+  const ctx = [["THAILAND",100.9,7.15,11],["INDONESIA",101.6,1.0,11],["INDONESIA",114.0,1.2,11],["BRUNEI",114.65,4.25,10],["SINGAPORE",103.82,1.24,9]].map(([t,lon,lat,fs])=>{const [x,y]=proj(lon,lat);return `<text class="lbl country" data-fs="${fs}" x="${x}" y="${y}">${t}</text>`;}).join("");
+  svg.innerHTML = `<rect x="-3000" y="-3000" width="8000" height="8000" fill="var(--sea)"/><g>${land}</g><line class="gapline" x1="540" y1="-2000" x2="540" y2="3000"/><g id="labels">${st}${ctx}</g><g id="pins"></g>`;
+}
+function ppu(){ const b = document.getElementById("map").getBoundingClientRect(); return (b.width&&b.height) ? Math.min(b.width/vbNow[2], b.height/vbNow[3]) : 0.5; }
+function setViewBox(vb){
+  vbNow = vb;
+  const svg = document.getElementById("map");
+  svg.setAttribute("viewBox", vb.map(v=>v.toFixed(2)).join(" "));
+  const u = 1/ppu();
+  svg.querySelectorAll("#labels text").forEach(t=>{
+    t.setAttribute("font-size",((+t.dataset.fs||11)*u).toFixed(3));
+    t.style.display = (vbNow[2]<150 && t.textContent!=="SINGAPORE" && t.textContent!=="Johor" && !(vbNow[0]<+t.getAttribute("x") && +t.getAttribute("x")<vbNow[0]+vbNow[2])) ? "none" : "";
+  });
+  drawPins();
+  syncZoomButtons();
+}
+let animId=0;
+function animateTo(to){
+  cancelAnimationFrame(animId);
+  const from=[...vbNow];
+  if (reduceMotion){ setViewBox([...to]); return; }
+  const t0=performance.now(), dur=480;
+  const step=now=>{ const t=Math.min(1,(now-t0)/dur), k=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; setViewBox(from.map((f,i)=>f+(to[i]-f)*k)); if(t<1) animId=requestAnimationFrame(step); };
+  animId=requestAnimationFrame(step);
+}
+function syncZoomButtons(){
+  document.querySelectorAll("[data-zoom]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.zoom===state.zoom)));
+  const zin=document.getElementById("zm-in"), zout=document.getElementById("zm-out");
+  if (zin) zin.disabled = vbNow[2] <= MIN_W+0.5;
+  if (zout) zout.disabled = vbNow[2] >= MAX_W-0.5;
+  const zr=document.getElementById("zm-reset"); if (zr) zr.disabled = state.zoom==="all" && Math.abs(vbNow[2]-VIEWS.all[2])<1;
+}
+const MIN_W=90, MAX_W=1600;
+function mapAspect(){ const b=document.getElementById("map").getBoundingClientRect(); return (b.width&&b.height)? b.height/b.width : 0.55; }
+function zoomTo(key){
+  state.zoom = key;
+  const vis = mapSites().filter(a=>inView(a,VIEWS[key]));
+  const cur = mapSites().find(a=>a.id===state.nsel);
+  if (vis.length && (!cur || !inView(cur,VIEWS[key]))) state.nsel = vis[0].id;
+  animateTo(VIEWS[key]);
+}
+function zoomToSite(a, w=Math.min(400, Math.max(vbNow[2]*0.6, 0))){
+  if (vbNow[2] <= 400) { w = vbNow[2]; }
+  const [x,y]=proj(a.lon,a.lat), h=w*mapAspect();
+  state.zoom="custom";
+  animateTo([x-w/2, y-h/2, w, h]);
+}
+function zoomBy(f, cx, cy){
+  const w=Math.max(MIN_W, Math.min(MAX_W, vbNow[2]*f)), k=w/vbNow[2];
+  if (cx==null){ cx=vbNow[0]+vbNow[2]/2; cy=vbNow[1]+vbNow[3]/2; }
+  state.zoom="custom";
+  animateTo([cx-(cx-vbNow[0])*k, cy-(cy-vbNow[1])*k, w, vbNow[3]*k]);
+}
+function clientToMap(ev){
+  const svg=document.getElementById("map"), b=svg.getBoundingClientRect(), u=1/ppu();
+  // account for letterboxing from preserveAspectRatio="xMidYMid meet"
+  const ox=(b.width - vbNow[2]/u)/2, oy=(b.height - vbNow[3]/u)/2;
+  return [vbNow[0]+(ev.clientX-b.left-ox)*u, vbNow[1]+(ev.clientY-b.top-oy)*u];
+}
+let dragged=false;
+function initMapControls(){
+  const svg=document.getElementById("map");
+  document.getElementById("zm-in").addEventListener("click",()=>{ zoomBy(0.6); });
+  document.getElementById("zm-out").addEventListener("click",()=>{ zoomBy(1/0.6); });
+  document.getElementById("zm-reset").addEventListener("click",()=>{ zoomTo("all"); renderMap(); save(); });
+  svg.addEventListener("wheel",ev=>{ if(!(ev.ctrlKey||ev.metaKey)) return; ev.preventDefault(); const [x,y]=clientToMap(ev); cancelAnimationFrame(animId); const f=Math.exp(ev.deltaY*0.01); const w=Math.max(MIN_W,Math.min(MAX_W,vbNow[2]*f)), k=w/vbNow[2]; state.zoom="custom"; setViewBox([x-(x-vbNow[0])*k, y-(y-vbNow[1])*k, w, vbNow[3]*k]); },{passive:false});
+  svg.addEventListener("dblclick",ev=>{ const [x,y]=clientToMap(ev); zoomBy(0.6,x,y); });
+  let start=null;
+  svg.addEventListener("pointerdown",ev=>{ if(ev.button!==0) return; start={x:ev.clientX,y:ev.clientY,vb:[...vbNow]}; dragged=false; });
+  window.addEventListener("pointermove",ev=>{ if(!start) return; const dx=ev.clientX-start.x, dy=ev.clientY-start.y; if(!dragged && Math.hypot(dx,dy)<4) return; if(!dragged){ dragged=true; cancelAnimationFrame(animId); svg.classList.add("dragging"); } const u=1/ppu(); state.zoom="custom"; setViewBox([start.vb[0]-dx*u, start.vb[1]-dy*u, start.vb[2], start.vb[3]]); });
+  window.addEventListener("pointerup",()=>{ if(start){ start=null; svg.classList.remove("dragging"); if(dragged) save(); setTimeout(()=>{dragged=false;},0); } });
+}
+function drawPins(){
+  const g = document.getElementById("pins"); if(!g) return;
+  const u = 1/ppu(), r = 6.5*u;
+  const sites = mapSites();
+  g.innerHTML = sites.map(a=>{
+    const e = evaluate(a,state.scen), [x,y] = proj(a.lon,a.lat), sel = a.id===state.nsel;
+    const mark = a.kind==="renew"
+      ? `<path class="mark" d="M${x},${y-r*1.3}L${x+r*1.3},${y}L${x},${y+r*1.3}L${x-r*1.3},${y}Z" fill="${COLORS[e.label]}" stroke-width="${r*0.3}"/>`
+      : `<circle class="mark" cx="${x}" cy="${y}" r="${r}" fill="${COLORS[e.label]}" stroke-width="${r*0.3}"/>`;
+    const ring = sel ? `<circle class="ring" cx="${x}" cy="${y}" r="${r*2}" stroke-width="${r*0.25}"/>` : "";
+    const flip = x > vbNow[0]+vbNow[2]*0.7;
+    const lbl = sel ? `<text class="pinlbl" text-anchor="${flip?"end":"start"}" x="${flip?x-r*2.5:x+r*2.5}" y="${y+r*0.5}" font-size="${(13*u).toFixed(3)}" stroke-width="${(3*u).toFixed(3)}">${place(a).split(",")[0]}</text>` : "";
+    return `<g class="pin" tabindex="0" role="button" data-id="${a.id}" aria-label="${a.what}, ${place(a)}, ${LABELNAME[e.label]}"><title>${a.what} · ${place(a)}</title>${ring}${mark}${lbl}</g>`;
+  }).join("");
+  const s = g.querySelector(`[data-id="${state.nsel}"]`); if (s) g.appendChild(s);
+  g.querySelectorAll(".pin").forEach(p=>{
+    const pick=()=>{ if(dragged) return; state.nsel=p.dataset.id; const a=mapSites().find(x=>x.id===state.nsel); zoomToSite(a); renderMap(); save(); };
+    p.addEventListener("click",pick);
+    p.addEventListener("dblclick",ev=>ev.stopPropagation());
+    p.addEventListener("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pick();} });
+  });
+}
+function renderMap(){
+  syncZoomButtons();
+  drawPins();
+  document.getElementById("mapkeys").innerHTML = ["risk","stable","gain"].map(k=>`<span><i style="background:${COLORS[k]}"></i>${short(k)}</span>`).join("") +
+    `<span><i style="background:var(--muted)"></i>Farm</span><span><i class="dia" style="background:var(--muted)"></i>Renewable</span>`;
+  const a = mapSites().find(x=>x.id===state.nsel) || mapSites()[0];
+  const e = evaluate(a,state.scen);
+  document.getElementById("ndetail").innerHTML = `
+    <div class="chead"><span class="label">${a.what}</span><h2>${place(a)}</h2><span class="bmeta">${a.lat.toFixed(2)}°N, ${a.lon.toFixed(2)}°E</span></div>
+    ${verdict(a,e)}
+    <ul class="facts">${facts(a,e).map(f=>`<li>${f}</li>`).join("")}</ul>
+    ${bars(e)}
+    ${evidenceBlock(a,e)}`;
+  document.getElementById("ntrends").innerHTML = trendPanel(a);
+}
+
+// ---------- render ----------
+function render(){
+  document.querySelectorAll(".navlinks [data-screen]").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.screen===state.screen)));
+  ["desk","map","arch"].forEach(k=>document.getElementById("screen-"+k).hidden = state.screen!==k);
+  document.querySelectorAll(".scen-select").forEach(s=>s.value=state.scen);
+  document.querySelectorAll(".scen-note").forEach(n=>{ n.hidden = state.scen==="base"; n.textContent = SCEN[state.scen].desc; });
+  document.querySelectorAll("[data-f]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.f===state.filter)));
+  if (state.screen==="desk") renderDesk();
+  else if (state.screen==="map"){ setViewBox(vbNow); renderMap(); }
+  save();
+}
+
+document.querySelectorAll(".scen-select").forEach(s=>{
+  s.innerHTML = Object.entries(SCEN).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  s.addEventListener("change",()=>{ state.scen=s.value; render(); });
+});
+document.querySelectorAll("[data-screen]").forEach(b=>b.addEventListener("click",ev=>{
+  ev.preventDefault();
+  const changed = state.screen!==b.dataset.screen;
+  state.screen=b.dataset.screen;
+  try{ history.replaceState(null,"",{map:"#nature-map",desk:"#lender-desk",arch:"#architecture"}[state.screen]); }catch(e){}
+  render(); if (changed) window.scrollTo({top:0});
+}));
+document.getElementById("book-select").addEventListener("change",ev=>{ state.book=ev.target.value; state.filter="all"; render(); });
+document.getElementById("region-select").addEventListener("change",ev=>{ state.region=ev.target.value; render(); });
+document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{state.filter=b.dataset.f; render();}));
+document.querySelectorAll("[data-zoom]").forEach(b=>b.addEventListener("click",()=>{ zoomTo(b.dataset.zoom); renderMap(); save(); }));
+window.addEventListener("resize",()=>{ if(state.screen==="map") setViewBox(vbNow); });
+window.addEventListener("hashchange",()=>{ fromHash(); render(); });
+
+drawBase();
+initMapControls();
+render();
+</script>
