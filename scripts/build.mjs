@@ -7,18 +7,28 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 
-const [app, geo, arch] = await Promise.all([
+const [app, geo, arch, archDefs, archSystem, archSequence, archRefresh] = await Promise.all([
   readFile(join(root, "src/app.html"), "utf8"),
   readFile(join(root, "src/geo.json"), "utf8"),
   readFile(join(root, "src/arch.svg"), "utf8"),
+  readFile(join(root, "src/arch-defs.svg"), "utf8"),
+  readFile(join(root, "src/arch-system.svg"), "utf8"),
+  readFile(join(root, "src/arch-sequence.svg"), "utf8"),
+  readFile(join(root, "src/arch-refresh.svg"), "utf8"),
 ]);
 
-if (!app.includes("/*__PATHS__*/[]") || !app.includes("/*__ARCH__*/")) {
-  throw new Error("src/app.html is missing the /*__PATHS__*/ or /*__ARCH__*/ placeholder");
-}
+const placeholders = ["/*__PATHS__*/[]", "/*__ARCH__*/", "/*__ARCH_DEFS__*/", "/*__ARCH_SYSTEM__*/", "/*__ARCH_SEQUENCE__*/", "/*__ARCH_REFRESH__*/"];
+const missing = placeholders.filter((p) => !app.includes(p));
+if (missing.length) throw new Error(`src/app.html is missing placeholders: ${missing.join(", ")}`);
 JSON.parse(geo); // fail the build on broken map data
 
-const body = app.replace("/*__PATHS__*/[]", geo.trim()).replace("/*__ARCH__*/", arch.trim());
+const body = app
+  .replace("/*__PATHS__*/[]", geo.trim())
+  .replace("/*__ARCH__*/", arch.trim())
+  .replace("/*__ARCH_DEFS__*/", archDefs.trim())
+  .replace("/*__ARCH_SYSTEM__*/", archSystem.trim())
+  .replace("/*__ARCH_SEQUENCE__*/", archSequence.trim())
+  .replace("/*__ARCH_REFRESH__*/", archRefresh.trim());
 
 const html = `<!doctype html>
 <html lang="en">

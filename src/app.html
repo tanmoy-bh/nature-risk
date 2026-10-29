@@ -10,6 +10,13 @@
   --real:#0071E3; --real-bg:#E5F0FD; --sample:#8944AB; --sample-bg:#F4EAFB;
   --sea:#CFE5F3; --land:#FFFFFF; --land-dim:#ECEBE7; --border:#C7C7CC; --maplabel:#8E8E93;
   --navbg:rgba(249,249,251,.82);
+  --sans:var(--font-body); --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --z-client:#E9EFFB; --zs-client:#9DB4E2; --zi-client:#2F55A4;
+  --z-edge:#F1EBFA; --zs-edge:#BFA9E4; --zi-edge:#6B44B0;
+  --z-plat:#E8F4EC; --zs-plat:#94C8A7; --zi-plat:#1E7A4A;
+  --z-data:#FCF2E1; --zs-data:#E2BF84; --zi-data:#9A6413;
+  --z-ext:#EDF0F1; --zs-ext:#B6BEC4; --zi-ext:#55616A;
+  --z-band:#EEF1EE;
   --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,system-ui,sans-serif;
   --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
   --font-data:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
@@ -23,6 +30,12 @@
   --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
   --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
   --navbg:rgba(22,22,24,.78);
+  --z-client:#152036; --zs-client:#3B5A92; --zi-client:#8EB0F2;
+  --z-edge:#211A30; --zs-edge:#5E4A8C; --zi-edge:#C3A8F2;
+  --z-plat:#13251B; --zs-plat:#2E6B47; --zi-plat:#6FD39C;
+  --z-data:#2A2112; --zs-data:#7A6030; --zi-data:#E9BE72;
+  --z-ext:#1C2124; --zs-ext:#4A535A; --zi-ext:#A9B4BC;
+  --z-band:#161B18;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#000000; --surface:#1C1C1E; --soft:#2C2C2E; --fill:rgba(118,118,128,.24); --ink:#FFFFFF; --muted:#98989F; --line:#38383A;
@@ -33,6 +46,12 @@
   --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
   --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
   --navbg:rgba(22,22,24,.78);
+  --z-client:#152036; --zs-client:#3B5A92; --zi-client:#8EB0F2;
+  --z-edge:#211A30; --zs-edge:#5E4A8C; --zi-edge:#C3A8F2;
+  --z-plat:#13251B; --zs-plat:#2E6B47; --zi-plat:#6FD39C;
+  --z-data:#2A2112; --zs-data:#7A6030; --zi-data:#E9BE72;
+  --z-ext:#1C2124; --zs-ext:#4A535A; --zi-ext:#A9B4BC;
+  --z-band:#161B18;
   color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.47;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
@@ -248,6 +267,148 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   .bar{grid-template-columns:130px 1fr 26px}
   .mapkey{display:none}
 }
+/* architecture views *//* architecture views */
+.archtabs{align-self:flex-start}
+.archview{overflow:hidden}
+.viewhead{padding:18px 20px 4px;display:flex;flex-direction:column;gap:4px}
+.viewhead p{font-size:14px}
+.ah{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.anum{font-family:var(--font-display);font-weight:600;font-size:14px}
+.lanes{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:28px;padding:16px 20px 20px}
+.lane{display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
+.lanehead{display:flex;flex-direction:column;gap:1px;min-height:38px}
+.lane+.lane::before{content:"\2192";position:absolute;left:-21px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;line-height:1}
+.node{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;position:relative}
+.node b{font-size:14px;font-weight:600}
+.node span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.node em{font-style:normal;font-size:11.5px;color:var(--accent);line-height:1.35;margin-top:3px}
+.node.poc{border:1.5px solid var(--accent)}
+.node.poc::after{content:"";position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.xcut{margin:0 20px 20px;background:var(--soft);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.xcut .node{background:var(--surface)}
+.xgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.flowwrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:16px 20px}
+.flow{display:flex;flex-direction:column;gap:6px;min-width:0}
+.flow>p{font-size:14px}
+.seq{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.seq li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;background:var(--soft);border-radius:10px;padding:10px 12px}
+.seq li.alt{background:transparent;border:1px dashed var(--border)}
+.sn{grid-row:1/3;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--link)}
+.actors{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.actor{font-size:12px;font-weight:600;background:var(--surface);border:.5px solid var(--line);border-radius:6px;padding:2px 7px}
+.to{color:var(--muted);font-size:13px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.st2{font-size:13.5px;line-height:1.45}
+.archview code,.erd code,.rels code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;background:var(--fill);padding:1px 5px;border-radius:4px}
+.contract{margin:0 20px 20px;display:flex;flex-direction:column;gap:8px}
+.contract pre{margin:0;background:var(--soft);border-radius:10px;padding:14px;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.contract pre code{background:none;padding:0}
+.erd{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:16px 20px}
+.ent{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);display:flex;flex-direction:column}
+.enth{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;font-weight:600;padding:8px 12px;background:var(--fill)}
+.ent ul{list-style:none;margin:0;padding:6px 12px;display:flex;flex-direction:column;gap:3px}
+.ent li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
+.ent li code{background:none;padding:0;color:var(--muted);text-align:right}
+.ent p{font-size:12px;color:var(--muted);padding:0 12px 10px}
+.rels{margin:0 20px 20px;padding:14px 14px 14px 32px;background:var(--soft);border-radius:12px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+.only-narrow{display:none}
+.dgwrap{overflow-x:auto;padding:8px 14px 14px}
+.dgwrap svg{display:block;width:100%;height:auto;min-width:940px}
+.dgdefs{position:absolute;width:0;height:0;overflow:hidden}
+@media (max-width:960px){
+  .lanes{grid-template-columns:minmax(0,1fr);gap:30px}
+  .lane+.lane::before{content:"\2193";left:50%;top:-24px;transform:translateX(-50%)}
+  .lanehead{min-height:0}
+  .xgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flowwrap{grid-template-columns:minmax(0,1fr)}
+  .only-wide{display:none}
+  .only-narrow{display:grid}
+}
+@media (max-width:480px){
+  .xgrid{grid-template-columns:minmax(0,1fr)}
+  .lanes,.flowwrap,.erd{padding-left:14px;padding-right:14px}
+  .xcut,.contract,.rels{margin-left:14px;margin-right:14px}
+  .viewhead{padding-left:14px;padding-right:14px}
+}
+/* architecture diagrams */
+/* diagram styling */
+.dg text{font-family:var(--sans)}
+.dg .zone rect{stroke-width:1.2}
+.dg .zone.z-client rect{fill:var(--z-client);stroke:var(--zs-client)}
+.dg .zone.z-edge rect{fill:var(--z-edge);stroke:var(--zs-edge)}
+.dg .zone.z-plat rect{fill:var(--z-plat);stroke:var(--zs-plat)}
+.dg .zone.z-data rect{fill:var(--z-data);stroke:var(--zs-data)}
+.dg .zone.z-ext rect{fill:var(--z-ext);stroke:var(--zs-ext)}
+.dg .zl{font:600 10.5px var(--mono);letter-spacing:.08em;fill:var(--muted)}
+.dg .zone.z-client .zl{fill:var(--zi-client)}.dg .zone.z-edge .zl{fill:var(--zi-edge)}.dg .zone.z-plat .zl{fill:var(--zi-plat)}.dg .zone.z-data .zl{fill:var(--zi-data)}.dg .zone.z-ext .zl{fill:var(--zi-ext)}
+.dg .sub{fill:color-mix(in srgb,var(--surface) 45%,transparent);stroke:var(--zs-plat);stroke-width:.8}
+.dg .sl{font:500 9.5px var(--mono);letter-spacing:.08em;fill:var(--zi-plat)}
+.dg .node rect{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.dg .node.z-client rect{stroke:var(--zs-client)}.dg .node.z-edge rect{stroke:var(--zs-edge)}.dg .node.z-plat rect{stroke:var(--zs-plat)}.dg .node.z-data rect{stroke:var(--zs-data)}.dg .node.z-ext rect{stroke:var(--zs-ext)}
+.dg .node.z-band rect{fill:var(--surface);stroke:var(--line)}
+.dg .node.poc rect{stroke:var(--accent);stroke-width:2}
+.dg .t{font-size:13px;font-weight:600;fill:var(--ink)}
+.dg .c{text-anchor:middle}
+.dg .s{font-size:11px;fill:var(--muted)}
+.dg .m{font:500 10.5px var(--mono);fill:var(--muted)}
+.dg .node.z-client .m{fill:var(--zi-client)}.dg .node.z-edge .m{fill:var(--zi-edge)}.dg .node.z-plat .m{fill:var(--zi-plat)}.dg .node.z-data .m{fill:var(--zi-data)}.dg .node.z-ext .m{fill:var(--zi-ext)}
+.dg .pocdot{fill:var(--accent)}
+.dg .ar{stroke:var(--muted);stroke-width:1.4;fill:none}
+.dg .ar.ret{stroke-dasharray:5 4;stroke-width:1.2}
+.dg .ahead{fill:var(--muted)}
+.dg .al{font:500 10px var(--mono);fill:var(--muted)}
+.dg .band{fill:var(--z-band);stroke:var(--line)}
+.dg .zl.z-band{fill:var(--muted)}
+.dg .kz{stroke-width:1.2}
+.dg .kz.z-client{fill:var(--z-client);stroke:var(--zs-client)}.dg .kz.z-edge{fill:var(--z-edge);stroke:var(--zs-edge)}.dg .kz.z-plat{fill:var(--z-plat);stroke:var(--zs-plat)}.dg .kz.z-data{fill:var(--z-data);stroke:var(--zs-data)}.dg .kz.z-ext{fill:var(--z-ext);stroke:var(--zs-ext)}
+.dg .life{stroke:var(--line);stroke-width:1.2;stroke-dasharray:4 5}
+.dg .frame{fill:color-mix(in srgb,var(--z-plat) 35%,transparent);stroke:var(--zs-plat);stroke-width:1}
+.dg .frametab{fill:var(--zs-plat)}
+.dg .ft{font:600 11px var(--mono);fill:var(--surface)}
+.dg .framesep{stroke:var(--zs-plat);stroke-dasharray:6 4}
+.dg .guard{font:600 11px var(--mono);fill:var(--zi-plat)}
+.dg .seqn{font:500 12px var(--mono);fill:var(--ink)}
+.dg .act{fill:var(--z-plat);stroke:var(--zs-plat)}
+.dg .seqn .nn{font-weight:600;fill:var(--accent)}
+.dg .step{fill:var(--accent)}
+.dg .stepn{font:600 12px var(--mono);fill:var(--surface);text-anchor:middle}
+.dg .decision path{stroke-dasharray:5 3}
+.dg .hair{stroke:var(--line)}
+.dg .rel{stroke:var(--muted);stroke-width:1.3;fill:none}
+.dg .erl{stroke:var(--muted);stroke-width:1.3;fill:none}
+.dg .ent rect{fill:var(--surface);stroke:var(--zs-data);stroke-width:1.1}
+.dg .ent .eh{fill:var(--z-data)}
+.dg .ent.hot rect{stroke:var(--accent);stroke-width:1.8}
+.dg .ent.hot .eh{fill:var(--z-plat)}
+.dg .en{font:600 13px var(--mono);fill:var(--ink)}
+.dg .ef{font:400 12px var(--mono);fill:var(--ink)}
+.dg .ef.key{font-weight:600}
+.dg .ek{font:600 9px var(--mono);fill:var(--zi-data);letter-spacing:.04em}
+.dg .et{font:400 11px var(--mono);fill:var(--muted);text-anchor:end}
+/* schematic shapes and icons */
+.dg .ic{color:var(--muted)}
+.dg .fillsoft{fill:currentColor;fill-opacity:.18}
+.dg .node .badge{fill:var(--z-plat);stroke:none}
+.dg .node.z-client .badge{fill:var(--z-client)}.dg .node.z-edge .badge{fill:var(--z-edge)}.dg .node.z-ext .badge{fill:var(--z-ext)}.dg .node.z-band .badge{fill:var(--z-band)}
+.dg .node .ic{color:var(--zi-plat)}
+.dg .node.z-client .ic,.dg .ic.z-client{color:var(--zi-client)}.dg .node.z-edge .ic,.dg .ic.z-edge{color:var(--zi-edge)}.dg .node.z-ext .ic{color:var(--zi-ext)}.dg .node.z-band .ic{color:var(--accent)}.dg .ic.z-plat{color:var(--zi-plat)}
+.dg .actor .disc{fill:var(--surface);stroke:var(--zs-client);stroke-width:1.4}
+.dg .actor .ic{color:var(--zi-client)}
+.dg .actor .m{fill:var(--zi-client)}
+.dg .db .dbbody{fill:var(--surface);stroke:var(--zs-data);stroke-width:1.3}
+.dg .db .dbtop{fill:var(--z-data);stroke:var(--zs-data);stroke-width:1.3}
+.dg .db .dbring{fill:none;stroke:var(--zs-data);stroke-width:1;opacity:.7}
+.dg .db .ic{color:var(--zi-data)}
+.dg .db .m{fill:var(--zi-data)}
+.dg .db.poc .dbbody,.dg .db.poc .dbtop{stroke:var(--accent)}
+.dg .queue .pipe,.dg .pipe.kq{fill:var(--surface);stroke:var(--zs-plat);stroke-width:1.3}
+.dg .queue .pipeend{fill:none;stroke:var(--zs-plat);stroke-width:1.1}
+.dg .queue .msg{fill:var(--zi-plat);opacity:.55}
+.dg .queue .m{fill:var(--zi-plat)}
+.dg .src rect{fill:var(--surface);stroke:var(--zs-ext);stroke-width:1.2}
+.dg .src .ic{color:var(--zi-ext)}
+.dg .src .m{fill:var(--zi-ext)}
+.dg .decision path{fill:var(--surface);stroke:var(--accent);stroke-width:1.6}
 /* phone: tables become stacked cards */
 @media (max-width:600px){
   .tablewrap{overflow-x:visible}
@@ -372,10 +533,35 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   <!-- PAGE 3 -->
   <section class="page" id="screen-arch" hidden>
     <div class="pagehead">
-      <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens, in Nature Signal's own three layers.</p></div>
+      <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens: what runs where, how a score is served, how data refreshes, and how data moves through the layers.</p></div>
     </div>
-    <div class="panel">
-      <div class="archwrap">/*__ARCH__*/</div>
+    /*__ARCH_DEFS__*/
+    <div class="chips archtabs" role="tablist" aria-label="Architecture views">
+      <button class="chip" type="button" role="tab" aria-pressed="true" data-view="system">Containers</button>
+      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="flow">Score request</button>
+      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="refresh">Refresh and alerts</button>
+      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="layers">Data layers</button>
+    </div>
+    <div class="panel archview" data-view="system">
+      <div class="viewhead"><h2>What runs where</h2><p class="muted">Every deployable piece, its technology and its trust zone: clients, the edge, the platform's online and batch halves, the data stores and external sources.</p></div>
+      <div class="dgwrap only-wide">/*__ARCH_SYSTEM__*/</div>
+      <div class="only-narrow"><div class="lanes" style="--n:5"><div class="lane"><div class="lanehead"><span class="ah">SOURCES</span><span class="anum">Pull and receive</span></div><div class="node"><b>Satellite catalogues</b><span>Sentinel-2, Landsat, WorldCover through STAC on Planetary Computer or Earth Engine</span></div><div class="node"><b>Thematic open data</b><span>Hansen forest loss, WRI Aqueduct, WDPA, GBIF, ERA5 through Open-Meteo</span></div><div class="node"><b>Partner data</b><span>Farm plots, supply chains and loan books by API or pre-signed upload</span></div></div><div class="lane"><div class="lanehead"><span class="ah">INGEST AND PROCESS</span><span class="anum">Batch, on Kubernetes</span></div><div class="node"><b>Orchestrator</b><span>Dagster: schedules, retries, backfills and asset lineage per source</span></div><div class="node"><b>Raster workers</b><span>Python with rasterio, xarray and Dask; windowed reads of cloud-optimised GeoTIFFs, cloud masking</span></div><div class="node poc"><b>Zonal statistics job</b><span>Clips every source to each site buffer and writes one observation per indicator and period</span><em>In this proof of concept: fetched once with scripts, saved in data/</em></div><div class="node"><b>Partner data validator</b><span>Schema, geometry and duplicate checks; personal data stripped before storage</span></div></div><div class="lane"><div class="lanehead"><span class="ah">STORE</span><span class="anum">Immutable and versioned</span></div><div class="node"><b>Object storage</b><span>Raw snapshots, GeoTIFFs, Zarr and GeoParquet, keyed by source version</span></div><div class="node poc"><b>PostgreSQL with PostGIS</b><span>Tenants, portfolios, sites, observations and scores; row-level security per tenant</span><em>In this proof of concept: embedded JSON in the page</em></div><div class="node"><b>pgvector</b><span>Embeddings of evidence and methodology text for retrieval</span></div><div class="node"><b>Redis</b><span>Score cache and per-tenant rate limits</span></div></div><div class="lane"><div class="lanehead"><span class="ah">SERVE</span><span class="anum">Stateless services</span></div><div class="node poc"><b>Signal engine</b><span>Versioned Python library: observations in, label, score, sub-scores and confidence out</span><em>In this proof of concept: same rules in browser JavaScript</em></div><div class="node poc"><b>Scenario engine</b><span>Re-runs the signal on shocked inputs: drought, stricter deforestation rule</span><em>In this proof of concept: two scenarios in the browser</em></div><div class="node"><b>Scoring API</b><span>FastAPI; cached scores return at once, new sites run as a job</span></div><div class="node"><b>AI notes service</b><span>LLM gateway, retrieval over the evidence trail, eval gate before release</span></div><div class="node"><b>Event bus</b><span>Queue topics: observation updated, label changed</span></div></div><div class="lane"><div class="lanehead"><span class="ah">DELIVER</span><span class="anum">Where clients work</span></div><div class="node"><b>API gateway</b><span>OAuth 2.0 client credentials, optional mutual TLS, per-tenant quotas</span></div><div class="node poc"><b>Web app</b><span>Single-page app on a CDN with single sign-on</span><em>In this proof of concept: Cloudflare Pages with a passphrase gate function</em></div><div class="node"><b>MCP server</b><span>Read-only tools over the API for analysts' own AI assistants</span></div><div class="node"><b>Webhooks and exports</b><span>Label-change alerts and TNFD-aligned exports to bank systems</span></div></div></div><div class="xcut"><span class="ah">ACROSS EVERY SERVICE</span><div class="xgrid"><div class="node"><b>Identity</b><span>Single sign-on with OIDC or SAML, SCIM provisioning, role-based access</span></div><div class="node"><b>Security</b><span>Encryption with per-tenant keys, private network, secrets manager, audit log of every score</span></div><div class="node"><b>Observability</b><span>OpenTelemetry traces, metrics and dashboards, LLM traces and eval scores, cost per site</span></div><div class="node"><b>Delivery</b><span>Terraform, CI/CD with data contract tests, blue-green releases, methodology release gates</span></div></div></div></div>
+      <div class="archfoot"><span><i></i>Green outline: a simpler version is built in this proof of concept</span><span>Everything else is the production plan</span></div>
+    </div>
+    <div class="panel archview" data-view="flow" hidden>
+      <div class="viewhead"><h2>Scoring a loan site</h2><p class="muted">A bank asks for a score. Three outcomes: a cached answer, a fresh score from stored observations, or a new site that becomes a job and returns by webhook. Dashed arrows are responses.</p></div>
+      <div class="dgwrap only-wide">/*__ARCH_SEQUENCE__*/</div>
+      <div class="flowwrap only-narrow"><div class="flow"><ol class="seq"><li class=""><span class="sn">1</span><span class="actors"><span class="actor">Bank credit system</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">API gateway</span></span><span class="st2"><code>POST /v1/sites:score</code> with the site polygon, commodity and loan reference, an OAuth token and an idempotency key.</span></li><li class=""><span class="sn">2</span><span class="actors"><span class="actor">API gateway</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Scoring API</span></span><span class="st2">Checks scopes and quota, adds the tenant ID.</span></li><li class=""><span class="sn">3</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">PostGIS</span></span><span class="st2">Saves the site and looks for observations newer than the freshness window.</span></li><li class=""><span class="sn">4a</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Signal engine</span></span><span class="st2"><b>Already observed:</b> scores with the current methodology version and scenario. Target under 300 ms at the 95th percentile.</span></li><li class="alt"><span class="sn">4b</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Event bus</span></span><span class="st2"><b>New site:</b> publishes <code>site.created</code>; the orchestrator runs zonal statistics (minutes). The API returns <code>202</code> with a job ID, then a webhook when the score is ready.</span></li><li class=""><span class="sn">5</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Audit log</span></span><span class="st2">Writes the request, a hash of the inputs, the methodology version and the result.</span></li><li class=""><span class="sn">6</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Bank credit system</span></span><span class="st2">Returns label, score, sub-scores, confidence and links to each piece of evidence.</span></li></ol></div></div>
+    </div>
+    <div class="panel archview" data-view="refresh" hidden>
+      <div class="viewhead"><h2>Data refresh and alerts</h2><p class="muted">When a source publishes new data: recompute only what changed, re-score, and tell the bank when a label moves, with an AI-drafted note that a person approves.</p></div>
+      <div class="dgwrap only-wide">/*__ARCH_REFRESH__*/</div>
+      <div class="flowwrap only-narrow"><div class="flow"><ol class="seq"><li class=""><span class="sn">1</span><span class="actors"><span class="actor">Orchestrator</span></span><span class="st2">Detects a new source release, such as a yearly forest-loss version or new satellite scenes.</span></li><li class=""><span class="sn">2</span><span class="actors"><span class="actor">Raster workers</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">PostGIS</span></span><span class="st2">Recompute observations only for sites whose tiles changed, using a spatial index.</span></li><li class=""><span class="sn">3</span><span class="actors"><span class="actor">Signal engine</span></span><span class="st2">Re-scores those sites and compares each label with the last one.</span></li><li class=""><span class="sn">4</span><span class="actors"><span class="actor">Event bus</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Webhooks</span></span><span class="st2"><code>label.changed</code> goes to the bank's system and shows as an alert in the web app.</span></li><li class=""><span class="sn">5</span><span class="actors"><span class="actor">AI notes service</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Analyst</span></span><span class="st2">Drafts an updated credit note; the eval gate checks every number against the evidence before an analyst sees it.</span></li></ol></div></div>
+    </div>
+    <div class="panel archview" data-view="layers" hidden>
+      <div class="viewhead"><h2>Data layers and transitions</h2><p class="muted">How data moves from sources to the client, in Nature Signal's three layers.</p></div>
+      <div class="archwrap only-wide">/*__ARCH__*/</div>
+      <div class="lanes only-narrow" style="--n:4"><div class="lane"><div class="lanehead"><span class="ah">SOURCES</span><span class="anum">Open data and partner data</span></div><div class="node"><b>Satellite imagery</b><span>Sentinel-2, Landsat via Earth Engine or Planetary Computer</span></div><div class="node"><b>Forest</b><span>GFW: Hansen loss, alerts, palm mill locations</span></div><div class="node"><b>Water</b><span>WRI Aqueduct 4.0</span></div><div class="node"><b>Biodiversity</b><span>WDPA, GBIF, IUCN Red List</span></div><div class="node"><b>Climate</b><span>NASA POWER, Open-Meteo</span></div><div class="node"><b>Partner data</b><span>Farm plots, supply chains, loan books (secure upload or API)</span></div></div><div class="lane"><div class="lanehead"><span class="ah">DATA LAYER</span><span class="anum">Ingest, store, prove</span></div><div class="node"><b>Ingestion jobs</b><span>Scheduled pulls per source, retries, versioned snapshots</span></div><div class="node"><b>Geospatial store</b><span>Cloud-optimised rasters and GeoParquet on object storage</span></div><div class="node poc"><b>Site evidence store</b><span>One row per site, indicator and date: value, source, licence, resolution, Real or Sample</span></div><div class="node"><b>Data quality and lineage</b><span>Coverage, cloud and freshness checks; every value traced to its source</span></div></div><div class="lane"><div class="lanehead"><span class="ah">INTELLIGENCE LAYER</span><span class="anum">Score, stress, explain</span></div><div class="node poc"><b>Signal engine</b><span>Sub-scores to Risk, Stable or Gain; versioned methodology (rules now, ML once labels exist)</span></div><div class="node poc"><b>Scenario engine</b><span>Drought, regulation and climate paths</span></div><div class="node poc"><b>Portfolio aggregation</b><span>Mix, concentration, migration</span></div><div class="node"><b>AI layer</b><span>Retrieval over the evidence trail, LLM drafts credit notes, eval gate checks every number</span></div></div><div class="lane"><div class="lanehead"><span class="ah">FINANCIAL LAYER</span><span class="anum">Inside the client's workflow</span></div><div class="node"><b>REST API</b><span>Scores, evidence, scenarios</span></div><div class="node"><b>MCP server</b><span>Query from their own AI tools</span></div><div class="node poc"><b>Web app</b><span>Lender desk, Nature map</span></div><div class="node"><b>Reporting</b><span>TNFD-aligned exports</span></div><div class="node"><b>Alerts</b><span>Label changes to bank systems</span></div></div></div>
       <div class="archfoot"><span><i></i>Built in this proof of concept</span><span>Everything else is the production plan</span></div>
     </div>
     <div class="cols">
@@ -868,4 +1054,10 @@ window.addEventListener("hashchange",()=>{ fromHash(); render(); });
 drawBase();
 initMapControls();
 render();
+
+// architecture views
+document.querySelectorAll(".archtabs [data-view]").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".archtabs [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  document.querySelectorAll(".archview").forEach(v=>v.hidden = v.dataset.view!==b.dataset.view);
+}));
 </script>
