@@ -1,3 +1,4 @@
+<script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 [hidden]{display:none!important}
 /* Layout: Apple HIG — translucent nav bar, large titles, inset grouped cards on a grouped background, system colors, segmented controls */
@@ -88,6 +89,11 @@ button,select{font:inherit}
 .navlinks a[aria-selected="true"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);font-weight:600}
 .navnote{margin-left:auto;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap}
 .navnote .dp{margin-left:8px}
+.themebtn{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:0;background:var(--fill);color:var(--ink);cursor:pointer;flex:none}
+.themebtn:hover{background:color-mix(in srgb,var(--fill) 100%,var(--line))}
+.themebtn .sun{display:none}
+.themebtn.isdark .sun{display:block}.themebtn.isdark .moon{display:none}
+@media (max-width:760px){.themebtn{margin-left:auto}}
 @media (max-width:760px){.navnote{display:none}.navlinks a{padding:5px 10px}}
 
 main{max-width:1180px;margin:0 auto;padding-top:32px}
@@ -270,6 +276,13 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   .bar{grid-template-columns:130px 1fr 26px}
   .mapkey{display:none}
 }
+.scalenote{background:color-mix(in srgb,var(--accent) 12%,var(--surface));border:1.5px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.scalehead{display:flex;align-items:center;gap:10px;color:var(--accent)}
+.scalehead b{font-family:var(--font-display);font-size:18px;color:var(--ink);letter-spacing:-.01em}
+.scalenote p{font-size:15px;line-height:1.5;max-width:90ch}
+.daychips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.daychips .label{margin-right:4px}
+.dchip{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface);border:.5px solid color-mix(in srgb,var(--accent) 45%,transparent)}
 /* architecture views *//* architecture views */
 .archtabs{align-self:flex-start}
 .archview{overflow:hidden}
@@ -460,6 +473,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <a id="scr-arch" role="tab" href="#architecture" aria-selected="false" data-screen="arch">Architecture</a>
     </div>
     <span class="navnote">Proof of concept <span class="dp real" title="Pulled from public open data">Real</span> open nature data <span class="dp sample" title="Sample value, not real data">Sample</span> loans and partner data</span>
+    <button class="themebtn" id="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch theme"><svg class="sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
   </div>
 </nav>
 
@@ -555,6 +569,11 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
     <div class="pagehead">
       <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens: what runs where, how a score is served, how data refreshes, how AI is routed, and how data moves through the layers.</p></div>
     </div>
+    <aside class="scalenote" role="note" aria-label="About this architecture">
+      <div class="scalehead"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 19h16M6 19V11M11 19V7M16 19V4M20.5 8.5 16 4l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><b>This is the scale-up architecture</b></div>
+      <p>It shows the platform once several banks score their loan books every day. In the first months, while traffic is small, a modular monolith does the job: one deployable app holding the scoring API, signal engine, notes and jobs; one PostgreSQL with PostGIS; scheduled jobs instead of an orchestrator; and Jev for every model call. Each box below starts as a module inside that app and moves out to its own service only when load, team size or a client's isolation needs call for it.</p>
+      <div class="daychips"><span class="label">Day one</span><span class="dchip">1 app</span><span class="dchip">PostgreSQL + PostGIS</span><span class="dchip">Scheduled jobs</span><span class="dchip">Object storage</span><span class="dchip">Jev for AI</span></div>
+    </aside>
     /*__ARCH_DEFS__*/
     <div class="chips archtabs" role="tablist" aria-label="Architecture views">
       <button class="chip" type="button" role="tab" aria-pressed="true" data-view="system">Containers</button>
@@ -1088,4 +1107,14 @@ document.querySelectorAll(".archtabs [data-view]").forEach(b=>b.addEventListener
   document.querySelectorAll(".archtabs [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
   document.querySelectorAll(".archview").forEach(v=>v.hidden = v.dataset.view!==b.dataset.view);
 }));
+
+// theme toggle: follows the device until the viewer picks one
+(function(){
+  const btn=document.getElementById("theme-toggle"), root=document.documentElement;
+  const isDark=()=>root.dataset.theme ? root.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const sync=()=>{const d=isDark();btn.classList.toggle("isdark",d);btn.setAttribute("aria-label",d?"Switch to light theme":"Switch to dark theme")};
+  btn.addEventListener("click",()=>{const next=isDark()?"light":"dark";root.dataset.theme=next;try{localStorage.setItem("theme",next)}catch(e){}sync()});
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",sync);
+  sync();
+})();
 </script>
