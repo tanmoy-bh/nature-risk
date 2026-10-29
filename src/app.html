@@ -248,66 +248,6 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   .bar{grid-template-columns:130px 1fr 26px}
   .mapkey{display:none}
 }
-/* architecture views */
-.archtabs{align-self:flex-start}
-.archview{overflow:hidden}
-.viewhead{padding:18px 20px 4px;display:flex;flex-direction:column;gap:4px}
-.viewhead p{font-size:14px}
-.ah{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
-.anum{font-family:var(--font-display);font-weight:600;font-size:14px}
-.lanes{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:28px;padding:16px 20px 20px}
-.lane{display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
-.lanehead{display:flex;flex-direction:column;gap:1px;min-height:38px}
-.lane+.lane::before{content:"\2192";position:absolute;left:-21px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;line-height:1}
-.node{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;position:relative}
-.node b{font-size:14px;font-weight:600}
-.node span{font-size:12.5px;color:var(--muted);line-height:1.4}
-.node em{font-style:normal;font-size:11.5px;color:var(--accent);line-height:1.35;margin-top:3px}
-.node.poc{border:1.5px solid var(--accent)}
-.node.poc::after{content:"";position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
-.xcut{margin:0 20px 20px;background:var(--soft);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.xcut .node{background:var(--surface)}
-.xgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.flowwrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:16px 20px}
-.flow{display:flex;flex-direction:column;gap:6px;min-width:0}
-.flow>p{font-size:14px}
-.seq{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
-.seq li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;background:var(--soft);border-radius:10px;padding:10px 12px}
-.seq li.alt{background:transparent;border:1px dashed var(--border)}
-.sn{grid-row:1/3;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--link)}
-.actors{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
-.actor{font-size:12px;font-weight:600;background:var(--surface);border:.5px solid var(--line);border-radius:6px;padding:2px 7px}
-.to{color:var(--muted);font-size:13px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.st2{font-size:13.5px;line-height:1.45}
-.archview code,.erd code,.rels code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;background:var(--fill);padding:1px 5px;border-radius:4px}
-.contract{margin:0 20px 20px;display:flex;flex-direction:column;gap:8px}
-.contract pre{margin:0;background:var(--soft);border-radius:10px;padding:14px;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-.contract pre code{background:none;padding:0}
-.erd{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:16px 20px}
-.ent{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);display:flex;flex-direction:column}
-.enth{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;font-weight:600;padding:8px 12px;background:var(--fill)}
-.ent ul{list-style:none;margin:0;padding:6px 12px;display:flex;flex-direction:column;gap:3px}
-.ent li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
-.ent li code{background:none;padding:0;color:var(--muted);text-align:right}
-.ent p{font-size:12px;color:var(--muted);padding:0 12px 10px}
-.rels{margin:0 20px 20px;padding:14px 14px 14px 32px;background:var(--soft);border-radius:12px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
-.only-narrow{display:none}
-@media (max-width:960px){
-  .lanes{grid-template-columns:minmax(0,1fr);gap:30px}
-  .lane+.lane::before{content:"\2193";left:50%;top:-24px;transform:translateX(-50%)}
-  .lanehead{min-height:0}
-  .xgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .flowwrap{grid-template-columns:minmax(0,1fr)}
-  .only-wide{display:none}
-  .only-narrow{display:grid}
-}
-@media (max-width:480px){
-  .xgrid{grid-template-columns:minmax(0,1fr)}
-  .lanes,.flowwrap,.erd{padding-left:14px;padding-right:14px}
-  .xcut,.contract,.rels{margin-left:14px;margin-right:14px}
-  .viewhead{padding-left:14px;padding-right:14px}
-}
 /* phone: tables become stacked cards */
 @media (max-width:600px){
   .tablewrap{overflow-x:visible}
@@ -432,54 +372,10 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   <!-- PAGE 3 -->
   <section class="page" id="screen-arch" hidden>
     <div class="pagehead">
-      <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens: the services and how they run, how a score is served, the data model, and how data moves through the layers.</p></div>
+      <div><h1>Architecture</h1><p class="lede">How I would build the platform behind these screens, in Nature Signal's own three layers.</p></div>
     </div>
-    <div class="chips archtabs" role="tablist" aria-label="Architecture views">
-      <button class="chip" type="button" role="tab" aria-pressed="true" data-view="system">System</button>
-      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="flow">Score request</button>
-      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="model">Data model</button>
-      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="layers">Data layers</button>
-    </div>
-    <div class="panel archview" data-view="system">
-      <div class="viewhead"><h2>System and runtime</h2><p class="muted">Containers, their technology and where each runs. Arrows show the direction data moves.</p></div>
-      <div class="lanes" style="--n:5"><div class="lane"><div class="lanehead"><span class="ah">SOURCES</span><span class="anum">Pull and receive</span></div><div class="node"><b>Satellite catalogues</b><span>Sentinel-2, Landsat, WorldCover through STAC on Planetary Computer or Earth Engine</span></div><div class="node"><b>Thematic open data</b><span>Hansen forest loss, WRI Aqueduct, WDPA, GBIF, ERA5 through Open-Meteo</span></div><div class="node"><b>Partner data</b><span>Farm plots, supply chains and loan books by API or pre-signed upload</span></div></div><div class="lane"><div class="lanehead"><span class="ah">INGEST AND PROCESS</span><span class="anum">Batch, on Kubernetes</span></div><div class="node"><b>Orchestrator</b><span>Dagster: schedules, retries, backfills and asset lineage per source</span></div><div class="node"><b>Raster workers</b><span>Python with rasterio, xarray and Dask; windowed reads of cloud-optimised GeoTIFFs, cloud masking</span></div><div class="node poc"><b>Zonal statistics job</b><span>Clips every source to each site buffer and writes one observation per indicator and period</span><em>In this proof of concept: fetched once with scripts, saved in data/</em></div><div class="node"><b>Partner data validator</b><span>Schema, geometry and duplicate checks; personal data stripped before storage</span></div></div><div class="lane"><div class="lanehead"><span class="ah">STORE</span><span class="anum">Immutable and versioned</span></div><div class="node"><b>Object storage</b><span>Raw snapshots, GeoTIFFs, Zarr and GeoParquet, keyed by source version</span></div><div class="node poc"><b>PostgreSQL with PostGIS</b><span>Tenants, portfolios, sites, observations and scores; row-level security per tenant</span><em>In this proof of concept: embedded JSON in the page</em></div><div class="node"><b>pgvector</b><span>Embeddings of evidence and methodology text for retrieval</span></div><div class="node"><b>Redis</b><span>Score cache and per-tenant rate limits</span></div></div><div class="lane"><div class="lanehead"><span class="ah">SERVE</span><span class="anum">Stateless services</span></div><div class="node poc"><b>Signal engine</b><span>Versioned Python library: observations in, label, score, sub-scores and confidence out</span><em>In this proof of concept: same rules in browser JavaScript</em></div><div class="node poc"><b>Scenario engine</b><span>Re-runs the signal on shocked inputs: drought, stricter deforestation rule</span><em>In this proof of concept: two scenarios in the browser</em></div><div class="node"><b>Scoring API</b><span>FastAPI; cached scores return at once, new sites run as a job</span></div><div class="node"><b>AI notes service</b><span>LLM gateway, retrieval over the evidence trail, eval gate before release</span></div><div class="node"><b>Event bus</b><span>Queue topics: observation updated, label changed</span></div></div><div class="lane"><div class="lanehead"><span class="ah">DELIVER</span><span class="anum">Where clients work</span></div><div class="node"><b>API gateway</b><span>OAuth 2.0 client credentials, optional mutual TLS, per-tenant quotas</span></div><div class="node poc"><b>Web app</b><span>Single-page app on a CDN with single sign-on</span><em>In this proof of concept: Cloudflare Pages with a passphrase gate function</em></div><div class="node"><b>MCP server</b><span>Read-only tools over the API for analysts' own AI assistants</span></div><div class="node"><b>Webhooks and exports</b><span>Label-change alerts and TNFD-aligned exports to bank systems</span></div></div></div><div class="xcut"><span class="ah">ACROSS EVERY SERVICE</span><div class="xgrid"><div class="node"><b>Identity</b><span>Single sign-on with OIDC or SAML, SCIM provisioning, role-based access</span></div><div class="node"><b>Security</b><span>Encryption with per-tenant keys, private network, secrets manager, audit log of every score</span></div><div class="node"><b>Observability</b><span>OpenTelemetry traces, metrics and dashboards, LLM traces and eval scores, cost per site</span></div><div class="node"><b>Delivery</b><span>Terraform, CI/CD with data contract tests, blue-green releases, methodology release gates</span></div></div></div>
-      <div class="archfoot"><span><i></i>Green outline: a simpler version is built in this proof of concept</span><span>Everything else is the production plan</span></div>
-    </div>
-    <div class="panel archview" data-view="flow" hidden>
-      <div class="viewhead"><h2>Score request</h2><p class="muted">The two paths that matter in production: a bank asking for a score, and the platform telling the bank when a label changes.</p></div>
-      <div class="flowwrap">
-<div class="flow"><h3>Score a new loan site</h3><p class="muted">Synchronous when the site is already observed, a job when it is new.</p><ol class="seq"><li class=""><span class="sn">1</span><span class="actors"><span class="actor">Bank credit system</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">API gateway</span></span><span class="st2"><code>POST /v1/sites:score</code> with the site polygon, commodity and loan reference, an OAuth token and an idempotency key.</span></li><li class=""><span class="sn">2</span><span class="actors"><span class="actor">API gateway</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Scoring API</span></span><span class="st2">Checks scopes and quota, adds the tenant ID.</span></li><li class=""><span class="sn">3</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">PostGIS</span></span><span class="st2">Saves the site and looks for observations newer than the freshness window.</span></li><li class=""><span class="sn">4a</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Signal engine</span></span><span class="st2"><b>Already observed:</b> scores with the current methodology version and scenario. Target under 300 ms at the 95th percentile.</span></li><li class="alt"><span class="sn">4b</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Event bus</span></span><span class="st2"><b>New site:</b> publishes <code>site.created</code>; the orchestrator runs zonal statistics (minutes). The API returns <code>202</code> with a job ID, then a webhook when the score is ready.</span></li><li class=""><span class="sn">5</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Audit log</span></span><span class="st2">Writes the request, a hash of the inputs, the methodology version and the result.</span></li><li class=""><span class="sn">6</span><span class="actors"><span class="actor">Scoring API</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Bank credit system</span></span><span class="st2">Returns label, score, sub-scores, confidence and links to each piece of evidence.</span></li></ol></div>
-<div class="flow"><h3>Refresh data and alert on change</h3><p class="muted">Runs when a source publishes new data.</p><ol class="seq"><li class=""><span class="sn">1</span><span class="actors"><span class="actor">Orchestrator</span></span><span class="st2">Detects a new source release, such as a yearly forest-loss version or new satellite scenes.</span></li><li class=""><span class="sn">2</span><span class="actors"><span class="actor">Raster workers</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">PostGIS</span></span><span class="st2">Recompute observations only for sites whose tiles changed, using a spatial index.</span></li><li class=""><span class="sn">3</span><span class="actors"><span class="actor">Signal engine</span></span><span class="st2">Re-scores those sites and compares each label with the last one.</span></li><li class=""><span class="sn">4</span><span class="actors"><span class="actor">Event bus</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Webhooks</span></span><span class="st2"><code>label.changed</code> goes to the bank's system and shows as an alert in the web app.</span></li><li class=""><span class="sn">5</span><span class="actors"><span class="actor">AI notes service</span><span class="to" aria-hidden="true">→</span><span class="sr">to</span><span class="actor">Analyst</span></span><span class="st2">Drafts an updated credit note; the eval gate checks every number against the evidence before an analyst sees it.</span></li></ol></div>
-</div>
-<div class="contract"><span class="ah">API CONTRACT, ABRIDGED</span><pre><code>POST /v1/sites:score
-{ "site": { "type": "Polygon", "coordinates": [...] },
-  "commodity": "palm_oil", "scenario": "baseline",
-  "loan_ref": "LN-20431" }
-
-200 OK
-{ "label": "nature_risk", "score": 41, "confidence": 0.72,
-  "methodology": "v0.1", "as_of": "2026-10-28",
-  "subscores": { "forest": 22, "vegetation": 48, "water": 61,
-                 "biodiversity": 35, "livelihoods": 50 },
-  "evidence": [ { "indicator": "forest_loss_2021_2024",
-                  "value": 0.031, "source": "hansen_gfc_v1.12",
-                  "snapshot": "snap_8f2c", "licence": "CC BY 4.0" } ] }</code></pre></div>
-    </div>
-    <div class="panel archview" data-view="model" hidden>
-      <div class="viewhead"><h2>Data model</h2><p class="muted">Core PostgreSQL tables. Observations are never overwritten, so any past score can be recomputed and audited.</p></div>
-      <div class="erd"><div class="ent"><div class="enth">tenant</div><ul><li><span>id</span><code>uuid</code></li><li><span>name</span><code>text</code></li><li><span>region</span><code>text</code></li><li><span>kms_key</span><code>text</code></li></ul><p>One per client; drives data residency and encryption key.</p></div><div class="ent"><div class="enth">portfolio</div><ul><li><span>id</span><code>uuid</code></li><li><span>tenant_id</span><code>fk</code></li><li><span>name</span><code>text</code></li><li><span>kind</span><code>agri | renewables</code></li></ul></div><div class="ent"><div class="enth">loan</div><ul><li><span>id</span><code>uuid</code></li><li><span>portfolio_id</span><code>fk</code></li><li><span>borrower_ref</span><code>text</code></li><li><span>exposure</span><code>numeric</code></li><li><span>currency</span><code>char(3)</code></li></ul></div><div class="ent"><div class="enth">loan_site</div><ul><li><span>loan_id</span><code>fk</code></li><li><span>site_id</span><code>fk</code></li><li><span>share</span><code>numeric</code></li></ul><p>A loan can span several estates.</p></div><div class="ent"><div class="enth">site</div><ul><li><span>id</span><code>uuid</code></li><li><span>tenant_id</span><code>fk</code></li><li><span>geom</span><code>geography</code></li><li><span>buffer_m</span><code>int</code></li><li><span>precision</span><code>plot | mill | district</code></li></ul></div><div class="ent"><div class="enth">indicator</div><ul><li><span>code</span><code>text pk</code></li><li><span>unit</span><code>text</code></li><li><span>resolution</span><code>text</code></li><li><span>licence</span><code>text</code></li><li><span>real</span><code>boolean</code></li></ul></div><div class="ent"><div class="enth">source_snapshot</div><ul><li><span>id</span><code>text</code></li><li><span>source</span><code>text</code></li><li><span>version</span><code>text</code></li><li><span>retrieved_at</span><code>timestamptz</code></li><li><span>uri, checksum</span><code>text</code></li></ul><p>Pins every value to the exact file it came from.</p></div><div class="ent"><div class="enth">observation</div><ul><li><span>site_id</span><code>fk</code></li><li><span>indicator_code</span><code>fk</code></li><li><span>period</span><code>daterange</code></li><li><span>value</span><code>numeric</code></li><li><span>quality</span><code>jsonb</code></li><li><span>snapshot_id</span><code>fk</code></li></ul><p>Append-only, partitioned by period.</p></div><div class="ent"><div class="enth">methodology</div><ul><li><span>version</span><code>text pk</code></li><li><span>weights</span><code>jsonb</code></li><li><span>thresholds</span><code>jsonb</code></li><li><span>approved_by</span><code>text</code></li><li><span>released_at</span><code>timestamptz</code></li></ul></div><div class="ent"><div class="enth">score</div><ul><li><span>site_id</span><code>fk</code></li><li><span>methodology</span><code>fk</code></li><li><span>scenario</span><code>text</code></li><li><span>as_of</span><code>date</code></li><li><span>score, label</span><code>numeric, enum</code></li><li><span>confidence</span><code>numeric</code></li><li><span>subscores</span><code>jsonb</code></li></ul><p>Reproducible from observations plus methodology version.</p></div><div class="ent"><div class="enth">alert</div><ul><li><span>id</span><code>uuid</code></li><li><span>tenant_id</span><code>fk</code></li><li><span>site_id</span><code>fk</code></li><li><span>from_label, to_label</span><code>enum</code></li><li><span>delivered_at</span><code>timestamptz</code></li></ul></div></div>
-<ul class="rels">
-<li><b>tenant</b> 1 to many <b>portfolio</b> 1 to many <b>loan</b></li>
-<li><b>loan</b> many to many <b>site</b> through <b>loan_site</b></li>
-<li><b>site</b> 1 to many <b>observation</b>, each pinned to one <b>source_snapshot</b> and one <b>indicator</b></li>
-<li><b>score</b> belongs to one <b>site</b> and one <b>methodology</b> version</li>
-<li>Every tenant-owned table carries <code>tenant_id</code> with row-level security</li>
-</ul>
-    </div>
-    <div class="panel archview" data-view="layers" hidden>
-      <div class="viewhead"><h2>Data layers and transitions</h2><p class="muted">How data moves from sources to the client, in Nature Signal's three layers.</p></div>
-      <div class="archwrap only-wide">/*__ARCH__*/</div>
-      <div class="lanes only-narrow" style="--n:4"><div class="lane"><div class="lanehead"><span class="ah">SOURCES</span><span class="anum">Open data and partner data</span></div><div class="node"><b>Satellite imagery</b><span>Sentinel-2, Landsat via Earth Engine or Planetary Computer</span></div><div class="node"><b>Forest</b><span>GFW: Hansen loss, alerts, palm mill locations</span></div><div class="node"><b>Water</b><span>WRI Aqueduct 4.0</span></div><div class="node"><b>Biodiversity</b><span>WDPA, GBIF, IUCN Red List</span></div><div class="node"><b>Climate</b><span>NASA POWER, Open-Meteo</span></div><div class="node"><b>Partner data</b><span>Farm plots, supply chains, loan books (secure upload or API)</span></div></div><div class="lane"><div class="lanehead"><span class="ah">DATA LAYER</span><span class="anum">Ingest, store, prove</span></div><div class="node"><b>Ingestion jobs</b><span>Scheduled pulls per source, retries, versioned snapshots</span></div><div class="node"><b>Geospatial store</b><span>Cloud-optimised rasters and GeoParquet on object storage</span></div><div class="node poc"><b>Site evidence store</b><span>One row per site, indicator and date: value, source, licence, resolution, Real or Sample</span></div><div class="node"><b>Data quality and lineage</b><span>Coverage, cloud and freshness checks; every value traced to its source</span></div></div><div class="lane"><div class="lanehead"><span class="ah">INTELLIGENCE LAYER</span><span class="anum">Score, stress, explain</span></div><div class="node poc"><b>Signal engine</b><span>Sub-scores to Risk, Stable or Gain; versioned methodology (rules now, ML once labels exist)</span></div><div class="node poc"><b>Scenario engine</b><span>Drought, regulation and climate paths</span></div><div class="node poc"><b>Portfolio aggregation</b><span>Mix, concentration, migration</span></div><div class="node"><b>AI layer</b><span>Retrieval over the evidence trail, LLM drafts credit notes, eval gate checks every number</span></div></div><div class="lane"><div class="lanehead"><span class="ah">FINANCIAL LAYER</span><span class="anum">Inside the client's workflow</span></div><div class="node"><b>REST API</b><span>Scores, evidence, scenarios</span></div><div class="node"><b>MCP server</b><span>Query from their own AI tools</span></div><div class="node poc"><b>Web app</b><span>Lender desk, Nature map</span></div><div class="node"><b>Reporting</b><span>TNFD-aligned exports</span></div><div class="node"><b>Alerts</b><span>Label changes to bank systems</span></div></div></div>
+    <div class="panel">
+      <div class="archwrap">/*__ARCH__*/</div>
       <div class="archfoot"><span><i></i>Built in this proof of concept</span><span>Everything else is the production plan</span></div>
     </div>
     <div class="cols">
@@ -972,10 +868,4 @@ window.addEventListener("hashchange",()=>{ fromHash(); render(); });
 drawBase();
 initMapControls();
 render();
-
-// architecture views
-document.querySelectorAll(".archtabs [data-view]").forEach(b=>b.addEventListener("click",()=>{
-  document.querySelectorAll(".archtabs [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-  document.querySelectorAll(".archview").forEach(v=>v.hidden = v.dataset.view!==b.dataset.view);
-}));
 </script>
