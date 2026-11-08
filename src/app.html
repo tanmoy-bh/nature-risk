@@ -101,6 +101,8 @@ main{max-width:1180px;margin:0 auto;padding-top:32px}
 .pagehead{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between}
 .pagehead .lede{color:var(--muted);max-width:62ch;margin-top:6px;font-size:17px;line-height:1.41}
 .scen{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.headctl{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+#place-pick{max-width:min(340px,100%)}
 .select{appearance:none;-webkit-appearance:none;background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='14' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%238E8E93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;
   border:0;border-radius:8px;padding:7px 30px 7px 12px;color:var(--ink);font-size:14px;cursor:pointer;min-height:32px}
 .scen-note{font-size:13px;color:var(--muted);background:var(--surface);border-radius:12px;padding:10px 14px}
@@ -520,7 +522,10 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   <section class="page" id="screen-map" hidden>
     <div class="pagehead">
       <div><h1>Nature map</h1><p class="lede">What the data says about each place in Malaysia and Singapore: forest, vegetation, water, biodiversity and livelihoods. No loans, no pricing.</p><p class="bmeta" style="white-space:normal;margin-top:8px">Nature indicators and 5-year trends are real<span class="dp real" title="Pulled from public open data">Real</span> Livelihoods and confidence depend on partner data, so they are samples<span class="dp sample" title="Sample value, not real data">Sample</span></p></div>
-      <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-map"></select></label>
+      <div class="headctl">
+        <label class="scen"><span class="label">Place</span><select class="select" id="place-pick" aria-label="Go to a place"></select></label>
+        <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-map"></select></label>
+      </div>
     </div>
     <p class="scen-note" hidden></p>
     <div class="panel mapshell">
@@ -1053,6 +1058,7 @@ function drawPins(){
   });
 }
 function renderMap(){
+  const pp=document.getElementById("place-pick"); if (pp && pp.value!==state.nsel) pp.value=state.nsel;
   syncZoomButtons();
   drawPins();
   document.getElementById("mapkeys").innerHTML = ["risk","stable","gain"].map(k=>`<span><i style="background:${COLORS[k]}"></i>${short(k)}</span>`).join("") +
@@ -1091,6 +1097,13 @@ document.querySelectorAll("[data-screen]").forEach(b=>b.addEventListener("click"
   try{ history.replaceState(null,"",{map:"#nature-map",desk:"#lender-desk",arch:"#architecture"}[state.screen]); }catch(e){}
   render(); if (changed) window.scrollTo({top:0});
 }));
+(function initPlacePicker(){
+  const pp=document.getElementById("place-pick"); if(!pp) return;
+  const groups={};
+  mapSites().forEach(a=>{ const parts=place(a).split(",").map(x=>x.trim()); const name=parts[0]; const STATES=["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Penang","Perak","Perlis","Sabah","Sarawak","Selangor","Terengganu","Singapore"]; const region=a.cc==="SG"?"Singapore":(STATES.find(st=>parts.some(x=>x.includes(st)))||"Malaysia"); (groups[region]=groups[region]||[]).push({id:a.id,label:`${name} · ${a.what}`}); });
+  pp.innerHTML = Object.keys(groups).sort().map(g=>`<optgroup label="${g}">${groups[g].sort((x,y)=>x.label.localeCompare(y.label)).map(o=>`<option value="${o.id}">${o.label}</option>`).join("")}</optgroup>`).join("");
+  pp.addEventListener("change",()=>{ state.nsel=pp.value; const a=mapSites().find(x=>x.id===state.nsel); if(a) zoomToSite(a, 380); renderMap(); save(); });
+})();
 document.getElementById("book-select").addEventListener("change",ev=>{ state.book=ev.target.value; state.filter="all"; render(); });
 document.getElementById("region-select").addEventListener("change",ev=>{ state.region=ev.target.value; render(); });
 document.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{state.filter=b.dataset.f; render();}));
