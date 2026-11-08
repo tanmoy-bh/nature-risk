@@ -143,6 +143,10 @@ tbody tr[aria-selected="true"] td:first-child{box-shadow:inset 3px 0 0 var(--lin
 .dot{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:14px}
 .dot i{width:8px;height:8px;border-radius:50%;display:inline-block}
 .was{font-size:12px;color:var(--muted)}
+.maplink{display:inline-flex;align-items:center;gap:3px;margin-left:8px;font-size:12px;font-weight:600;color:var(--link);text-decoration:none;padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--link) 10%,transparent)}
+.maplink:hover{background:color-mix(in srgb,var(--link) 18%,transparent)}
+.mapbtn{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:14px;font-weight:600;color:var(--link);text-decoration:none;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--link) 10%,transparent)}
+.mapbtn:hover{background:color-mix(in srgb,var(--link) 18%,transparent)}
 .lowc{color:var(--risk-ink)}
 
 /* detail / site card */
@@ -746,7 +750,22 @@ function evaluate(asset,scenKey){
 // ---------- state ----------
 let state = {screen:"desk", book:"agri", region:"all", scen:"base", filter:"all", sel:"A01", zoom:"all", nsel:"A19"};
 try{ const saved = JSON.parse(localStorage.getItem("nrd-state5")||"null"); if(saved) state = {...state, ...saved}; }catch(e){}
+let pendingZoom=null;
+function goToMap(id){
+  state.screen="map"; state.nsel=id; pendingZoom=id;
+  try{ history.replaceState(null,"","#map-"+id.toLowerCase()); }catch(e){}
+  render(); window.scrollTo({top:0});
+}
+function wireMapLinks(root){
+  if(!root) return;
+  root.querySelectorAll("[data-goto]").forEach(el=>{
+    el.addEventListener("click",ev=>{ ev.preventDefault(); ev.stopPropagation(); goToMap(el.dataset.goto); });
+    el.addEventListener("keydown",ev=>ev.stopPropagation());
+  });
+}
 function fromHash(){
+  const m=/^#map-([ar]\d{2})$/i.exec(location.hash);
+  if (m){ state.screen="map"; state.nsel=m[1].toUpperCase(); pendingZoom=state.nsel; return; }
   if (location.hash==="#nature-map") state.screen="map";
   else if (location.hash==="#architecture") state.screen="arch";
   else if (location.hash==="#lender-desk") state.screen="desk";
@@ -927,12 +946,13 @@ function renderDesk(){
   if (!book.some(a=>a.id===state.sel)) state.sel = [...evals].sort((p,q)=>q.a.exp-p.a.exp)[0].a.id;
   document.getElementById("rows").innerHTML = shown.length ? shown.map(({a,e,b})=>`
     <tr tabindex="0" data-id="${a.id}" aria-selected="${a.id===state.sel}">
-      <td><div class="bname">${a.what}</div><div class="bmeta">${place(a)}</div></td>
+      <td><div class="bname">${a.what}</div><div class="bmeta">${place(a)}${isMYSG(a)?` <a class="maplink" href="#map-${a.id.toLowerCase()}" data-goto="${a.id}" title="Show ${place(a).split(",")[0]} on the Nature map"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5A5 5 0 0 0 3 6.5C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.5" r="1.8" fill="currentColor"/></svg>Map</a>`:""}</div></td>
       <td class="r num" data-label="Exposure">${fmtM(a.exp)}</td>
       <td data-label="Label"><span class="dot"><i style="background:${COLORS[e.label]}"></i>${short(e.label)}${e.label!==b.label?` <span class="was">was ${short(b.label)}</span>`:""}</span></td>
       <td class="r num" data-label="Score">${e.score.toFixed(0)}</td>
       <td class="r num" data-label="Pricing">${fmtBps(e.bps)}</td>
     </tr>`).join("") : `<tr><td colspan="5" class="muted">No loans with this label in this scenario.</td></tr>`;
+  wireMapLinks(document.getElementById("rows"));
   document.querySelectorAll("#rows tr[data-id]").forEach(tr=>{
     const pick=()=>{state.sel=tr.dataset.id; render();};
     tr.addEventListener("click",pick);
@@ -945,8 +965,10 @@ function renderDesk(){
     ${e.greenOnGreen?'<span class="flag">Green-on-green: good for climate, risky for nature</span>':""}
     <div class="action"><span class="label">Suggested action<span class="dp sample" title="Illustrative rule, not real credit policy">Sample</span></span><br>${action(a,e)}</div>
     <p class="note muted">${note(a,e)}</p>
+    ${isMYSG(a)?`<a class="mapbtn" href="#map-${a.id.toLowerCase()}" data-goto="${a.id}"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5A5 5 0 0 0 3 6.5C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.5" r="1.8" fill="currentColor"/></svg>See this place on the Nature map</a>`:`<p class="bmeta" style="white-space:normal">The Nature map covers Malaysia and Singapore; this site is outside it.</p>`}
     ${bars(e)}
     ${evidenceBlock(a,e)}`;
+  wireMapLinks(document.getElementById("detail"));
 }
 
 // ---------- page 2: nature map ----------
@@ -1082,7 +1104,7 @@ function render(){
   document.querySelectorAll(".scen-note").forEach(n=>{ n.hidden = state.scen==="base"; n.textContent = SCEN[state.scen].desc; });
   document.querySelectorAll("[data-f]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.f===state.filter)));
   if (state.screen==="desk") renderDesk();
-  else if (state.screen==="map"){ setViewBox(vbNow); renderMap(); }
+  else if (state.screen==="map"){ setViewBox(vbNow); renderMap(); if (pendingZoom){ const t=mapSites().find(x=>x.id===pendingZoom); pendingZoom=null; if (t){ requestAnimationFrame(()=>{ zoomToSite(t, 380); renderMap(); }); } } }
   save();
 }
 
