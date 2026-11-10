@@ -19,7 +19,6 @@ const sites = ctx.ASSETS.filter((a) => a.kind === "agri").map((a) => ({
   ndvi: a.real && a.real.n19 != null && a.real.n25 != null ? ((a.real.n25 - a.real.n19) / a.real.n19) * 100 : null,
   stress: a.raw.stress || 0, pa: a.raw.dist,
   score: ctx.evaluate(a, "base").score, label: ctx.evaluate(a, "base").label,
-  ruleBps: { base: ctx.evaluate(a, "base").bps, drought: ctx.evaluate(a, "drought").bps, defor: ctx.evaluate(a, "defor").bps },
 }));
 await writeFile(join(root, "analysis/sites.json"), JSON.stringify(sites, null, 1) + "\n");
 console.log(`Wrote analysis/sites.json (${sites.length} farm loans)`);

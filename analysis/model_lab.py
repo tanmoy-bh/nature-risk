@@ -4,7 +4,7 @@ Nature Risk Desk - model lab.
 Runs the credit model from the Credit model page numerically (NumPy/SciPy),
 the way you would in MATLAB:
 
-  A. Old rule vs model, per site
+  A. Traditional view (financials only) vs view with nature data, per loan
   B. Monte Carlo check of the analytic PD (every site)
   C. Parameter uncertainty: distribution of the price change (every site)
   D. Tornado: which assumption moves the price most (every site)
@@ -107,14 +107,15 @@ def bank_of(s, **over):
 f = lambda x: float(np.asarray(x))
 out = {"meta": {"bank": BANK, "seed": 20261110}}
 
-# ---------- A. Old rule vs model, per site ----------
+# ---------- A. Traditional view vs view with nature data, per loan ----------
 rows = []
 for s in SITES:
     rec = {"id": s["id"], "name": s["where"].split(",")[0], "what": s["what"], "cc": s["cc"], "exp": s["exp"],
            "score": s["score"], "label": s["label"], "commodity": commodity(s["what"])["name"]}
     for sc in TRIGGER:
         m = run(nat_of(s), bank_of(s), sc)
-        rec[sc] = dict(rule=s["ruleBps"][sc], model=f(m["dbps"]), pd0=f(m["pd0"]), pdN=f(m["pdN"]),
+        rec[sc] = dict(model=f(m["dbps"]), sp0=f(m["sp0"]) * 1e4, spN=f(m["spN"]) * 1e4, pd0=f(m["pd0"]), pdN=f(m["pdN"]),
+                       lgd0=f(m["lgd0"]), el0=f(m["pd0"]) * f(m["lgd0"]) * s["exp"], elN=f(m["pdN"]) * f(m["lgdN"]) * s["exp"],
                        lgdN=f(m["lgdN"]), K0=f(m["K0"]), KN=f(m["KN"]), stage=2 if bool(m["sicr"]) else 1,
                        prov0=f(m["prov0"]) * s["exp"], provN=f(m["provN"]) * s["exp"])
     rec["plan"] = f(run(nat_of(s), bank_of(s), "base", plan=True)["dbps"])

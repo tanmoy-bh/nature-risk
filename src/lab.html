@@ -175,16 +175,16 @@ footer{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;ga
 
   <section class="card" id="model" aria-labelledby="m-h">
     <div class="head"><div class="t"><span class="tag">Read this first</span><h2 id="m-h">The credit model in equations</h2>
-      <p class="muted small">Every experiment below runs this chain. It takes a site's nature data, turns it into lost revenue, then into the numbers a bank prices with. The same chain runs on the Lender desk.</p></div></div>
+      <p class="muted small">Every experiment below runs this chain. It takes a site's nature data, turns it into lost revenue, then into the numbers a bank prices with.</p></div></div>
     <div class="eq" id="model-eq"></div>
     <div class="vals" id="model-vals"></div>
   </section>
 
   <section class="card" id="exp-a" aria-labelledby="a-h">
-    <div class="head"><div class="t"><span class="tag">Experiment A · all 27 farm loans</span><h2 id="a-h">The old rule against the credit model</h2></div>
-      <div class="ctrls"><div class="seg" id="a-scen" role="group" aria-label="Scenario"></div></div></div>
+    <div class="head"><div class="t"><span class="tag">Experiment A · all 27 farm loans</span><h2 id="a-h">The traditional risk view against the view with nature data</h2></div>
+      <div class="ctrls"><div class="seg" id="a-measure" role="group" aria-label="Measure"></div><div class="seg" id="a-scen" role="group" aria-label="Scenario"></div></div></div>
     <div class="sec" id="a-what"></div><div class="sec" id="a-eq"></div>
-    <div id="pA" class="plot tall" role="img" aria-label="Price change per loan: old rule against credit model"></div>
+    <div id="pA" class="plot tall" role="img" aria-label="Each loan under the traditional risk view and with nature data"></div>
     <p class="take" id="a-take"></p>
     <details><summary>Show the table</summary><div class="tablebox" id="a-table"></div></details>
   </section>
@@ -264,7 +264,7 @@ const SC={base:"Baseline",drought:"Repeat of driest year",defor:"Stricter defore
 const TRIG={base:2,drought:2,defor:0.5};
 const LABELNAME={risk:"Nature Risk",stable:"Nature Stable",gain:"Nature Gain"};
 const CN={MY:"Malaysia",SG:"Singapore",ID:"Indonesia",VN:"Vietnam",TH:"Thailand",PH:"Philippines",LK:"Sri Lanka",AU:"Australia"};
-const st={id:"A19",a:"base",e:"base",ev:"3d"};
+const st={id:"A19",a:"base",am:"price",e:"base",ev:"3d"};
 const fromHash=()=>{ const m=/^#(a\d{2})$/i.exec(location.hash); return m&&SITE[m[1].toUpperCase()]?m[1].toUpperCase():null; };
 const site=()=>SITE[st.id], per=()=>RES.per[st.id];
 const place=s=>`${s.name}, ${s.what.toLowerCase()}`;
@@ -293,7 +293,7 @@ function eqsec(id,lines,table){
 function vtable(rows,head=["Symbol","What it is","Value used","Source"]){
   return `<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===2?' class="n"':""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
-const REAL='<span class="dp real" style="margin-left:0">Real</span>', SAMPLE='<span class="dp sample" style="margin-left:0">Sample</span>', FIXED='<span class="muted">Rule</span>';
+const REAL='<span class="dp real" style="margin-left:0">Real</span>', SAMPLE='<span class="dp sample" style="margin-left:0">Sample</span>', FIXED='<span class="muted">Set by design</span>';
 function siteVals(s,p){
   const n=p.inputs.nat;
   return [
@@ -356,38 +356,48 @@ function findings(){
 }
 
 // ---------- A ----------
+// Traditional view = the bank's own model from financials alone (steps 5 to 10 without nature inputs).
+const AM={
+  pd:{label:"Chance of default",axis:"Probability of default in a year",f0:r=>r.pd0*100,fN:r=>r.pdN*100,fmt:v=>v.toFixed(2)+"%",unit:"%"},
+  el:{label:"Expected loss",axis:"Expected loss a year, $ thousands",f0:r=>r.el0*1000,fN:r=>r.elN*1000,fmt:v=>"$"+Math.round(v)+"k",unit:"k"},
+  price:{label:"Required price",axis:"Required price above funding cost, bps a year",f0:r=>r.sp0,fN:r=>r.spN,fmt:v=>Math.round(v)+" bps",unit:"bps"},
+};
+const gradeOf=pd=>{ const G=[[0.0003,"1 (AA)"],[0.001,"2 (A)"],[0.002,"3 (BBB+)"],[0.004,"4 (BBB)"],[0.008,"5 (BB+)"],[0.016,"6 (BB)"],[0.032,"7 (B+)"],[0.064,"8 (B)"],[0.128,"9 (B−)"],[1,"10 (CCC)"]]; return (G.find(g=>pd<g[0])||G[9])[1]; };
 function textA(){
   const n=RES.sites.length, tot=RES.sites.reduce((t,s)=>t+s.exp,0), cc=[...new Set(RES.sites.map(s=>s.cc))].length;
   what("a-what",[
-    ["Question","How different are loan prices under the credit model compared with the rule the Lender desk uses today?"],
-    ["What it simulates","Nothing random. Every loan is re-priced twice, once with the old rule and once with the credit model, under the scenario you pick."],
+    ["Question","How does the bank's traditional view of each loan's risk, built from the borrower's financials alone, compare with its view once nature data is added?"],
+    ["What it simulates","Nothing random. Every loan is assessed twice under the scenario you pick: once the traditional way, from financials only, and once with the site's nature data feeding into the same calculations."],
     ["Cohort",`All ${n} farm and plantation loans on the Lender desk: $${tot}m across ${cc} countries. The renewable energy projects are left out because their cash flows behave differently.`],
-    ["Data points per loan",`${REAL} forest loss, rainfall deficit, water stress, vegetation change and distance to protected areas. ${SAMPLE} loan size, crop sensitivities and the bank assumptions at their central values. The nature score comes from the Nature map's scoring.`],
-    ["How we read it","Grey is the old rule, purple is the model. The further apart, the more the old rule misprices the loan. The selected place is circled."],
+    ["Data points per loan",`${SAMPLE} loan size and borrower financials. To isolate the effect of nature, every borrower is given the same financials, so the traditional view rates all 27 loans alike. ${REAL} forest loss, rainfall deficit, water stress, vegetation change and distance to protected areas, used only in the view with nature data.`],
+    ["How we read it","Grey is the traditional view, purple is the view with nature data. Switch between chance of default, expected loss and required price. The further a purple dot sits from the grey line, the more the traditional view misses. The selected place is circled."],
   ]);
   eqsec("a-eq",[
-    `<b>Old rule</b>   Nature Risk: min(60, 25 + 0.8 × max(0, 60 − score))   Nature Gain: −min(20, 10 + 0.5 × (score − 62))   Nature Stable: 0`,
-    `<b>Credit model</b>   Δprice = (EL<sub>N</sub> + K<sub>N</sub> × r + c) − (EL₀ + K₀ × r + c)   <span class="c">steps 1 to 10 of the model above</span>`,
-    `<span class="c">Scenarios: Baseline T = 2%;  Repeat of driest year p<sub>D</sub> = 25% and r<sub>drought</sub> = y ÷ 4;  Stricter deforestation rule T = 0.5%</span>`],
-    vtable([["Loans","27 farm and plantation loans","$"+tot+"m",SAMPLE],["Nature inputs","5 per loan, measured in a 2–4 km box around the site","135 values",REAL],["Bank assumptions","Central values from the model card above","13 values",SAMPLE]],["Item","What it is","Count or size","Source"]));
+    `<b>Traditional view</b>   PD₀ = N(−ln DSCR̄ ÷ σ)   LGD₀   EL₀ = PD₀ × LGD₀ × EAD   Price₀ = PD₀ × LGD₀ + K(PD₀, LGD₀) × r + c`,
+    `<b>With nature data</b>   PD<sub>N</sub> = N(−ln DSCR̄<sub>N</sub> ÷ σ<sub>N</sub>)   LGD<sub>N</sub>   EL<sub>N</sub> = PD<sub>N</sub> × LGD<sub>N</sub> × EAD   Price<sub>N</sub> = PD<sub>N</sub> × LGD<sub>N</sub> + K(PD<sub>N</sub>, LGD<sub>N</sub>) × r + c   <span class="c">steps 1 to 10 of the model above</span>`,
+    `<b>Difference</b>   Δprice = Price<sub>N</sub> − Price₀   <span class="c">in bps a year; K is the Basel capital requirement, step 9</span>`,
+    `<span class="c">Scenarios: Baseline T = 2%;  Repeat of driest year p<sub>D</sub> = 25% and r<sub>drought</sub> = y ÷ ${B.tenor};  Stricter deforestation rule T = 0.5%</span>`],
+    vtable([["Loans","27 farm and plantation loans","$"+tot+"m",SAMPLE],["Borrower financials","The same for every loan: DSCR̄ "+B.dscr.toFixed(2)+"×, σ "+B.sigma.toFixed(2)+", LGD₀ "+pct(B.lgd,0),"1 set",SAMPLE],
+      ["Nature inputs","5 per loan, measured in a 2–4 km box around the site","135 values",REAL],["Bank assumptions","Central values from the model card above","13 values",SAMPLE]],["Item","What it is","Count or size","Source"]));
 }
 function drawA(T){
-  const sc=st.a, rows=[...RES.sites].sort((x,y)=>x[sc].model-y[sc].model);
+  const sc=st.a, M=AM[st.am], rows=[...RES.sites].sort((x,y)=>M.fN(x[sc])-M.fN(y[sc]));
   const narrow=document.getElementById("pA").clientWidth<560, names=rows.map(r=>narrow?r.name:`${r.name} · ${r.commodity}`);
-  const segX=[],segY=[]; rows.forEach((r,i)=>{ segX.push(r[sc].rule,r[sc].model,null); segY.push(names[i],names[i],null); });
-  const hov=r=>`<b>${r.name}</b>, ${r.what}<br>${LABELNAME[r.label]}, score ${r.score.toFixed(0)}<br>Old rule: ${fmt(r[sc].rule)} bps<br>Credit model: ${fmt(r[sc].model,1)} bps<br>PD ${pct(r[sc].pd0,2)} → ${pct(r[sc].pdN,2)} · Stage ${r[sc].stage}<extra></extra>`;
+  const segX=[],segY=[]; rows.forEach((r,i)=>{ segX.push(M.f0(r[sc]),M.fN(r[sc]),null); segY.push(names[i],names[i],null); });
+  const hov=r=>{ const v=r[sc]; return `<b>${r.name}</b>, ${r.what}<br>Traditional: PD ${pct(v.pd0,2)} · grade ${gradeOf(v.pd0)} · ${Math.round(v.sp0)} bps<br>With nature data: PD ${pct(v.pdN,2)} · grade ${gradeOf(v.pdN)} · ${Math.round(v.spN)} bps<br>Price change ${fmt(v.model,1)} bps · IFRS 9 Stage ${v.stage}<extra></extra>`; };
   const sel=rows.findIndex(r=>r.id===st.id);
   Plotly.react("pA",[
     {x:segX,y:segY,mode:"lines",line:{color:T.line,width:2},hoverinfo:"skip",showlegend:false},
-    {x:rows.map(r=>r[sc].rule),y:names,mode:"markers",name:"Old rule",marker:{size:10,color:T.base,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
-    {x:rows.map(r=>r[sc].model),y:names,mode:"markers",name:"Credit model",marker:{size:11,color:T.nat,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
-    {x:[rows[sel][sc].model],y:[names[sel]],mode:"markers",name:"Selected place",marker:{size:22,color:"rgba(0,0,0,0)",line:{color:T.ink,width:2}},hoverinfo:"skip"},
-  ],layout(T,{xaxis:{title:{text:"Price change, bps a year"},zeroline:true,zerolinecolor:T.muted},yaxis:{tickfont:{size:11.5,color:T.ink},gridcolor:"rgba(0,0,0,0)"},height:document.getElementById("pA").clientHeight||640}),CFG);
-  const up=rows.filter(r=>r[sc].model-r[sc].rule>15).length, gainRows=rows.filter(r=>r.label==="gain");
-  const avg=(a,k)=>a.reduce((t,r)=>t+r[sc][k],0)/a.length, s=site()[sc];
-  document.getElementById("a-take").innerHTML=`In the ${SC[sc].toLowerCase()} scenario, the credit model prices ${up} of the 27 loans more than 15 bps above the old rule. ${site().name} goes from ${fmt(s.rule)} to ${fmt(s.model)} bps. The ${gainRows.length} Nature Gain loans average ${fmt(avg(gainRows,"rule"))} bps under the rule but ${fmt(avg(gainRows,"model"))} bps in the model: the rule gives discounts that the cash-flow evidence does not yet support, so a sustainability-linked discount needs verified improvement behind it.`;
-  document.getElementById("a-table").innerHTML=`<table><thead><tr><th>Loan</th><th>Label</th><th>Loan size</th><th>Score</th><th>Old rule</th><th>Credit model</th><th>With verified plan</th><th>PD</th><th>IFRS 9</th></tr></thead><tbody>${
-    [...RES.sites].sort((a,b)=>b[sc].model-a[sc].model).map(r=>`<tr><td>${r.name}, ${r.what}</td><td><span class="chip ${r.label}">${LABELNAME[r.label]}</span></td><td>$${r.exp}m</td><td>${r.score.toFixed(0)}</td><td>${fmt(r[sc].rule)}</td><td>${fmt(r[sc].model,1)}</td><td>${sc==="base"?fmt(r.plan,1):"–"}</td><td>${pct(r[sc].pd0,2)} → ${pct(r[sc].pdN,2)}</td><td>Stage ${r[sc].stage}</td></tr>`).join("")}</tbody></table>`;
+    {x:rows.map(r=>M.f0(r[sc])),y:names,mode:"markers",name:"Traditional view (financials only)",marker:{size:10,color:T.base,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+    {x:rows.map(r=>M.fN(r[sc])),y:names,mode:"markers",name:"With nature data",marker:{size:11,color:T.nat,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+    {x:[M.fN(rows[sel][sc])],y:[names[sel]],mode:"markers",name:"Selected place",marker:{size:22,color:"rgba(0,0,0,0)",line:{color:T.ink,width:2}},hoverinfo:"skip"},
+  ],layout(T,{xaxis:{title:{text:M.axis}},yaxis:{tickfont:{size:11.5,color:T.ink},gridcolor:"rgba(0,0,0,0)"},height:document.getElementById("pA").clientHeight||640}),CFG);
+  const v0=rows.map(r=>M.f0(r[sc])), vN=rows.map(r=>M.fN(r[sc])), same=Math.max(...v0)-Math.min(...v0)<1e-6;
+  const up=rows.filter(r=>r[sc].model>5).length, down=rows.filter(r=>r[sc].model<-5).length, top=rows[rows.length-1], s=site()[sc];
+  document.getElementById("a-take").innerHTML=`${same?`The traditional view gives every loan the same ${M.label.toLowerCase()}, ${M.fmt(v0[0])}, because it only sees the borrowers' financials, which are identical here.`:`The traditional view ranges from ${M.fmt(Math.min(...v0))} to ${M.fmt(Math.max(...v0))}.`} With nature data, the same loans spread from ${M.fmt(Math.min(...vN))} to ${M.fmt(Math.max(...vN))}. In the ${SC[sc].toLowerCase()} scenario, ${up} loans need a higher price than the traditional view sets and ${down} could be priced lower. The biggest gap is ${top.name}, ${top.what.toLowerCase()}. ${site().name} moves from ${M.fmt(M.f0(s))} to ${M.fmt(M.fN(s))}.`;
+  document.getElementById("a-table").innerHTML=`<table><thead><tr><th>Loan</th><th>Nature label</th><th>Loan size</th><th>Chance of default</th><th>Internal grade</th><th>Expected loss a year</th><th>Required price</th><th>Price change</th><th>With verified plan</th><th>IFRS 9</th></tr></thead><tbody>${
+    [...RES.sites].sort((a,b)=>b[sc].model-a[sc].model).map(r=>{ const v=r[sc]; return `<tr><td>${r.name}, ${r.what}</td><td><span class="chip ${r.label}">${LABELNAME[r.label]}</span></td><td>$${r.exp}m</td><td>${pct(v.pd0,2)} → ${pct(v.pdN,2)}</td><td>${gradeOf(v.pd0)} → ${gradeOf(v.pdN)}</td><td>$${Math.round(v.el0*1000)}k → $${Math.round(v.elN*1000)}k</td><td>${Math.round(v.sp0)} → ${Math.round(v.spN)} bps</td><td>${fmt(v.model,1)} bps</td><td>${sc==="base"?fmt(r.plan,1)+" bps":"–"}</td><td>Stage 1 → ${v.stage}</td></tr>`; }).join("")}</tbody></table>
+    <p class="small muted" style="margin-top:8px">Each cell reads traditional view → with nature data.</p>`;
 }
 
 // ---------- B ----------
@@ -649,6 +659,7 @@ async function init(){
   sel.value=st.id; sel.addEventListener("change",()=>selectSite(sel.value,true));
   window.addEventListener("hashchange",()=>{ const id=fromHash(); if(id&&id!==st.id) selectSite(id,false); });
   modelCard(); findings(); textAll();
+  segs("a-measure",Object.entries(AM).map(([k,v])=>[k,v.label]),"am",()=>drawOne("pA"));
   segs("a-scen",Object.entries(SC),"a",()=>drawOne("pA"));
   segs("e-scen",[["base","Baseline"],["drought","Repeat of driest year"]],"e",()=>{ textE(); drawOne("pE"); });
   segs("e-view",[["3d","3D surface"],["map","Contour map"]],"ev",()=>drawOne("pE"));

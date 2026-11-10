@@ -11,12 +11,7 @@
   "stress": 0,
   "pa": 35,
   "score": 86.03576187715065,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 25
-  }
+  "label": "stable"
  },
  {
   "id": "A02",
@@ -30,12 +25,7 @@
   "stress": 0,
   "pa": 35,
   "score": 38.41314549976515,
-  "label": "risk",
-  "ruleBps": {
-   "base": 42,
-   "drought": 47,
-   "defor": 42
-  }
+  "label": "risk"
  },
  {
   "id": "A03",
@@ -49,12 +39,7 @@
   "stress": 0,
   "pa": 0,
   "score": 72.5418348602986,
-  "label": "gain",
-  "ruleBps": {
-   "base": -15,
-   "drought": 0,
-   "defor": -15
-  }
+  "label": "gain"
  },
  {
   "id": "A04",
@@ -68,12 +53,7 @@
   "stress": 0,
   "pa": 35,
   "score": 50.85000000000001,
-  "label": "risk",
-  "ruleBps": {
-   "base": 32,
-   "drought": 39,
-   "defor": 32
-  }
+  "label": "risk"
  },
  {
   "id": "A05",
@@ -87,12 +67,7 @@
   "stress": 0,
   "pa": 20,
   "score": 54.74399999999999,
-  "label": "risk",
-  "ruleBps": {
-   "base": 29,
-   "drought": 36,
-   "defor": 29
-  }
+  "label": "risk"
  },
  {
   "id": "A06",
@@ -106,12 +81,7 @@
   "stress": 1.48,
   "pa": 2,
   "score": 57.84049563245817,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 0
-  }
+  "label": "stable"
  },
  {
   "id": "A07",
@@ -125,12 +95,7 @@
   "stress": 2.52,
   "pa": 35,
   "score": 80.046,
-  "label": "gain",
-  "ruleBps": {
-   "base": -19,
-   "drought": -15,
-   "defor": -19
-  }
+  "label": "gain"
  },
  {
   "id": "A08",
@@ -144,12 +109,7 @@
   "stress": 0,
   "pa": 35,
   "score": 50.901273405228,
-  "label": "risk",
-  "ruleBps": {
-   "base": 32,
-   "drought": 40,
-   "defor": 32
-  }
+  "label": "risk"
  },
  {
   "id": "A09",
@@ -163,12 +123,7 @@
   "stress": 0,
   "pa": 35,
   "score": 78.86776187715066,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 0
-  }
+  "label": "stable"
  },
  {
   "id": "A10",
@@ -182,12 +137,7 @@
   "stress": 2.8,
   "pa": 35,
   "score": 57.81203649157396,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 0
-  }
+  "label": "stable"
  },
  {
   "id": "A11",
@@ -201,12 +151,7 @@
   "stress": 0,
   "pa": 60,
   "score": 94.04536982490728,
-  "label": "gain",
-  "ruleBps": {
-   "base": -20,
-   "drought": -20,
-   "defor": -20
-  }
+  "label": "gain"
  },
  {
   "id": "A12",
@@ -220,12 +165,7 @@
   "stress": 1.43,
   "pa": 20,
   "score": 80.84422691254194,
-  "label": "gain",
-  "ruleBps": {
-   "base": -19,
-   "drought": -15,
-   "defor": -19
-  }
+  "label": "gain"
  },
  {
   "id": "A13",
@@ -239,12 +179,7 @@
   "stress": 2.77,
   "pa": 5,
   "score": 61.85625927885767,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 25
-  }
+  "label": "stable"
  },
  {
   "id": "A14",
@@ -258,12 +193,7 @@
   "stress": 0.26,
   "pa": 10,
   "score": 60.94328563145197,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 25
-  }
+  "label": "stable"
  },
  {
   "id": "A15",
@@ -277,12 +207,7 @@
   "stress": 1.65,
   "pa": 1,
   "score": 57.93532005650641,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 27
-  }
+  "label": "stable"
  },
  {
   "id": "A16",
@@ -296,12 +221,7 @@
   "stress": 0,
   "pa": 5,
   "score": 73.25,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 0
-  }
+  "label": "stable"
  },
  {
   "id": "A17",
@@ -315,12 +235,7 @@
   "stress": 0,
   "pa": 20,
   "score": 71.24395023159913,
-  "label": "risk",
-  "ruleBps": {
-   "base": 25,
-   "drought": 25,
-   "defor": 25
-  }
+  "label": "risk"
  },
  {
   "id": "A18",
@@ -334,12 +249,7 @@
   "stress": 0,
   "pa": 20,
   "score": 73.20794007189465,
-  "label": "risk",
-  "ruleBps": {
-   "base": 25,
-   "drought": 25,
-   "defor": 25
-  }
+  "label": "risk"
  },
  {
   "id": "A19",
@@ -353,12 +263,7 @@
   "stress": 0,
   "pa": 2,
   "score": 37.1169753542733,
-  "label": "risk",
-  "ruleBps": {
-   "base": 43,
-   "drought": 49,
-   "defor": 43
-  }
+  "label": "risk"
  },
  {
   "id": "A20",
@@ -372,12 +277,7 @@
   "stress": 0,
   "pa": 60,
   "score": 49.86995229811864,
-  "label": "risk",
-  "ruleBps": {
-   "base": 33,
-   "drought": 39,
-   "defor": 33
-  }
+  "label": "risk"
  },
  {
   "id": "A21",
@@ -391,12 +291,7 @@
   "stress": 0.01,
   "pa": 35,
   "score": 72.47555612061703,
-  "label": "risk",
-  "ruleBps": {
-   "base": 25,
-   "drought": 25,
-   "defor": 25
-  }
+  "label": "risk"
  },
  {
   "id": "A22",
@@ -410,12 +305,7 @@
   "stress": 0,
   "pa": 10,
   "score": 80.5784017964687,
-  "label": "gain",
-  "ruleBps": {
-   "base": -19,
-   "drought": -15,
-   "defor": -19
-  }
+  "label": "gain"
  },
  {
   "id": "A23",
@@ -429,12 +319,7 @@
   "stress": 0,
   "pa": 35,
   "score": 51.0453698249073,
-  "label": "risk",
-  "ruleBps": {
-   "base": 32,
-   "drought": 41,
-   "defor": 32
-  }
+  "label": "risk"
  },
  {
   "id": "A24",
@@ -448,12 +333,7 @@
   "stress": 0,
   "pa": 1,
   "score": 63.742247331539645,
-  "label": "stable",
-  "ruleBps": {
-   "base": 0,
-   "drought": 0,
-   "defor": 25
-  }
+  "label": "stable"
  },
  {
   "id": "A25",
@@ -467,12 +347,7 @@
   "stress": 0.97,
   "pa": 20,
   "score": 78.72395229811865,
-  "label": "gain",
-  "ruleBps": {
-   "base": -18,
-   "drought": -13,
-   "defor": -18
-  }
+  "label": "gain"
  },
  {
   "id": "A26",
@@ -486,12 +361,7 @@
   "stress": 0,
   "pa": 20,
   "score": 57.92038084193596,
-  "label": "risk",
-  "ruleBps": {
-   "base": 27,
-   "drought": 34,
-   "defor": 27
-  }
+  "label": "risk"
  },
  {
   "id": "A27",
@@ -505,11 +375,6 @@
   "stress": 0.01,
   "pa": 2,
   "score": 62.14666666666666,
-  "label": "risk",
-  "ruleBps": {
-   "base": 25,
-   "drought": 29,
-   "defor": 25
-  }
+  "label": "risk"
  }
 ]
