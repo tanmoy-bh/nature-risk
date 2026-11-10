@@ -1,0 +1,665 @@
+<style>
+/* Layout: Apple HIG — translucent nav bar, large titles, inset grouped cards on a grouped background, system colors, segmented controls */
+:root{
+  --bg:#F2F2F7; --surface:#FFFFFF; --soft:#F2F2F7; --fill:rgba(118,118,128,.12); --ink:#000000; --muted:#6E6E73; --line:#E5E5EA;
+  --accent:#248A3D; --accent-ink:#FFFFFF; --link:#007AFF;
+  --risk:#FF3B30; --risk-bg:#FFE9E7; --risk-ink:#D70015;
+  --stable:#FF9500; --stable-bg:#FFF2DF; --stable-ink:#C93400;
+  --gain:#34C759; --gain-bg:#E4F8E9; --gain-ink:#248A3D;
+  --real:#0071E3; --real-bg:#E5F0FD; --sample:#8944AB; --sample-bg:#F4EAFB;
+  --sea:#CFE5F3; --land:#FFFFFF; --land-dim:#ECEBE7; --border:#C7C7CC; --maplabel:#8E8E93;
+  --navbg:rgba(249,249,251,.82);
+  --sans:var(--font-body); --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --z-client:#E9EFFB; --zs-client:#9DB4E2; --zi-client:#2F55A4;
+  --z-edge:#F1EBFA; --zs-edge:#BFA9E4; --zi-edge:#6B44B0;
+  --z-plat:#E8F4EC; --zs-plat:#94C8A7; --zi-plat:#1E7A4A;
+  --z-data:#FCF2E1; --zs-data:#E2BF84; --zi-data:#9A6413;
+  --z-ext:#EDF0F1; --zs-ext:#B6BEC4; --zi-ext:#55616A;
+  --z-band:#EEF1EE;
+  --z-ai:#E2F3F3; --zs-ai:#80C3C1; --zi-ai:#0F6E6B;
+  --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+  --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+  --font-data:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#1C1C1E; --soft:#2C2C2E; --fill:rgba(118,118,128,.24); --ink:#FFFFFF; --muted:#98989F; --line:#38383A;
+  --accent:#30D158; --accent-ink:#000000; --link:#0A84FF;
+  --risk:#FF453A; --risk-bg:#3B1714; --risk-ink:#FF6961;
+  --stable:#FF9F0A; --stable-bg:#3A2809; --stable-ink:#FFB340;
+  --gain:#30D158; --gain-bg:#10331C; --gain-ink:#4CD964;
+  --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
+  --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
+  --navbg:rgba(22,22,24,.78);
+  --z-client:#152036; --zs-client:#3B5A92; --zi-client:#8EB0F2;
+  --z-edge:#211A30; --zs-edge:#5E4A8C; --zi-edge:#C3A8F2;
+  --z-plat:#13251B; --zs-plat:#2E6B47; --zi-plat:#6FD39C;
+  --z-data:#2A2112; --zs-data:#7A6030; --zi-data:#E9BE72;
+  --z-ext:#1C2124; --zs-ext:#4A535A; --zi-ext:#A9B4BC;
+  --z-band:#161B18;
+  --z-ai:#0E2524; --zs-ai:#2A6A67; --zi-ai:#6FD6D2;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --soft:#2C2C2E; --fill:rgba(118,118,128,.24); --ink:#FFFFFF; --muted:#98989F; --line:#38383A;
+  --accent:#30D158; --accent-ink:#000000; --link:#0A84FF;
+  --risk:#FF453A; --risk-bg:#3B1714; --risk-ink:#FF6961;
+  --stable:#FF9F0A; --stable-bg:#3A2809; --stable-ink:#FFB340;
+  --gain:#30D158; --gain-bg:#10331C; --gain-ink:#4CD964;
+  --real:#0A84FF; --real-bg:#0B2A4A; --sample:#BF5AF2; --sample-bg:#33173F;
+  --sea:#0E2233; --land:#2C2C2E; --land-dim:#1F1F21; --border:#48484A; --maplabel:#8E8E93;
+  --navbg:rgba(22,22,24,.78);
+  --z-client:#152036; --zs-client:#3B5A92; --zi-client:#8EB0F2;
+  --z-edge:#211A30; --zs-edge:#5E4A8C; --zi-edge:#C3A8F2;
+  --z-plat:#13251B; --zs-plat:#2E6B47; --zi-plat:#6FD39C;
+  --z-data:#2A2112; --zs-data:#7A6030; --zi-data:#E9BE72;
+  --z-ext:#1C2124; --zs-ext:#4A535A; --zi-ext:#A9B4BC;
+  --z-band:#161B18;
+  --z-ai:#0E2524; --zs-ai:#2A6A67; --zi-ai:#6FD6D2;
+  color-scheme:dark}
+/* Model lab: nav, place picker, findings, the model's equations, then one card per experiment:
+   what it is -> equations and values -> chart -> what it shows. Charts are Plotly, themed from these tokens. */
+:root{ --nat:#5856D6; --nat-bg:rgba(88,86,214,.14); --base:#8E8E93; --eq:#F7F7FA; --s1:#2a78d6; --s2:#eb6834; --div-neg:#2a78d6; --div-mid:#f0efec; --div-pos:#e34948; }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --nat:#7D7AFF; --nat-bg:rgba(125,122,255,.2); --base:#8E8E93; --eq:#232326; --s1:#3987e5; --s2:#d95926; --div-neg:#3987e5; --div-mid:#383835; --div-pos:#e66767; }}
+:root[data-theme="dark"]{ --nat:#7D7AFF; --nat-bg:rgba(125,122,255,.2); --base:#8E8E93; --eq:#232326; --s1:#3987e5; --s2:#d95926; --div-neg:#3987e5; --div-mid:#383835; --div-pos:#e66767; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.47;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navbg)}
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navbg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topnav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:8px 24px;flex-wrap:wrap;min-height:52px}
+.brand{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);text-decoration:none;padding-block:8px}
+.brand svg{color:var(--accent)}
+.navlinks{display:inline-flex;gap:2px;background:var(--fill);border-radius:9px;padding:2px;flex-wrap:wrap}
+.navlinks a{display:flex;align-items:center;font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;padding:5px 14px;border-radius:7px;min-height:28px}
+.navlinks a[aria-current="page"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);font-weight:600}
+.themebtn{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:0;background:var(--fill);color:var(--ink);cursor:pointer;flex:none;margin-left:auto}
+.themebtn .sun{display:none}.themebtn.isdark .sun{display:block}.themebtn.isdark .moon{display:none}
+@media (max-width:760px){.navlinks a{padding:5px 10px}}
+@media (max-width:480px){.navlinks{order:3}.navlinks a{padding:5px 7px;font-size:12.5px}.brand{font-size:15px}}
+
+.wrap{max-width:1180px;margin:0 auto;padding-block:24px 48px;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--font-display);font-size:34px;line-height:1.1;letter-spacing:-.025em;margin:0;text-wrap:balance}
+h2{font-family:var(--font-display);font-size:21px;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h3{font-size:13px;font-weight:600;margin:0;color:var(--ink)}
+p{margin:0}
+.muted{color:var(--muted)} .small{font-size:13px}
+.label{font-size:12px;color:var(--muted);font-weight:500}
+.dp{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;letter-spacing:.02em;line-height:1;padding:3px 7px;border-radius:999px;vertical-align:2px;margin-left:6px;white-space:nowrap}
+.dp::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.dp.sample{color:var(--sample);background:var(--sample-bg)} .dp.real{color:var(--real);background:var(--real-bg)}
+.intro{display:flex;flex-direction:column;gap:8px;max-width:76ch}
+button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid color-mix(in srgb,var(--link) 45%,transparent);outline-offset:2px}
+
+.placebar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 53px);z-index:4;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;background:var(--surface);border-radius:14px;padding:10px 16px;box-shadow:0 1px 0 var(--line)}
+.placebar label{display:flex;align-items:center;gap:8px;min-width:0}
+.select{font:inherit;font-size:15px;padding:7px 30px 7px 10px;border-radius:9px;border:0;background:var(--fill);color:var(--ink);max-width:100%;min-width:0;appearance:none;-webkit-appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+.placebar .note{font-size:13px;color:var(--muted)}
+
+.findings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.find{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.find .big{font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.find p{font-size:13.5px;color:var(--muted)}
+
+.card{background:var(--surface);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0;scroll-margin-top:120px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.head .t{display:flex;flex-direction:column;gap:4px;max-width:76ch;min-width:0}
+.tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--nat)}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:13px;font-weight:500;border:0;background:transparent;color:var(--ink);padding:5px 11px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);font-weight:600}
+.resetbtn{font:inherit;font-size:13px;font-weight:500;border:0;border-radius:9px;padding:6px 12px;background:var(--fill);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.resetbtn.zoomed{background:var(--nat);color:#fff;font-weight:600}
+
+.sec{border-radius:12px;background:var(--soft);padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sec .sh{display:flex;align-items:center;gap:8px}
+.sec .sn{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--nat);color:#fff;font-size:11px;font-weight:700;flex:none}
+.facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.facts dt{color:var(--muted);font-size:13px;padding-top:1px}
+.facts dd{margin:0}
+.eq{background:var(--eq);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:12.5px;line-height:1.6;display:flex;flex-direction:column;gap:6px;overflow-wrap:anywhere}
+.eq>div{padding-left:1.4em;text-indent:-1.4em;white-space:pre-wrap}
+.eq .c{color:var(--muted)}
+.vals{overflow-x:auto}
+table{border-collapse:collapse;font-size:13px;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:6px 10px;border-bottom:.5px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12px;white-space:nowrap}
+td.n{text-align:right;white-space:nowrap}
+td code,.facts code{font-family:var(--mono);font-size:12px}
+.plot{width:100%;min-height:340px}
+.plot.tall{min-height:640px} .plot.surf{min-height:520px} .plot.short{min-height:300px}
+.take{border-radius:12px;padding:12px 14px;background:var(--nat-bg);font-size:14px}
+.multi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+details summary{cursor:pointer;color:var(--link);font-size:14px}
+.tablebox{overflow-x:auto;margin-top:10px}
+.tablebox td,.tablebox th{white-space:nowrap}
+.chip{display:inline-flex;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
+.chip.risk{background:var(--risk-bg);color:var(--risk-ink)} .chip.stable{background:var(--stable-bg);color:var(--stable-ink)} .chip.gain{background:var(--gain-bg);color:var(--gain-ink)}
+footer{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:90ch}
+.loading{color:var(--muted);font-size:13px}
+@media (max-width:900px){ .findings{grid-template-columns:repeat(2,minmax(0,1fr))} .multi{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:560px){ .findings{grid-template-columns:minmax(0,1fr)} h1{font-size:28px} .card{padding:16px} .plot.tall{min-height:760px}
+  .facts{grid-template-columns:minmax(0,1fr)} .facts dd{margin-bottom:6px} .placebar{position:static} .placebar label{width:100%} .placebar .select{flex:1} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<!--NAV-->
+<nav class="topnav" aria-label="Pages">
+  <div class="topnav-in">
+    <a class="brand" href="./#lender-desk"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3c-4 3-6.5 6.4-6.5 10A6.5 6.5 0 0 0 12 19.5 6.5 6.5 0 0 0 18.5 13C18.5 9.4 16 6 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v13" stroke="currentColor" stroke-width="1.8"/></svg>Nature Risk Desk</a>
+    <div class="navlinks">
+      <a href="./#lender-desk">Lender desk</a>
+      <a href="./#nature-map">Nature map</a>
+      <a href="./#architecture">Architecture</a>
+      <a href="lab" aria-current="page">Model lab</a>
+    </div>
+    <button class="themebtn" id="theme-toggle" type="button" aria-label="Switch theme" title="Switch theme"><svg class="sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+  </div>
+</nav>
+<!--/NAV-->
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Model lab</h1>
+    <p class="muted">Seven numerical experiments on the credit model, run in Python with NumPy and SciPy the way you would in MATLAB. Each card says what the experiment is and which data it uses, then shows its equations and the exact values it ran with, then the chart. Drag across a chart to zoom into part of it, and press <b>Reset view</b> to go back.</p>
+  </header>
+
+  <section class="placebar" aria-label="Choose a place">
+    <label><span class="label">Place</span><select class="select" id="place" aria-label="Place"></select></label>
+    <span class="note">Experiments B to E use this place. A, F and G cover all 27 farm loans.</span>
+  </section>
+
+  <section class="findings" id="findings" aria-label="Main findings"></section>
+
+  <section class="card" id="model" aria-labelledby="m-h">
+    <div class="head"><div class="t"><span class="tag">Read this first</span><h2 id="m-h">The credit model in equations</h2>
+      <p class="muted small">Every experiment below runs this chain. It takes a site's nature data, turns it into lost revenue, then into the numbers a bank prices with. The same chain runs on the Lender desk.</p></div></div>
+    <div class="eq" id="model-eq"></div>
+    <div class="vals" id="model-vals"></div>
+  </section>
+
+  <section class="card" id="exp-a" aria-labelledby="a-h">
+    <div class="head"><div class="t"><span class="tag">Experiment A · all 27 farm loans</span><h2 id="a-h">The old rule against the credit model</h2></div>
+      <div class="ctrls"><div class="seg" id="a-scen" role="group" aria-label="Scenario"></div></div></div>
+    <div class="sec" id="a-what"></div><div class="sec" id="a-eq"></div>
+    <div id="pA" class="plot tall" role="img" aria-label="Price change per loan: old rule against credit model"></div>
+    <p class="take" id="a-take"></p>
+    <details><summary>Show the table</summary><div class="tablebox" id="a-table"></div></details>
+  </section>
+
+  <section class="card" id="exp-b" aria-labelledby="b-h">
+    <div class="head"><div class="t"><span class="tag" id="b-tag"></span><h2 id="b-h">Checking the default probability by simulation</h2></div><div class="ctrls"></div></div>
+    <div class="sec" id="b-what"></div><div class="sec" id="b-eq"></div>
+    <div id="pB" class="plot" role="img" aria-label="Simulated distribution of the debt service coverage ratio"></div>
+    <p class="take" id="b-take"></p>
+  </section>
+
+  <section class="card" id="exp-c" aria-labelledby="c-h">
+    <div class="head"><div class="t"><span class="tag" id="c-tag"></span><h2 id="c-h">How sure are we of the price?</h2></div><div class="ctrls"></div></div>
+    <div class="sec" id="c-what"></div><div class="sec" id="c-eq"></div>
+    <div id="pC" class="plot" role="img" aria-label="Distribution of the price change across uncertain assumptions"></div>
+    <p class="take" id="c-take"></p>
+  </section>
+
+  <section class="card" id="exp-d" aria-labelledby="d-h">
+    <div class="head"><div class="t"><span class="tag" id="d-tag"></span><h2 id="d-h">Which assumption matters most?</h2></div><div class="ctrls"></div></div>
+    <div class="sec" id="d-what"></div><div class="sec" id="d-eq"></div>
+    <div id="pD" class="plot" role="img" aria-label="Tornado chart of price sensitivity"></div>
+    <p class="take" id="d-take"></p>
+  </section>
+
+  <section class="card" id="exp-e" aria-labelledby="e-h">
+    <div class="head"><div class="t"><span class="tag" id="e-tag"></span><h2 id="e-h">Price change across forest loss and drought</h2></div>
+      <div class="ctrls"><div class="seg" id="e-scen" role="group" aria-label="Scenario"></div><div class="seg" id="e-view" role="group" aria-label="View"></div></div></div>
+    <div class="sec" id="e-what"></div><div class="sec" id="e-eq"></div>
+    <div id="pE" class="plot surf" role="img" aria-label="Response surface of the price change"></div>
+    <p class="take" id="e-take"></p>
+  </section>
+
+  <section class="card" id="exp-f" aria-labelledby="f-h">
+    <div class="head"><div class="t"><span class="tag">Experiment F · all 27 farm loans · portfolio Monte Carlo</span><h2 id="f-h">How much the whole book could lose</h2></div><div class="ctrls"></div></div>
+    <div class="sec" id="f-what"></div><div class="sec" id="f-eq"></div>
+    <div id="pF" class="plot" role="img" aria-label="How often each size of portfolio loss is exceeded"></div>
+    <p class="take" id="f-take"></p>
+  </section>
+
+  <section class="card" id="exp-g" aria-labelledby="g-h">
+    <div class="head"><div class="t"><span class="tag">Experiment G · all 27 farm loans · scenarios</span><h2 id="g-h">What each scenario does to the book</h2></div><div class="ctrls"></div></div>
+    <div class="sec" id="g-what"></div><div class="sec" id="g-eq"></div>
+    <div class="multi"><div id="pG1" class="plot short" role="img" aria-label="Expected loss by scenario"></div><div id="pG2" class="plot short" role="img" aria-label="Regulatory capital by scenario"></div><div id="pG3" class="plot short" role="img" aria-label="Provisions by scenario"></div></div>
+    <p class="take" id="g-take"></p>
+  </section>
+
+  <footer>
+    <p><span class="dp real" style="margin-left:0">Real</span> forest loss (Hansen/UMD v1.12), rainfall deficit (ERA5), vegetation change (Sentinel-2 NDVI), water stress (WRI Aqueduct) and distance to protected areas (WDPA), pulled from open data on 28 Oct 2026.</p>
+    <p><span class="dp sample" style="margin-left:0">Sample</span> loan sizes, borrower financials, crop sensitivities and bank pricing inputs. The capital formula is the Basel IRB corporate formula. The links from nature to cash flow are a v0.1 sketch for discussion, not Nature Signal's methodology, and would be calibrated on real loan outcomes.</p>
+    <p>Reproduce with <code>python3 analysis/model_lab.py</code>: it reads <code>analysis/sites.json</code> and writes <code>analysis/results.json</code>, which this page draws. The random seed is fixed at 20261110.</p>
+  </footer>
+</div>
+
+<script>
+// Results are computed offline by analysis/model_lab.py. The page fetches them once per build
+// and keeps them in IndexedDB, so a reload reads them locally instead of over the network.
+const RESULTS_URL="lab-results.json", RESULTS_VERSION="/*__RESULTS_VERSION__*/";
+let RES, B, G, SITE;
+function idb(){ return new Promise((ok,no)=>{ try{ const r=indexedDB.open("nature-risk-lab",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("results"); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); }catch(e){ no(e); } }); }
+async function idbGet(key){ try{ const db=await idb(); return await new Promise(ok=>{ const q=db.transaction("results").objectStore("results").get(key); q.onsuccess=()=>ok(q.result); q.onerror=()=>ok(undefined); }); }catch(e){ return undefined; } }
+async function idbPut(key,val){ try{ const db=await idb(); const tx=db.transaction("results","readwrite"); const os=tx.objectStore("results"); os.clear(); os.put(val,key); }catch(e){} }
+async function loadResults(){
+  const t0=performance.now(), key="v-"+RESULTS_VERSION;
+  let data=await idbGet(key), from="IndexedDB";
+  if(!data){ from="network"; const r=await fetch(RESULTS_URL+"?v="+RESULTS_VERSION); if(!r.ok) throw new Error("HTTP "+r.status); data=await r.json(); idbPut(key,data); }
+  window.labLoad={from,ms:Math.round(performance.now()-t0),version:RESULTS_VERSION};
+  return data;
+}
+const fmt=(v,d=0)=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(d);
+const pct=(v,d=1)=>{ const s=(v*100).toFixed(d); return (+s===0?(0).toFixed(d):s)+"%"; };
+const $m=v=>"$"+v.toFixed(v>=10?1:2)+"m";
+const num=n=>n.toLocaleString("en");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SC={base:"Baseline",drought:"Repeat of driest year",defor:"Stricter deforestation rule"};
+const TRIG={base:2,drought:2,defor:0.5};
+const LABELNAME={risk:"Nature Risk",stable:"Nature Stable",gain:"Nature Gain"};
+const CN={MY:"Malaysia",SG:"Singapore",ID:"Indonesia",VN:"Vietnam",TH:"Thailand",PH:"Philippines",LK:"Sri Lanka",AU:"Australia"};
+const st={id:"A19",a:"base",e:"base",ev:"3d"};
+const fromHash=()=>{ const m=/^#(a\d{2})$/i.exec(location.hash); return m&&SITE[m[1].toUpperCase()]?m[1].toUpperCase():null; };
+const site=()=>SITE[st.id], per=()=>RES.per[st.id];
+const place=s=>`${s.name}, ${s.what.toLowerCase()}`;
+
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function theme(){ return {ink:css("--ink"),muted:css("--muted"),line:css("--line"),surf:css("--surface"),nat:css("--nat"),base:css("--base"),risk:css("--risk"),
+  s1:css("--s1"),s2:css("--s2"),neg:css("--div-neg"),mid:css("--div-mid"),pos:css("--div-pos"),font:css("--font-body")||"system-ui"}; }
+function layout(T,extra={}){
+  const ax=a=>Object.assign({gridcolor:T.line,zerolinecolor:T.line,linecolor:T.line,tickfont:{color:T.muted,size:12},title:{font:{color:T.muted,size:12.5}},automargin:true},a||{});
+  return Object.assign({paper_bgcolor:"rgba(0,0,0,0)",plot_bgcolor:"rgba(0,0,0,0)",font:{family:T.font,color:T.ink,size:13},
+    margin:{l:10,r:16,t:40,b:10},hoverlabel:{bgcolor:T.surf,bordercolor:T.line,font:{color:T.ink,family:T.font,size:13}},
+    legend:{orientation:"h",x:0,y:1.12,font:{color:T.ink,size:12.5}},showlegend:true},extra,{xaxis:ax(extra.xaxis),yaxis:ax(extra.yaxis)});
+}
+const CFG={displayModeBar:false,responsive:true,showTips:false};
+function segs(id,opts,key,cb){
+  const el=document.getElementById(id);
+  el.innerHTML=opts.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="${st[key]===k}">${l}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ st[key]=b.dataset.k; el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); cb(); }));
+}
+
+// ---------- the two sections above every chart ----------
+function what(id,rows){ document.getElementById(id).innerHTML=`<div class="sh"><span class="sn">1</span><h3>What this experiment is</h3></div><dl class="facts">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>`; }
+function eqsec(id,lines,table){
+  document.getElementById(id).innerHTML=`<div class="sh"><span class="sn">2</span><h3>Equations and the values used</h3></div><div class="eq">${lines.map(l=>`<div>${l}</div>`).join("")}</div>${table?`<div class="vals">${table}</div>`:""}`;
+}
+function vtable(rows,head=["Symbol","What it is","Value used","Source"]){
+  return `<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===2?' class="n"':""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+const REAL='<span class="dp real" style="margin-left:0">Real</span>', SAMPLE='<span class="dp sample" style="margin-left:0">Sample</span>', FIXED='<span class="muted">Rule</span>';
+function siteVals(s,p){
+  const n=p.inputs.nat;
+  return [
+    ["<code>L</code>","Share of the area that lost tree cover, 2021–2024",n.loss.toFixed(1)+"%",REAL],
+    ["<code>D</code>","Rainfall deficit in the driest year since 2001",n.deficit.toFixed(1)+"%",REAL],
+    ["<code>W</code>","Water stress, 0 to 5",n.stress.toFixed(2),REAL],
+    ["<code>ΔNDVI</code>","Vegetation change, 2019 to 2025",n.ndvi==null?"no data":(n.ndvi>0?"+":"")+n.ndvi.toFixed(1)+"%",REAL],
+    ["<code>d<sub>PA</sub></code>","Distance to the nearest protected area",n.pa>=60?"over 50 km":n.pa+" km",REAL],
+    ["<code>s</code>",`Share of ${s.commodity.toLowerCase()} sales to deforestation-free buyers`,pct(p.inputs.s,0),SAMPLE],
+    ["<code>β</code>",`Yield response of ${s.commodity.toLowerCase()} to rainfall deficit`,p.inputs.beta.toFixed(2),SAMPLE],
+    ["<code>w</code>","How much vegetation change counts for this crop",String(p.inputs.vegw),SAMPLE],
+  ];
+}
+const BANKROWS=()=>[
+  ["<code>T</code>","Forest-loss trigger","2% (0.5% under the stricter rule)",FIXED],
+  ["<code>d</code>","Price lost when deforestation-free buyers walk away",pct(B.disc,0),SAMPLE],
+  ["<code>v</code>","Productivity response to vegetation change",B.veg.toFixed(2),SAMPLE],
+  ["<code>λ</code>","Operating leverage: profit change per 1% revenue change",B.lev.toFixed(1)+"×",SAMPLE],
+  ["<code>DSCR̄</code>","Expected debt service coverage before nature",B.dscr.toFixed(2)+"×",SAMPLE],
+  ["<code>σ</code>","Year-to-year volatility of coverage (log scale)",B.sigma.toFixed(2),SAMPLE],
+  ["<code>p<sub>D</sub></code>","Yearly chance the driest year repeats",pct(B.pDrought,0)+" (25% in the drought scenario)",SAMPLE],
+  ["<code>LGD₀</code>","Loss given default before nature",pct(B.lgd,0),SAMPLE],
+  ["<code>h<sub>PA</sub></code>, <code>h<sub>clear</sub></code>","Land value cut near a protected area, and for recent clearing",pct(B.hPA,0)+", "+pct(B.hClear,0),SAMPLE],
+  ["<code>M</code>","Effective maturity for capital",B.M+" years",SAMPLE],
+  ["<code>r</code>","Return shareholders require on capital",pct(B.hurdle,0),SAMPLE],
+  ["<code>c</code>","Cost to serve the loan",Math.round(B.opex*1e4)+" bps",SAMPLE],
+  ["<code>n</code>","Years left on the loan",B.tenor+" years",SAMPLE],
+];
+
+function modelCard(){
+  const L=[
+    `<b>1. Buyers turn the borrower away</b>   p<sub>ex</sub> = 1 ÷ (1 + e<sup>−(L − T) ÷ (T/4)</sup>)   <span class="c">× 0.3 with a verified no-deforestation plan</span>`,
+    `<b>2. Drought shock in a driest-year repeat</b>   y = min(0.6, β × D × (1 + W ÷ 5))`,
+    `<b>3. Revenue lost</b>   r = p<sub>ex</sub> × s × d  +  r<sub>drought</sub>  −  ΔNDVI × v × w   <span class="c">r<sub>drought</sub> = 0 in the baseline; y ÷ n in the drought scenario; ΔNDVI capped at ±10%</span>`,
+    `<b>4. Operating profit lost</b>   e = λ × r`,
+    `<b>5. Coverage with nature</b>   DSCR̄<sub>N</sub> = DSCR̄ × (1 − e)   σ<sub>N</sub> = √(σ² + (λy)² × p<sub>D</sub>(1 − p<sub>D</sub>))`,
+    `<b>6. Probability of default</b>   PD = N(−ln DSCR̄ ÷ σ)   <span class="c">N is the standard normal distribution; without nature use DSCR̄ and σ, with nature DSCR̄<sub>N</sub> and σ<sub>N</sub></span>`,
+    `<b>7. Loss given default</b>   LGD<sub>N</sub> = 1 − (1 − LGD₀)(1 − h)   h = h<sub>PA</sub> × max(0, 1 − d<sub>PA</sub> ÷ 5 km) + h<sub>clear</sub> × min(1, L ÷ T)`,
+    `<b>8. Expected loss</b>   EL = PD × LGD × EAD   <span class="c">EAD is the loan outstanding</span>`,
+    `<b>9. Basel IRB capital</b>   K = [LGD × N((N⁻¹(PD) + √R × N⁻¹(0.999)) ÷ √(1 − R)) − PD × LGD] × (1 + (M − 2.5)b) ÷ (1 − 1.5b)`,
+    `<span class="c">   R = 0.12q + 0.24(1 − q), q = (1 − e<sup>−50·PD</sup>) ÷ (1 − e<sup>−50</sup>);   b = (0.11852 − 0.05478 × ln PD)²</span>`,
+    `<b>10. Price</b>   Price = PD × LGD + K × r + c   Δprice = Price<sub>with nature</sub> − Price<sub>without</sub>   <span class="c">in bps a year</span>`,
+    `<b>11. IFRS 9 provision</b>   lifetime PD = 1 − (1 − PD)<sup>n</sup>;   Stage 2 if lifetime PD at least doubles, or L ≥ T with no plan;   provision = (Stage 2 ? lifetime PD : PD) × LGD × EAD`,
+  ];
+  document.getElementById("model-eq").innerHTML=L.map(l=>`<div>${l}</div>`).join("");
+  document.getElementById("model-vals").innerHTML=vtable(BANKROWS(),["Symbol","What it is","Central value","Source"]);
+}
+
+// ---------- findings ----------
+function findings(){
+  const p=RES.portfolio, b=p.base, d=p.drought, s=site(), u=per().unc, mc=per().mc;
+  const gap=(mc.pd_mcN/mc.pd_anN-1)*100;
+  const tiles=[
+    ["Expected loss on the book",`${$m(b.without.EL)} → ${$m(b.with.EL)}`,`Nature data adds ${$m(b.with.EL-b.without.EL)} a year (${fmt((b.with.EL/b.without.EL-1)*100,0)}%) on ${$m(p.total)} of loans, at today's prices.`],
+    ["Accounting provisions",`${$m(b.prov0)} → ${$m(b.provN)}`,`${b.stage2} of 27 loans move to IFRS 9 Stage 2. In the drought scenario it is ${d.stage2} loans and ${$m(d.provN)}.`],
+    [`${s.name}, 90% range`,`${fmt(u.p5)} to ${fmt(u.p95)} bps`,`The central estimate is ${fmt(u.point)} bps a year on this ${$m(s.exp)} loan. See experiment C.`],
+    [`${s.name}, formula against simulation`,`${pct(mc.pd_anN,2)} vs ${pct(mc.pd_mcN,2)}`,Math.abs(gap)<3?`The closed-form PD and the simulation agree to within ${Math.abs(gap).toFixed(0)}%. See experiment B.`:`Simulation puts the default chance ${Math.abs(gap).toFixed(0)}% ${gap>0?"higher":"lower"} than the formula. See experiment B.`],
+  ];
+  document.getElementById("findings").innerHTML=tiles.map(([l,v,t])=>`<div class="find"><span class="label">${esc(l)}</span><span class="big">${v}</span><p>${t}</p></div>`).join("");
+}
+
+// ---------- A ----------
+function textA(){
+  const n=RES.sites.length, tot=RES.sites.reduce((t,s)=>t+s.exp,0), cc=[...new Set(RES.sites.map(s=>s.cc))].length;
+  what("a-what",[
+    ["Question","How different are loan prices under the credit model compared with the rule the Lender desk uses today?"],
+    ["What it simulates","Nothing random. Every loan is re-priced twice, once with the old rule and once with the credit model, under the scenario you pick."],
+    ["Cohort",`All ${n} farm and plantation loans on the Lender desk: $${tot}m across ${cc} countries. The renewable energy projects are left out because their cash flows behave differently.`],
+    ["Data points per loan",`${REAL} forest loss, rainfall deficit, water stress, vegetation change and distance to protected areas. ${SAMPLE} loan size, crop sensitivities and the bank assumptions at their central values. The nature score comes from the Nature map's scoring.`],
+    ["How we read it","Grey is the old rule, purple is the model. The further apart, the more the old rule misprices the loan. The selected place is circled."],
+  ]);
+  eqsec("a-eq",[
+    `<b>Old rule</b>   Nature Risk: min(60, 25 + 0.8 × max(0, 60 − score))   Nature Gain: −min(20, 10 + 0.5 × (score − 62))   Nature Stable: 0`,
+    `<b>Credit model</b>   Δprice = (EL<sub>N</sub> + K<sub>N</sub> × r + c) − (EL₀ + K₀ × r + c)   <span class="c">steps 1 to 10 of the model above</span>`,
+    `<span class="c">Scenarios: Baseline T = 2%;  Repeat of driest year p<sub>D</sub> = 25% and r<sub>drought</sub> = y ÷ 4;  Stricter deforestation rule T = 0.5%</span>`],
+    vtable([["Loans","27 farm and plantation loans","$"+tot+"m",SAMPLE],["Nature inputs","5 per loan, measured in a 2–4 km box around the site","135 values",REAL],["Bank assumptions","Central values from the model card above","13 values",SAMPLE]],["Item","What it is","Count or size","Source"]));
+}
+function drawA(T){
+  const sc=st.a, rows=[...RES.sites].sort((x,y)=>x[sc].model-y[sc].model);
+  const narrow=document.getElementById("pA").clientWidth<560, names=rows.map(r=>narrow?r.name:`${r.name} · ${r.commodity}`);
+  const segX=[],segY=[]; rows.forEach((r,i)=>{ segX.push(r[sc].rule,r[sc].model,null); segY.push(names[i],names[i],null); });
+  const hov=r=>`<b>${r.name}</b>, ${r.what}<br>${LABELNAME[r.label]}, score ${r.score.toFixed(0)}<br>Old rule: ${fmt(r[sc].rule)} bps<br>Credit model: ${fmt(r[sc].model,1)} bps<br>PD ${pct(r[sc].pd0,2)} → ${pct(r[sc].pdN,2)} · Stage ${r[sc].stage}<extra></extra>`;
+  const sel=rows.findIndex(r=>r.id===st.id);
+  Plotly.react("pA",[
+    {x:segX,y:segY,mode:"lines",line:{color:T.line,width:2},hoverinfo:"skip",showlegend:false},
+    {x:rows.map(r=>r[sc].rule),y:names,mode:"markers",name:"Old rule",marker:{size:10,color:T.base,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+    {x:rows.map(r=>r[sc].model),y:names,mode:"markers",name:"Credit model",marker:{size:11,color:T.nat,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+    {x:[rows[sel][sc].model],y:[names[sel]],mode:"markers",name:"Selected place",marker:{size:22,color:"rgba(0,0,0,0)",line:{color:T.ink,width:2}},hoverinfo:"skip"},
+  ],layout(T,{xaxis:{title:{text:"Price change, bps a year"},zeroline:true,zerolinecolor:T.muted},yaxis:{tickfont:{size:11.5,color:T.ink},gridcolor:"rgba(0,0,0,0)"},height:document.getElementById("pA").clientHeight||640}),CFG);
+  const up=rows.filter(r=>r[sc].model-r[sc].rule>15).length, gainRows=rows.filter(r=>r.label==="gain");
+  const avg=(a,k)=>a.reduce((t,r)=>t+r[sc][k],0)/a.length, s=site()[sc];
+  document.getElementById("a-take").innerHTML=`In the ${SC[sc].toLowerCase()} scenario, the credit model prices ${up} of the 27 loans more than 15 bps above the old rule. ${site().name} goes from ${fmt(s.rule)} to ${fmt(s.model)} bps. The ${gainRows.length} Nature Gain loans average ${fmt(avg(gainRows,"rule"))} bps under the rule but ${fmt(avg(gainRows,"model"))} bps in the model: the rule gives discounts that the cash-flow evidence does not yet support, so a sustainability-linked discount needs verified improvement behind it.`;
+  document.getElementById("a-table").innerHTML=`<table><thead><tr><th>Loan</th><th>Label</th><th>Loan size</th><th>Score</th><th>Old rule</th><th>Credit model</th><th>With verified plan</th><th>PD</th><th>IFRS 9</th></tr></thead><tbody>${
+    [...RES.sites].sort((a,b)=>b[sc].model-a[sc].model).map(r=>`<tr><td>${r.name}, ${r.what}</td><td><span class="chip ${r.label}">${LABELNAME[r.label]}</span></td><td>$${r.exp}m</td><td>${r.score.toFixed(0)}</td><td>${fmt(r[sc].rule)}</td><td>${fmt(r[sc].model,1)}</td><td>${sc==="base"?fmt(r.plan,1):"–"}</td><td>${pct(r[sc].pd0,2)} → ${pct(r[sc].pdN,2)}</td><td>Stage ${r[sc].stage}</td></tr>`).join("")}</tbody></table>`;
+}
+
+// ---------- B ----------
+function textB(){
+  const s=site(), p=per(), m=p.mc;
+  document.getElementById("b-tag").textContent=`Experiment B · ${s.name} · Monte Carlo`;
+  what("b-what",[
+    ["Question","Is the closed-form formula for the probability of default (step 6 of the model) accurate for this loan?"],
+    ["What it simulates",`${num(G.N_MC)} possible years of this borrower's cash flow. In each year the economy moves at random, deforestation-free buyers either turn the borrower away or not, and the driest year since 2001 either repeats or not. Both events are drawn as yes or no, not averaged.`],
+    ["Cohort",`One loan: ${esc(place(s))}, ${$m(s.exp)}.`],
+    ["Data points",`${REAL} this site's forest loss, rainfall deficit, water stress and vegetation change. ${SAMPLE} the crop sensitivities and bank assumptions in the table below.`],
+    ["How we read it","Each curve shows how often each level of coverage happens. The red zone, below 1, is where the borrower cannot pay from operations. The share of years that land there is the simulated probability of default."],
+  ]);
+  eqsec("b-eq",[
+    `<b>One simulated year t</b>   DSCR<sub>t</sub> = DSCR̄ × e<sup>σZ<sub>t</sub></sup> × (1 − λ × (X<sub>t</sub> × s × d + Y<sub>t</sub> × y + r<sub>veg</sub>))`,
+    `<span class="c">Z<sub>t</sub> ~ Normal(0, 1);   X<sub>t</sub> = 1 with probability p<sub>ex</sub>, else 0;   Y<sub>t</sub> = 1 with probability p<sub>D</sub>, else 0;   r<sub>veg</sub> = −ΔNDVI × v × w</span>`,
+    `<b>Simulated PD</b> = (number of years with DSCR<sub>t</sub> &lt; 1) ÷ ${num(G.N_MC)}   <span class="c">standard error √(PD(1 − PD) ÷ ${num(G.N_MC)})</span>`,
+    `<b>Closed form, for comparison</b>   PD = N(−ln DSCR̄<sub>N</sub> ÷ σ<sub>N</sub>) = N(−ln ${m.dN.toFixed(3)} ÷ ${m.sN.toFixed(3)}) = ${pct(m.pd_anN,2)}`],
+    vtable([
+      ["<code>N</code>","Simulated years",num(G.N_MC),FIXED],
+      ["<code>DSCR̄</code>, <code>σ</code>","Expected coverage and its volatility",`${B.dscr.toFixed(2)}×, ${B.sigma.toFixed(2)}`,SAMPLE],
+      ["<code>λ</code>","Operating leverage",B.lev.toFixed(1)+"×",SAMPLE],
+      ["<code>p<sub>ex</sub></code>",`Chance buyers turn the borrower away, from L = ${p.inputs.nat.loss.toFixed(1)}% and T = 2%`,pct(m.pEx,1),"Model step 1"],
+      ["<code>s × d</code>","Revenue lost if they do",`${pct(p.inputs.s,0)} × ${pct(B.disc,0)} = ${pct(p.inputs.s*B.disc,1)}`,SAMPLE],
+      ["<code>p<sub>D</sub></code>, <code>y</code>","Chance of a driest-year repeat, and its revenue shock",`${pct(m.pD,0)}, ${pct(m.y,1)}`,"Model step 2"],
+      ["<code>r<sub>veg</sub></code>","Revenue change from the vegetation trend",(m.r3>=0?"−":"+")+pct(Math.abs(m.r3),2),"Model step 3"],
+      ["Seed","Random number seed",String(RES.meta.seed),FIXED]]));
+}
+function drawB(T){
+  const m=per().mc, E=G.mc_edges, mids=E.slice(0,-1).map((e,i)=>(e+E[i+1])/2), ymax=Math.max(...m.h0,...m.hN)*1.12;
+  Plotly.react("pB",[
+    {x:mids,y:m.h0,type:"scatter",mode:"lines",line:{shape:"hvh",color:T.base,width:2},fill:"tozeroy",fillcolor:T.base+"33",name:"Without nature data",hovertemplate:"Coverage %{x:.2f}<br>density %{y:.2f}<extra>Without nature data</extra>"},
+    {x:mids,y:m.hN,type:"scatter",mode:"lines",line:{shape:"hvh",color:T.nat,width:2.5},fill:"tozeroy",fillcolor:T.nat+"33",name:"With nature data",hovertemplate:"Coverage %{x:.2f}<br>density %{y:.2f}<extra>With nature data</extra>"},
+  ],layout(T,{xaxis:{title:{text:"Debt service coverage ratio in a simulated year"},range:[0.2,4]},yaxis:{title:{text:"Share of simulated years (density)"},range:[0,ymax]},
+    shapes:[{type:"rect",x0:0.2,x1:1,y0:0,y1:ymax,fillcolor:css("--risk-bg"),opacity:.5,line:{width:0},layer:"below"},{type:"line",x0:1,x1:1,y0:0,y1:ymax,line:{color:T.risk,width:1.5}}],
+    annotations:[{x:3.95,y:ymax*0.92,xanchor:"right",showarrow:false,align:"right",font:{color:css("--risk-ink"),size:12.5},text:`<b>Years below 1 (can't pay from operations)</b><br>without: ${pct(m.pd_mc0,2)} of years<br>with: ${pct(m.pd_mcN,2)} of years`}]}),CFG);
+  const gap=(m.pd_mcN/m.pd_anN-1)*100;
+  document.getElementById("b-take").innerHTML=`Without nature data, simulation and formula agree: ${pct(m.pd_mc0,2)} against ${pct(m.pd_an0,2)}. With nature data, simulation gives ${pct(m.pd_mcN,2)} (± ${pct(1.96*m.seN,2)}) against the formula's ${pct(m.pd_anN,2)}${Math.abs(gap)<3?", so the formula is a good shortcut for this loan.":`, ${Math.abs(gap).toFixed(0)}% ${gap>0?"higher":"lower"}. The formula spreads the buyer and drought shocks evenly over every year. In reality each one either hits in full or not at all, and the years with a full hit are the ones that fall below 1. A production model would simulate, as here.`}`;
+}
+
+// ---------- C ----------
+const ULABEL={s:"Sales to deforestation-free buyers",disc:"Price lost when those buyers walk away",lev:"Operating leverage",sigma:"Cash flow volatility",dscr:"Expected debt service coverage",
+  lgd:"Loss given default before nature",hPA:"Land value cut near a protected area",hClear:"Land value cut for recent clearing",beta:"Yield response to rainfall deficit",hurdle:"Return required on capital"};
+const USYM={s:"s",disc:"d",lev:"λ",sigma:"σ",dscr:"DSCR̄",lgd:"LGD₀",hPA:"h<sub>PA</sub>",hClear:"h<sub>clear</sub>",beta:"β",hurdle:"r"};
+const UFMT={s:v=>pct(v,0),disc:v=>pct(v,0),lev:v=>v.toFixed(1)+"×",sigma:v=>v.toFixed(2),dscr:v=>v.toFixed(2)+"×",lgd:v=>pct(v,0),hPA:v=>pct(v,0),hClear:v=>pct(v,0),beta:v=>v.toFixed(2),hurdle:v=>pct(v,0)};
+function rangeTable(r){ return `<table><thead><tr><th>Symbol</th><th>Assumption</th><th>Low</th><th>Central</th><th>High</th><th>Source</th></tr></thead><tbody>${
+  Object.entries(r).map(([k,[lo,mo,hi]])=>`<tr><td><code>${USYM[k]}</code></td><td>${ULABEL[k]}</td><td class="n">${UFMT[k](lo)}</td><td class="n">${UFMT[k](mo)}</td><td class="n">${UFMT[k](hi)}</td><td>${SAMPLE}</td></tr>`).join("")}</tbody></table>`; }
+function textC(){
+  const s=site(), u=per().unc;
+  document.getElementById("c-tag").textContent=`Experiment C · ${s.name} · parameter uncertainty`;
+  what("c-what",[
+    ["Question","We don't know this borrower's finances or the crop sensitivities exactly. How much does that uncertainty change the price?"],
+    ["What it simulates",`${num(G.N_U)} re-pricings of the loan. Each one draws a fresh, plausible set of the ten sample assumptions, all at the same time.`],
+    ["Cohort",`One loan: ${esc(place(s))}, ${$m(s.exp)}.`],
+    ["Data points",`${REAL} the nature inputs stay fixed at this site's measured values. ${SAMPLE} the ten assumptions in the table vary between their low and high values. Ranges for crop-specific assumptions are scaled around this crop's central value.`],
+    ["How we read it","Each bar counts how many of the re-pricings landed at that price change. The dotted lines mark the 5th and 95th percentiles: 90% of outcomes lie between them."],
+  ]);
+  eqsec("c-eq",[
+    `<b>Draw i = 1 … ${num(G.N_U)}</b>   θ<sub>k,i</sub> ~ Triangular(low<sub>k</sub>, central<sub>k</sub>, high<sub>k</sub>) for each of the 10 assumptions k, drawn independently`,
+    `<b>Price change</b>   Δprice<sub>i</sub> = f(nature data of ${esc(s.name)}, θ<sub>i</sub>)   <span class="c">f is the whole model, steps 1 to 10</span>`,
+    `<b>Reported</b>   5th, 50th and 95th percentiles of Δprice<sub>i</sub>; share of draws above zero = ${pct(u.share_pos,1)}`],
+    rangeTable(u.ranges));
+}
+function drawC(T){
+  const u=per().unc, E=u.edges, mids=E.slice(0,-1).map((e,i)=>(e+E[i+1])/2), w=E[1]-E[0];
+  const vline=(x,c,dash)=>({type:"line",x0:x,x1:x,yref:"paper",y0:0,y1:1,line:{color:c,width:1.5,dash}});
+  Plotly.react("pC",[{x:mids,y:u.counts,type:"bar",width:w*0.92,marker:{color:T.nat},showlegend:false,
+    customdata:mids.map(m=>[(m-w/2).toFixed(0),(m+w/2).toFixed(0)]),hovertemplate:"%{customdata[0]} to %{customdata[1]} bps<br>%{y} of "+num(G.N_U)+" draws<extra></extra>"}],
+    layout(T,{bargap:0,xaxis:{title:{text:`${site().name} price change, bps a year`}},yaxis:{title:{text:"Draws"}},margin:{l:10,r:16,t:56,b:10},
+      shapes:[vline(u.p5,T.muted,"dot"),vline(u.p95,T.muted,"dot"),vline(u.point,T.ink,"solid")],
+      annotations:[{x:u.p5,y:1,yref:"paper",yanchor:"bottom",xanchor:"right",showarrow:false,text:`5th percentile ${fmt(u.p5)} `,font:{color:T.muted,size:12}},
+                   {x:u.point,y:1.08,yref:"paper",yanchor:"bottom",showarrow:false,text:`<b>Central estimate ${fmt(u.point)}</b>`,font:{color:T.ink,size:12}},
+                   {x:u.p95,y:1,yref:"paper",yanchor:"bottom",xanchor:"left",showarrow:false,text:` 95th percentile ${fmt(u.p95)}`,font:{color:T.muted,size:12}}]}),CFG);
+  const allPos=u.share_pos>0.995, allNeg=u.share_pos<0.005;
+  document.getElementById("c-take").innerHTML=`In 90% of draws the price change falls between ${fmt(u.p5)} and ${fmt(u.p95)} bps, with a median of ${fmt(u.p50)}. ${allPos?"Every draw is above zero: whatever the assumptions, this loan needs a higher price once the nature data is included.":allNeg?"Every draw is below zero: the nature data points to lower risk whatever the assumptions.":`${pct(u.share_pos,0)} of draws are above zero, so the direction of the price change depends on the assumptions. This loan needs better borrower data before it is repriced.`} ${u.p95-u.point>u.point-u.p5?"The longer right tail comes from draws where the borrower has thin coverage, so the same nature shock pushes many more years below 1.":""}`;
+}
+
+// ---------- D ----------
+function textD(){
+  const s=site(), u=per().unc;
+  document.getElementById("d-tag").textContent=`Experiment D · ${s.name} · sensitivity`;
+  what("d-what",[
+    ["Question","Which assumption moves this loan's price the most?"],
+    ["What it simulates","Twenty re-pricings: each of the ten assumptions moved to its low end and then to its high end, one at a time, with everything else at its central value."],
+    ["Cohort",`One loan: ${esc(place(s))}, ${$m(s.exp)}.`],
+    ["Data points",`${REAL} the nature inputs stay fixed. ${SAMPLE} the same ten assumptions and ranges as experiment C.`],
+    ["How we read it","Each bar runs from the price at the low end (blue) to the price at the high end (orange). The vertical line is the central estimate. The longest bars are where better data pays off most."],
+  ]);
+  eqsec("d-eq",[
+    `<b>For each assumption k</b>   Δprice<sub>k,low</sub> = f(nature, θ<sub>k</sub> = low<sub>k</sub>, other θ = central)   Δprice<sub>k,high</sub> = f(nature, θ<sub>k</sub> = high<sub>k</sub>, other θ = central)`,
+    `<b>Swing</b>   |Δprice<sub>k,high</sub> − Δprice<sub>k,low</sub>|   <span class="c">bars sorted by swing, largest at the top</span>`],
+    rangeTable(u.ranges));
+}
+function drawD(T){
+  const t=per().tornado, rows=[...t.rows].reverse(), base=t.base;
+  const tip=(r,w)=>`<b>${r.label}</b><br>${w==="lo"?"Low":"High"} end ${UFMT[r.k](r[w])}: ${fmt(w==="lo"?r.at_lo:r.at_hi,1)} bps<extra></extra>`;
+  Plotly.react("pD",[
+    {type:"bar",orientation:"h",y:rows.map(r=>r.label),x:rows.map(r=>r.at_lo-base),base:base,name:"Low end of the range",marker:{color:T.s1},hovertemplate:rows.map(r=>tip(r,"lo"))},
+    {type:"bar",orientation:"h",y:rows.map(r=>r.label),x:rows.map(r=>r.at_hi-base),base:base,name:"High end of the range",marker:{color:T.s2},hovertemplate:rows.map(r=>tip(r,"hi"))},
+  ],layout(T,{barmode:"overlay",bargap:.35,xaxis:{title:{text:`${site().name} price change, bps a year`}},yaxis:{tickfont:{size:12,color:T.ink},gridcolor:"rgba(0,0,0,0)"},
+    shapes:[{type:"line",x0:base,x1:base,yref:"paper",y0:0,y1:1,line:{color:T.ink,width:1.5}}]}),CFG);
+  const [a,b,c]=t.rows, own=new Set(["dscr","sigma","lev","lgd","hurdle"]);
+  const lead=own.has(a.k)?"The biggest swing comes from the borrower's own finances, which the bank already has in its credit files.":"The biggest swing comes from a crop or buyer assumption, which is where partner data earns its keep.";
+  document.getElementById("d-take").innerHTML=`${lead} The top three are ${a.label.toLowerCase()} (${fmt(a.at_lo)} to ${fmt(a.at_hi)} bps), ${b.label.toLowerCase()} (${fmt(b.at_lo)} to ${fmt(b.at_hi)} bps) and ${c.label.toLowerCase()} (${fmt(c.at_lo)} to ${fmt(c.at_hi)} bps).`;
+}
+
+// ---------- E ----------
+function textE(){
+  const s=site(), p=per(), n=p.inputs.nat;
+  document.getElementById("e-tag").textContent=`Experiment E · ${s.name} · response surface`;
+  what("e-what",[
+    ["Question","How does the price change respond to forest loss and drought together, for a loan like this one?"],
+    ["What it simulates",`${num(G.loss.length*G.deficit.length)} re-pricings on a grid, in each of two scenarios: forest loss from 0% to 20% and rainfall deficit from 0% to 70%. Nothing random.`],
+    ["Cohort",`One loan: ${esc(place(s))}, ${$m(s.exp)}. Everything except forest loss and rainfall deficit stays at this site's real values and this crop's assumptions.`],
+    ["Data points",`${REAL} water stress ${n.stress.toFixed(2)}, vegetation change ${n.ndvi==null?"no data":(n.ndvi>0?"+":"")+n.ndvi.toFixed(1)+"%"}, protected area ${n.pa>=60?"over 50 km":n.pa+" km"} away. The dot marks this site's real forest loss (${n.loss.toFixed(1)}%) and rainfall deficit (${n.deficit.toFixed(1)}%).`],
+    ["How we read it","Height and colour show the price change: red is a higher price, blue a lower one, grey no change. Drag the 3D view to rotate it, or switch to the contour map."],
+  ]);
+  eqsec("e-eq",[
+    `<b>Grid</b>   L ∈ {0%, ${(G.loss[1]).toFixed(2)}%, …, 20%} (${G.loss.length} steps) × D ∈ {0%, ${(G.deficit[1]).toFixed(1)}%, …, 70%} (${G.deficit.length} steps)`,
+    `<b>Surface</b>   Δprice(L, D) = f(L, D, W = ${n.stress.toFixed(2)}, ΔNDVI = ${n.ndvi==null?"none":n.ndvi.toFixed(1)+"%"}, d<sub>PA</sub> = ${n.pa>=60?"over 50 km":n.pa+" km"}, crop and bank assumptions at central values)`,
+    `<span class="c">Baseline: T = 2%, drought only widens σ<sub>N</sub>.   Repeat of driest year: p<sub>D</sub> = 25%, r<sub>drought</sub> = y ÷ ${B.tenor}.</span>`],
+    vtable(siteVals(s,p)));
+}
+function drawE(T){
+  const p=per(), z=p.surface[st.e], here=p.here, X=G.loss, Y=G.deficit;
+  const all=z.flat(), lim=Math.max(5,...all.map(Math.abs));
+  const cs=[[0,T.neg],[0.5,T.mid],[1,T.pos]];
+  const ix=Math.max(0,X.findIndex(v=>v>=Math.min(20,here[0]))), iy=Math.max(0,Y.findIndex(v=>v>=Math.min(70,here[1])));
+  const hz=z[iy][ix], ht="Forest loss %{x:.1f}%<br>Rainfall deficit %{y:.0f}%<br>Price change %{z:.0f} bps<extra></extra>";
+  let data, lay;
+  if (st.ev==="3d"){
+    data=[{type:"surface",x:X,y:Y,z,colorscale:cs,cmin:-lim,cmax:lim,hovertemplate:ht,colorbar:{title:{text:"bps",font:{color:T.muted}},tickfont:{color:T.muted},len:.7,thickness:12},contours:{z:{show:true,usecolormap:true,project:{z:true},width:1}}},
+          {type:"scatter3d",mode:"markers+text",x:[here[0]],y:[here[1]],z:[hz],marker:{size:6,color:T.ink},text:[site().name],textposition:"top center",textfont:{color:T.ink,size:12},hoverinfo:"skip",showlegend:false}];
+    const ax=t=>({title:{text:t,font:{color:T.muted,size:12}},gridcolor:T.line,zerolinecolor:T.line,tickfont:{color:T.muted,size:11},showbackground:false});
+    lay={paper_bgcolor:"rgba(0,0,0,0)",font:{family:T.font,color:T.ink},margin:{l:0,r:0,t:0,b:0},showlegend:false,hoverlabel:{bgcolor:T.surf,bordercolor:T.line,font:{color:T.ink}},
+      scene:{xaxis:ax("Forest loss, %"),yaxis:ax("Rainfall deficit, %"),zaxis:ax("Price change, bps"),camera:{eye:{x:-1.6,y:-1.6,z:0.9}},aspectratio:{x:1.2,y:1,z:.7}}};
+  } else {
+    data=[{type:"contour",x:X,y:Y,z,colorscale:cs,zmin:-lim,zmax:lim,hovertemplate:ht,contours:{coloring:"heatmap",showlabels:true,labelfont:{color:T.ink,size:11}},line:{width:.5,color:T.surf},colorbar:{title:{text:"bps",font:{color:T.muted}},tickfont:{color:T.muted},thickness:12}},
+          {type:"scatter",mode:"markers+text",x:[here[0]],y:[here[1]],marker:{size:11,color:T.ink,line:{color:T.surf,width:2}},text:[site().name],textposition:"top right",textfont:{color:T.ink},hoverinfo:"skip",showlegend:false}];
+    lay=layout(T,{showlegend:false,margin:{l:10,r:16,t:10,b:10},xaxis:{title:{text:"Forest loss, 2021–2024, %"}},yaxis:{title:{text:"Rainfall deficit in the driest year, %"}}});
+  }
+  Plotly.react("pE",data,lay,{...CFG,displayModeBar:false});
+  const col=z.map(r=>r[ix]), row=z[iy], dDef=Math.max(...col)-Math.min(...col), dLoss=Math.max(...row)-Math.min(...row);
+  document.getElementById("e-take").innerHTML=`At this site's rainfall deficit, moving forest loss from 0% to 20% changes the price by ${Math.round(dLoss)} bps; at its forest loss, moving the rainfall deficit from 0% to 70% changes it by ${Math.round(dDef)} bps. ${st.e==="base"?"In the baseline, forest loss dominates: the price climbs steeply as loss crosses the 2% trigger and buyers start turning the borrower away, then levels off once rejection is near certain.":"In the drought scenario, the driest year repeats during the loan, so rainfall deficit becomes a second steep slope."} ${site().name} sits at about ${fmt(hz)} bps.`;
+}
+
+// ---------- F ----------
+function textF(){
+  const sc=RES.sites, pds=sc.map(s=>s.base.pdN), R=pd=>{ const q=(1-Math.exp(-50*pd))/(1-Math.exp(-50)); return 0.12*q+0.24*(1-q); };
+  const Rs=pds.map(R), p=RES.portfolio;
+  what("f-what",[
+    ["Question","Across the whole book, how bad can a bad year get, with and without nature data?"],
+    ["What it simulates",`${num(p.hist.N)} possible years for all 27 loans together. In each year one shared economic factor moves every borrower at once, and each borrower also has its own luck. A loan defaults when the two together fall below its default threshold.`],
+    ["Cohort",`All 27 farm and plantation loans, ${$m(p.total)} in total, in the baseline scenario.`],
+    ["Data points",`Each loan's PD and LGD from the model, without and with nature data (${REAL} nature inputs, ${SAMPLE} loan sizes and assumptions), and its Basel correlation with the economy.`],
+    ["How we read it","The curve shows how often the year's loss is larger than each amount. Further right means a worse year. The dots mark the 1-in-1,000-year loss."],
+  ]);
+  eqsec("f-eq",[
+    `<b>Loan i defaults in year t if</b>   √R<sub>i</sub> × Z<sub>t</sub> + √(1 − R<sub>i</sub>) × ε<sub>i,t</sub> &lt; N⁻¹(PD<sub>i</sub>)   <span class="c">Z<sub>t</sub>, ε<sub>i,t</sub> ~ Normal(0, 1), independent</span>`,
+    `<b>Loss in year t</b>   Loss<sub>t</sub> = Σ<sub>i</sub> 1[loan i defaults] × LGD<sub>i</sub> × EAD<sub>i</sub>`,
+    `<b>Reported</b>   expected loss = average of Loss<sub>t</sub>;   1-in-1,000-year loss = 99.9th percentile of Loss<sub>t</sub>;   exceedance curve P(Loss > x)`],
+    vtable([
+      ["<code>N</code>","Simulated years",num(p.hist.N),FIXED],
+      ["<code>EAD<sub>i</sub></code>","Loan sizes, 27 loans",`$${Math.min(...sc.map(s=>s.exp))}m to $${Math.max(...sc.map(s=>s.exp))}m`,SAMPLE],
+      ["<code>PD<sub>i</sub></code>","Probability of default with nature data, baseline",`${pct(Math.min(...pds),2)} to ${pct(Math.max(...pds),2)}`,"Model step 6"],
+      ["<code>R<sub>i</sub></code>","Basel correlation with the economy",`${pct(Math.min(...Rs),1)} to ${pct(Math.max(...Rs),1)}`,"Basel formula"],
+      ["<code>LGD<sub>i</sub></code>","Loss given default with nature data",`${pct(Math.min(...sc.map(s=>s.base.lgdN)),1)} to ${pct(Math.max(...sc.map(s=>s.base.lgdN)),1)}`,"Model step 7"],
+      ["Seed","Random number seed",String(RES.meta.seed),FIXED]]));
+}
+function drawF(T){
+  const p=RES.portfolio, e=p.exceed, b=p.base, N=p.hist.N;
+  const cut=a=>a.map(v=>v>0?v:null), oneIn=v=>v>0?"1 year in "+num(Math.round(1/v)):"never";
+  Plotly.react("pF",[
+    {x:e.x,y:cut(e.without),type:"scatter",mode:"lines",line:{color:T.base,width:2.5},name:"Without nature data",customdata:e.without.map(oneIn),hovertemplate:"Loss above $%{x:.1f}m<br>%{customdata}<extra>Without nature data</extra>"},
+    {x:e.x,y:cut(e.with_),type:"scatter",mode:"lines",line:{color:T.nat,width:2.5},name:"With nature data",customdata:e.with_.map(oneIn),hovertemplate:"Loss above $%{x:.1f}m<br>%{customdata}<extra>With nature data</extra>"},
+    {x:[b.without.q999,b.with.q999],y:[0.001,0.001],mode:"markers",marker:{size:10,color:[T.base,T.nat],line:{color:T.surf,width:2}},showlegend:false,hoverinfo:"skip"},
+  ],layout(T,{xaxis:{title:{text:"Credit loss on the 27 loans in one year, $m"},rangemode:"tozero"},
+    yaxis:{title:{text:"How often the loss is exceeded"},type:"log",range:[Math.log10(5/N),0],tickvals:[1,0.1,0.01,0.001,0.0001],ticktext:["Every year","1 in 10","1 in 100","1 in 1,000","1 in 10,000"]},
+    shapes:[{type:"line",xref:"paper",x0:0,x1:1,y0:0.001,y1:0.001,line:{color:T.line,width:1,dash:"dot"}}],
+    annotations:[{x:b.with.q999,y:-3,xanchor:"left",yanchor:"bottom",showarrow:false,text:` 1-in-1,000-year loss: ${$m(b.without.q999)} → <b>${$m(b.with.q999)}</b>`,font:{size:12,color:T.ink}}]}),CFG);
+  document.getElementById("f-take").innerHTML=`With nature data, the average yearly loss rises from ${$m(b.without.EL)} to ${$m(b.with.EL)}, and the 1-in-1,000-year loss from ${$m(b.without.q999)} to ${$m(b.with.q999)}. The purple curve sits to the right of the grey one all the way down: every size of loss becomes more frequent. The Basel capital the bank must hold rises from ${$m(b.without.regK)} to ${$m(b.with.regK)}.`;
+}
+
+// ---------- G ----------
+function textG(){
+  const p=RES.portfolio;
+  what("g-what",[
+    ["Question","What does each scenario do to the book's expected loss, capital and accounting provisions?"],
+    ["What it simulates","Nothing random. The model runs on all 27 loans under each of the three scenarios, and the results are added up across the book."],
+    ["Cohort",`All 27 farm and plantation loans, ${$m(p.total)} in total.`],
+    ["Data points",`${REAL} nature inputs per loan. ${SAMPLE} loan sizes and the bank assumptions at their central values.`],
+    ["How we read it","Each panel has its own scale. Grey is without nature data, purple is with it. Without nature data the bank sees no difference between scenarios, because it cannot see them."],
+  ]);
+  eqsec("g-eq",[
+    `<b>Expected loss</b>   EL = Σ<sub>i</sub> PD<sub>i</sub> × LGD<sub>i</sub> × EAD<sub>i</sub>`,
+    `<b>Regulatory capital</b>   Capital = Σ<sub>i</sub> K<sub>i</sub> × EAD<sub>i</sub>   <span class="c">K from the Basel formula, step 9</span>`,
+    `<b>IFRS 9 provisions</b>   Provision = Σ<sub>i</sub> (Stage 2<sub>i</sub> ? 1 − (1 − PD<sub>i</sub>)<sup>${B.tenor}</sup> : PD<sub>i</sub>) × LGD<sub>i</sub> × EAD<sub>i</sub>`],
+    vtable([
+      ["Baseline","Today's conditions","T = 2%, p<sub>D</sub> = 5%",FIXED],
+      ["Repeat of driest year","The driest year since 2001 repeats once before the loan ends",`T = 2%, p<sub>D</sub> = 25%, r<sub>drought</sub> = y ÷ ${B.tenor}`,FIXED],
+      ["Stricter deforestation rule","Buyers and regulators tighten deforestation-free sourcing","T = 0.5%, p<sub>D</sub> = 5%",FIXED]],["Scenario","What it means","Values","Source"]));
+}
+function drawG(T){
+  const p=RES.portfolio, keys=["base","drought","defor"], xs=["Baseline","Driest year","Stricter rule"];
+  const panel=(id,title,f0,fN)=>Plotly.react(id,[
+    {type:"bar",x:xs,y:keys.map(f0),name:"Without",marker:{color:T.base},hovertemplate:"%{x}<br>Without nature data: $%{y:.1f}m<extra></extra>"},
+    {type:"bar",x:xs,y:keys.map(fN),name:"With",marker:{color:T.nat},hovertemplate:"%{x}<br>With nature data: $%{y:.1f}m<extra></extra>"},
+  ],layout(T,{barmode:"group",bargap:.35,bargroupgap:.08,title:{text:title,font:{size:14,color:T.ink},x:0,xanchor:"left",y:.98},margin:{l:10,r:10,t:60,b:10},
+    legend:{orientation:"h",x:0,y:1.12,font:{size:12}},yaxis:{title:{text:"$m"},rangemode:"tozero"},xaxis:{tickfont:{size:11.5,color:T.muted}}}),CFG);
+  panel("pG1","Expected loss a year",k=>p[k].without.EL,k=>p[k].with.EL);
+  panel("pG2","Regulatory capital",k=>p[k].without.regK,k=>p[k].with.regK);
+  panel("pG3","IFRS 9 provisions",k=>p[k].prov0,k=>p[k].provN);
+  const d=p.drought;
+  document.getElementById("g-take").innerHTML=`The drought scenario hits hardest. Expected loss rises from ${$m(d.without.EL)} to ${$m(d.with.EL)}, regulatory capital from ${$m(d.without.regK)} to ${$m(d.with.regK)}, and ${d.stage2} of 27 loans move to Stage 2, with provisions of ${$m(d.provN)}. Provisions move the most in every scenario, because Stage 2 switches a loan from 12 months of expected loss to its whole remaining life. For a bank's finance team, this is the most immediate effect on reported profit.`;
+}
+
+// ---------- wiring ----------
+function textAll(){ textA(); textB(); textC(); textD(); textE(); textF(); textG(); }
+// Charts draw when they come near the screen; after a theme or place change, only drawn charts redraw now.
+const DRAW={pA:drawA,pB:drawB,pC:drawC,pD:drawD,pE:drawE,pF:drawF,pG1:drawG};
+const SITE_CHARTS=["pA","pB","pC","pD","pE"], visible=new Set(), drawn=new Set();
+function drawOne(id){ DRAW[id](theme()); drawn.add(id); }
+function redraw(ids){ ids.forEach(id=>{ if(visible.has(id)) drawOne(id); else drawn.delete(id); }); }
+function drawSite(){ redraw(SITE_CHARTS); }
+function drawAll(){ redraw(Object.keys(DRAW)); }
+function initLazy(){
+  if(!("IntersectionObserver" in window)){ Object.keys(DRAW).forEach(id=>{ visible.add(id); drawOne(id); }); return; }
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ const id=e.target.id; if(e.isIntersecting){ visible.add(id); if(!drawn.has(id)) drawOne(id); } }),{rootMargin:"600px 0px"});
+  Object.keys(DRAW).forEach(id=>io.observe(document.getElementById(id)));
+}
+const RESETS=[[["pA"],()=>drawA(theme())],[["pB"],()=>drawB(theme())],[["pC"],()=>drawC(theme())],[["pD"],()=>drawD(theme())],
+  [["pE"],()=>drawE(theme())],[["pF"],()=>drawF(theme())],[["pG1","pG2","pG3"],()=>drawG(theme())]];
+const resetBtns=[];
+function initResets(){
+  RESETS.forEach(([ids,redraw])=>{
+    const ctrls=document.getElementById(ids[0]).closest(".card").querySelector(".head .ctrls");
+    const btn=document.createElement("button"); btn.type="button"; btn.className="resetbtn"; btn.title="Go back to the full chart";
+    btn.innerHTML='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset view';
+    ctrls.appendChild(btn); resetBtns.push(btn);
+    btn.addEventListener("click",()=>{ redraw(); btn.classList.remove("zoomed"); });
+    ids.forEach(id=>{ const el=document.getElementById(id); let wired=false;
+      const wire=()=>{ if(wired||!el.on) return; wired=true; el.on("plotly_relayout",ev=>{ if(Object.keys(ev||{}).some(k=>/range|camera|autorange/.test(k))) btn.classList.add("zoomed"); }); };
+      new MutationObserver(wire).observe(el,{childList:true}); wire(); });
+  });
+}
+function selectSite(id,push){
+  if(!SITE[id]) return; st.id=id; document.getElementById("place").value=id;
+  if(push){ try{ history.replaceState(null,"","#"+id.toLowerCase()); }catch(e){} }
+  findings(); textA(); textB(); textC(); textD(); textE(); if(window.Plotly){ drawSite(); resetBtns.forEach(b=>b.classList.remove("zoomed")); }
+}
+async function init(){
+  try{ RES=await loadResults(); }catch(e){
+    document.getElementById("findings").innerHTML='<p class="loading">The model results did not load. Check your connection and reload the page.</p>'; return; }
+  B=RES.meta.bank; G=RES.grids; SITE=Object.fromEntries(RES.sites.map(s=>[s.id,s]));
+  st.id=fromHash()||st.id;
+  const sel=document.getElementById("place"), by={};
+  RES.sites.forEach(s=>(by[s.cc]=by[s.cc]||[]).push(s));
+  sel.innerHTML=["MY","SG","ID","VN","TH","PH","LK","AU"].filter(c=>by[c]).map(c=>`<optgroup label="${CN[c]}">${by[c].map(s=>`<option value="${s.id}">${esc(s.name)}: ${esc(s.what)}</option>`).join("")}</optgroup>`).join("");
+  sel.value=st.id; sel.addEventListener("change",()=>selectSite(sel.value,true));
+  window.addEventListener("hashchange",()=>{ const id=fromHash(); if(id&&id!==st.id) selectSite(id,false); });
+  modelCard(); findings(); textAll();
+  segs("a-scen",Object.entries(SC),"a",()=>drawOne("pA"));
+  segs("e-scen",[["base","Baseline"],["drought","Repeat of driest year"]],"e",()=>{ textE(); drawOne("pE"); });
+  segs("e-view",[["3d","3D surface"],["map","Contour map"]],"ev",()=>drawOne("pE"));
+  const btn=document.getElementById("theme-toggle"), root=document.documentElement;
+  const isDark=()=>root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  const sync=()=>{ if(btn) btn.classList.toggle("isdark",isDark()); }; sync();
+  if(btn) btn.addEventListener("click",()=>{ root.dataset.theme=isDark()?"light":"dark"; try{localStorage.setItem("theme",root.dataset.theme)}catch(e){} });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ sync(); if(window.Plotly) drawAll(); });
+  new MutationObserver(()=>{ sync(); if(window.Plotly) drawAll(); }).observe(root,{attributes:true,attributeFilter:["data-theme"]});
+  if (window.Plotly){ initResets(); initLazy(); }
+  else document.querySelectorAll(".plot").forEach(el=>el.innerHTML='<p class="loading">The chart library did not load. Reload the page to see the charts.</p>');
+}
+init();
+</script>

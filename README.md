@@ -9,6 +9,7 @@ Live at **https://projects.tanmoybh.com/nature-risk/** (passphrase protected).
 | Lender desk | An APAC agri and commodities loan book. Each loan gets a Nature Risk, Stable or Gain label, a score, an evidence trail, a suggested credit action and a pricing signal, with a drought and a deforestation-rule stress test. |
 | Nature map | Malaysia and Singapore sites with nature data only: score, sub-scores, evidence trail, last-5-year trends and the data sources. Click a place to zoom in. |
 | Architecture | How the full platform would be built in Nature Signal's three layers, and a 90-day plan. |
+| Model lab (`/lab`) | Seven numerical experiments on the credit model: Monte Carlo, parameter uncertainty, sensitivity, a response surface and a portfolio loss distribution. Each card explains the experiment, its equations and the values used. Every farm loan on the Lender desk links to it. |
 
 ## What is real and what is sample
 
@@ -41,7 +42,25 @@ scripts/build.mjs     assembles dist/ (no dependencies)
 functions/_middleware.js  passphrase gate (Cloudflare Pages Function)
 tests/                tests for the gate
 data/                 the real values used, as fetched
+src/lab.html          the Model lab page
+analysis/model_lab.py the credit model and the seven experiments (NumPy/SciPy)
+analysis/sites.json   input: real nature indicators per farm loan
+analysis/results.json output: everything the Model lab draws
+scripts/export-sites.mjs  regenerates analysis/sites.json from src/app.html
 ```
+
+## Model lab
+
+The experiments run offline in Python; the page only draws their results.
+
+```bash
+node scripts/export-sites.mjs        # only if the site data in src/app.html changed
+pip install numpy scipy
+python3 analysis/model_lab.py        # writes analysis/results.json (seed 20261110, about 4 seconds)
+npm run build                        # writes dist/lab.html and dist/lab-results.json
+```
+
+The build stamps the results with a version hash. The page caches them in the browser's IndexedDB under that version, so reloads read them locally, and a new build replaces them. Charts draw as they scroll into view.
 
 ## Passphrase
 

@@ -1,0 +1,515 @@
+[
+ {
+  "id": "A01",
+  "what": "Palm oil plantation",
+  "where": "Riau, Indonesia",
+  "cc": "ID",
+  "exp": 42,
+  "loss": 1.1199999999999999,
+  "deficit": 25.6,
+  "ndvi": 15.875370919881302,
+  "stress": 0,
+  "pa": 35,
+  "score": 86.03576187715065,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A02",
+  "what": "Palm oil plantation",
+  "where": "Central Kalimantan, Indonesia",
+  "cc": "ID",
+  "exp": 55,
+  "loss": 16.57,
+  "deficit": 29.5,
+  "ndvi": -19.758064516129036,
+  "stress": 0,
+  "pa": 35,
+  "score": 38.41314549976515,
+  "label": "risk",
+  "ruleBps": {
+   "base": 42,
+   "drought": 47,
+   "defor": 42
+  }
+ },
+ {
+  "id": "A03",
+  "what": "Palm oil estate",
+  "where": "Tawau, Sabah, Malaysia",
+  "cc": "MY",
+  "exp": 38,
+  "loss": 0,
+  "deficit": 40.4,
+  "ndvi": 3.7647058823529442,
+  "stress": 0,
+  "pa": 0,
+  "score": 72.5418348602986,
+  "label": "gain",
+  "ruleBps": {
+   "base": -15,
+   "drought": 0,
+   "defor": -15
+  }
+ },
+ {
+  "id": "A04",
+  "what": "Smallholder palm co-op",
+  "where": "Jambi, Indonesia",
+  "cc": "ID",
+  "exp": 12,
+  "loss": 12.26,
+  "deficit": 25.8,
+  "ndvi": -0.39318479685452196,
+  "stress": 0,
+  "pa": 35,
+  "score": 50.85000000000001,
+  "label": "risk",
+  "ruleBps": {
+   "base": 32,
+   "drought": 39,
+   "defor": 32
+  }
+ },
+ {
+  "id": "A05",
+  "what": "Robusta coffee",
+  "where": "Dak Lak, Vietnam",
+  "cc": "VN",
+  "exp": 18,
+  "loss": 3.46,
+  "deficit": 54.5,
+  "ndvi": -25.03703703703704,
+  "stress": 0,
+  "pa": 20,
+  "score": 54.74399999999999,
+  "label": "risk",
+  "ruleBps": {
+   "base": 29,
+   "drought": 36,
+   "defor": 29
+  }
+ },
+ {
+  "id": "A06",
+  "what": "Arabica coffee",
+  "where": "Lam Dong, Vietnam",
+  "cc": "VN",
+  "exp": 9,
+  "loss": 0.4,
+  "deficit": 34.9,
+  "ndvi": -3.1505250875145885,
+  "stress": 1.48,
+  "pa": 2,
+  "score": 57.84049563245817,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 0
+  }
+ },
+ {
+  "id": "A07",
+  "what": "Cocoa",
+  "where": "South Sulawesi, Indonesia",
+  "cc": "ID",
+  "exp": 11,
+  "loss": 0.09,
+  "deficit": 33.5,
+  "ndvi": 18.083670715249664,
+  "stress": 2.52,
+  "pa": 35,
+  "score": 80.046,
+  "label": "gain",
+  "ruleBps": {
+   "base": -19,
+   "drought": -15,
+   "defor": -19
+  }
+ },
+ {
+  "id": "A08",
+  "what": "Rubber",
+  "where": "Surat Thani, Thailand",
+  "cc": "TH",
+  "exp": 20,
+  "loss": 18.029999999999998,
+  "deficit": 31.2,
+  "ndvi": 1.3054830287206278,
+  "stress": 0,
+  "pa": 35,
+  "score": 50.901273405228,
+  "label": "risk",
+  "ruleBps": {
+   "base": 32,
+   "drought": 40,
+   "defor": 32
+  }
+ },
+ {
+  "id": "A09",
+  "what": "Rice",
+  "where": "An Giang, Mekong Delta, Vietnam",
+  "cc": "VN",
+  "exp": 26,
+  "loss": 0,
+  "deficit": 29.8,
+  "ndvi": -2.6573426573426597,
+  "stress": 0,
+  "pa": 35,
+  "score": 78.86776187715066,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 0
+  }
+ },
+ {
+  "id": "A10",
+  "what": "Rice",
+  "where": "Central Luzon, Philippines",
+  "cc": "PH",
+  "exp": 14,
+  "loss": 0,
+  "deficit": 30.8,
+  "ndvi": -65.5083655083655,
+  "stress": 2.8,
+  "pa": 35,
+  "score": 57.81203649157396,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 0
+  }
+ },
+ {
+  "id": "A11",
+  "what": "Beef cattle",
+  "where": "Fitzroy basin, Queensland",
+  "cc": "AU",
+  "exp": 48,
+  "loss": 0,
+  "deficit": 47.4,
+  "ndvi": 37.440758293838854,
+  "stress": 0,
+  "pa": 60,
+  "score": 94.04536982490728,
+  "label": "gain",
+  "ruleBps": {
+   "base": -20,
+   "drought": -20,
+   "defor": -20
+  }
+ },
+ {
+  "id": "A12",
+  "what": "Sugarcane",
+  "where": "Burdekin, Queensland (reef catchment)",
+  "cc": "AU",
+  "exp": 30,
+  "loss": 0,
+  "deficit": 68.2,
+  "ndvi": 41.40786749482403,
+  "stress": 1.43,
+  "pa": 20,
+  "score": 80.84422691254194,
+  "label": "gain",
+  "ruleBps": {
+   "base": -19,
+   "drought": -15,
+   "defor": -19
+  }
+ },
+ {
+  "id": "A13",
+  "what": "Plantation forestry",
+  "where": "Gippsland, Victoria",
+  "cc": "AU",
+  "exp": 22,
+  "loss": 1.66,
+  "deficit": 45.4,
+  "ndvi": 11.673699015471179,
+  "stress": 2.77,
+  "pa": 5,
+  "score": 61.85625927885767,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A14",
+  "what": "Agroforestry coffee",
+  "where": "Aceh, Sumatra, Indonesia",
+  "cc": "ID",
+  "exp": 7,
+  "loss": 1.95,
+  "deficit": 16.1,
+  "ndvi": -4.28015564202335,
+  "stress": 0.26,
+  "pa": 10,
+  "score": 60.94328563145197,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A15",
+  "what": "Tea estate",
+  "where": "Central Highlands, Sri Lanka",
+  "cc": "LK",
+  "exp": 10,
+  "loss": 0.7000000000000001,
+  "deficit": 42.8,
+  "ndvi": 1.0590015128593049,
+  "stress": 1.65,
+  "pa": 1,
+  "score": 57.93532005650641,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 27
+  }
+ },
+ {
+  "id": "A16",
+  "what": "Shrimp aquaculture",
+  "where": "Ca Mau, Vietnam (mangrove belt)",
+  "cc": "VN",
+  "exp": 8,
+  "loss": 0,
+  "deficit": 26.4,
+  "ndvi": null,
+  "stress": 0,
+  "pa": 5,
+  "score": 73.25,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 0
+  }
+ },
+ {
+  "id": "A17",
+  "what": "Certified palm oil, restoring",
+  "where": "Bintulu, Sarawak, Malaysia",
+  "cc": "MY",
+  "exp": 33,
+  "loss": 3.4099999999999997,
+  "deficit": 30.2,
+  "ndvi": 13.43283582089552,
+  "stress": 0,
+  "pa": 20,
+  "score": 71.24395023159913,
+  "label": "risk",
+  "ruleBps": {
+   "base": 25,
+   "drought": 25,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A18",
+  "what": "Pulpwood supplier",
+  "where": "Riau, Indonesia",
+  "cc": "ID",
+  "exp": 60,
+  "loss": 3.5999999999999996,
+  "deficit": 16.5,
+  "ndvi": 21.42857142857143,
+  "stress": 0,
+  "pa": 20,
+  "score": 73.20794007189465,
+  "label": "risk",
+  "ruleBps": {
+   "base": 25,
+   "drought": 25,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A19",
+  "what": "Palm oil estate",
+  "where": "Kinabatangan floodplain, Sabah, Malaysia",
+  "cc": "MY",
+  "exp": 28,
+  "loss": 13.18,
+  "deficit": 24.4,
+  "ndvi": -1.8867924528301903,
+  "stress": 0,
+  "pa": 2,
+  "score": 37.1169753542733,
+  "label": "risk",
+  "ruleBps": {
+   "base": 43,
+   "drought": 49,
+   "defor": 43
+  }
+ },
+ {
+  "id": "A20",
+  "what": "Palm oil on peatland",
+  "where": "Mukah, Sarawak, Malaysia",
+  "cc": "MY",
+  "exp": 24,
+  "loss": 9.43,
+  "deficit": 25.5,
+  "ndvi": -4.919908466819226,
+  "stress": 0,
+  "pa": 60,
+  "score": 49.86995229811864,
+  "label": "risk",
+  "ruleBps": {
+   "base": 33,
+   "drought": 39,
+   "defor": 33
+  }
+ },
+ {
+  "id": "A21",
+  "what": "Palm oil estate",
+  "where": "Kluang, Johor, Malaysia",
+  "cc": "MY",
+  "exp": 35,
+  "loss": 2.13,
+  "deficit": 24.3,
+  "ndvi": 0.41152263374485637,
+  "stress": 0.01,
+  "pa": 35,
+  "score": 72.47555612061703,
+  "label": "risk",
+  "ruleBps": {
+   "base": 25,
+   "drought": 25,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A22",
+  "what": "Palm oil estate",
+  "where": "Rompin, Pahang, Malaysia",
+  "cc": "MY",
+  "exp": 19,
+  "loss": 0.03,
+  "deficit": 43.2,
+  "ndvi": 40.28776978417265,
+  "stress": 0,
+  "pa": 10,
+  "score": 80.5784017964687,
+  "label": "gain",
+  "ruleBps": {
+   "base": -19,
+   "drought": -15,
+   "defor": -19
+  }
+ },
+ {
+  "id": "A23",
+  "what": "Rubber smallholders",
+  "where": "Kelantan, Malaysia",
+  "cc": "MY",
+  "exp": 6,
+  "loss": 16.17,
+  "deficit": 36.3,
+  "ndvi": 3.1446540880503036,
+  "stress": 0,
+  "pa": 35,
+  "score": 51.0453698249073,
+  "label": "risk",
+  "ruleBps": {
+   "base": 32,
+   "drought": 41,
+   "defor": 32
+  }
+ },
+ {
+  "id": "A24",
+  "what": "Highland vegetables & tea",
+  "where": "Cameron Highlands, Pahang, Malaysia",
+  "cc": "MY",
+  "exp": 9,
+  "loss": 1.3299999999999998,
+  "deficit": 22.7,
+  "ndvi": 3.412462908011856,
+  "stress": 0,
+  "pa": 1,
+  "score": 63.742247331539645,
+  "label": "stable",
+  "ruleBps": {
+   "base": 0,
+   "drought": 0,
+   "defor": 25
+  }
+ },
+ {
+  "id": "A25",
+  "what": "Rice",
+  "where": "Muda scheme, Kedah, Malaysia",
+  "cc": "MY",
+  "exp": 15,
+  "loss": 0.06,
+  "deficit": 37.9,
+  "ndvi": 23.318385650224226,
+  "stress": 0.97,
+  "pa": 20,
+  "score": 78.72395229811865,
+  "label": "gain",
+  "ruleBps": {
+   "base": -18,
+   "drought": -13,
+   "defor": -18
+  }
+ },
+ {
+  "id": "A26",
+  "what": "Coastal aquaculture",
+  "where": "Matang mangroves, Perak, Malaysia",
+  "cc": "MY",
+  "exp": 7,
+  "loss": 5.94,
+  "deficit": 29.6,
+  "ndvi": 10.331125827814564,
+  "stress": 0,
+  "pa": 20,
+  "score": 57.92038084193596,
+  "label": "risk",
+  "ruleBps": {
+   "base": 27,
+   "drought": 34,
+   "defor": 27
+  }
+ },
+ {
+  "id": "A27",
+  "what": "Vertical farm",
+  "where": "Lim Chu Kang, Singapore",
+  "cc": "SG",
+  "exp": 5,
+  "loss": 4.1000000000000005,
+  "deficit": 24.1,
+  "ndvi": 12.62798634812288,
+  "stress": 0.01,
+  "pa": 2,
+  "score": 62.14666666666666,
+  "label": "risk",
+  "ruleBps": {
+   "base": 25,
+   "drought": 29,
+   "defor": 25
+  }
+ }
+]

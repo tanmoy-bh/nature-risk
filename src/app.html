@@ -95,6 +95,7 @@ button,select{font:inherit}
 .themebtn.isdark .sun{display:block}.themebtn.isdark .moon{display:none}
 @media (max-width:760px){.themebtn{margin-left:auto}}
 @media (max-width:760px){.navnote{display:none}.navlinks a{padding:5px 10px}}
+@media (max-width:480px){.navlinks{order:3}.navlinks a{padding:5px 7px;font-size:12.5px}.brand{font-size:15px}}
 
 main{max-width:1180px;margin:0 auto;padding-top:32px}
 .page{display:flex;flex-direction:column;gap:20px}
@@ -478,6 +479,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <a id="scr-desk" role="tab" href="#lender-desk" aria-selected="true" data-screen="desk">Lender desk</a>
       <a id="scr-map" role="tab" href="#nature-map" aria-selected="false" data-screen="map">Nature map</a>
       <a id="scr-arch" role="tab" href="#architecture" aria-selected="false" data-screen="arch">Architecture</a>
+      <a id="scr-lab" href="lab" title="Numerical experiments on the credit model">Model lab</a>
     </div>
     <span class="navnote">Proof of concept <span class="dp real" title="Pulled from public open data">Real</span> open nature data <span class="dp sample" title="Sample value, not real data">Sample</span> loans and partner data</span>
     <button class="themebtn" id="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch theme"><svg class="sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
@@ -757,6 +759,11 @@ function goToMap(id){
   try{ history.replaceState(null,"","#map-"+id.toLowerCase()); }catch(e){}
   render(); window.scrollTo({top:0});
 }
+// Links to the Model lab page (lab), opened on this loan's place
+const LAB_ICON='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M2.5 13.5h11M4 11V8M7 11V5M10 11V7M13 11V3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const labLink=a=>` <a class="maplink lablink" href="lab#${a.id.toLowerCase()}" title="Open ${place(a).split(",")[0]} in the Model lab">${LAB_ICON}Model</a>`;
+const labButton=a=>`<a class="mapbtn lablink" href="lab#${a.id.toLowerCase()}">${LAB_ICON}Open this loan in the Model lab</a>`;
+function wireLabLinks(root){ if(!root) return; root.querySelectorAll("a.lablink").forEach(el=>{ el.addEventListener("click",ev=>ev.stopPropagation()); el.addEventListener("keydown",ev=>ev.stopPropagation()); }); }
 function wireMapLinks(root){
   if(!root) return;
   root.querySelectorAll("[data-goto]").forEach(el=>{
@@ -947,13 +954,14 @@ function renderDesk(){
   if (!book.some(a=>a.id===state.sel)) state.sel = [...evals].sort((p,q)=>q.a.exp-p.a.exp)[0].a.id;
   document.getElementById("rows").innerHTML = shown.length ? shown.map(({a,e,b})=>`
     <tr tabindex="0" data-id="${a.id}" aria-selected="${a.id===state.sel}">
-      <td><div class="bname">${a.what}</div><div class="bmeta">${place(a)}${isMYSG(a)?` <a class="maplink" href="#map-${a.id.toLowerCase()}" data-goto="${a.id}" title="Show ${place(a).split(",")[0]} on the Nature map"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5A5 5 0 0 0 3 6.5C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.5" r="1.8" fill="currentColor"/></svg>Map</a>`:""}</div></td>
+      <td><div class="bname">${a.what}</div><div class="bmeta">${place(a)}${isMYSG(a)?` <a class="maplink" href="#map-${a.id.toLowerCase()}" data-goto="${a.id}" title="Show ${place(a).split(",")[0]} on the Nature map"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5A5 5 0 0 0 3 6.5C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.5" r="1.8" fill="currentColor"/></svg>Map</a>`:""}${a.kind==="agri"?labLink(a):""}</div></td>
       <td class="r num" data-label="Exposure">${fmtM(a.exp)}</td>
       <td data-label="Label"><span class="dot"><i style="background:${COLORS[e.label]}"></i>${short(e.label)}${e.label!==b.label?` <span class="was">was ${short(b.label)}</span>`:""}</span></td>
       <td class="r num" data-label="Score">${e.score.toFixed(0)}</td>
       <td class="r num" data-label="Pricing">${fmtBps(e.bps)}</td>
     </tr>`).join("") : `<tr><td colspan="5" class="muted">No loans with this label in this scenario.</td></tr>`;
   wireMapLinks(document.getElementById("rows"));
+  wireLabLinks(document.getElementById("rows"));
   document.querySelectorAll("#rows tr[data-id]").forEach(tr=>{
     const pick=()=>{state.sel=tr.dataset.id; render();};
     tr.addEventListener("click",pick);
@@ -967,9 +975,11 @@ function renderDesk(){
     <div class="action"><span class="label">Suggested action<span class="dp sample" title="Illustrative rule, not real credit policy">Sample</span></span><br>${action(a,e)}</div>
     <p class="note muted">${note(a,e)}</p>
     ${isMYSG(a)?`<a class="mapbtn" href="#map-${a.id.toLowerCase()}" data-goto="${a.id}"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5A5 5 0 0 0 3 6.5C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.5" r="1.8" fill="currentColor"/></svg>See this place on the Nature map</a>`:`<p class="bmeta" style="white-space:normal">The Nature map covers Malaysia and Singapore; this site is outside it.</p>`}
+    ${a.kind==="agri"?labButton(a):""}
     ${bars(e)}
     ${evidenceBlock(a,e)}`;
   wireMapLinks(document.getElementById("detail"));
+  wireLabLinks(document.getElementById("detail"));
 }
 
 // ---------- page 2: nature map ----------

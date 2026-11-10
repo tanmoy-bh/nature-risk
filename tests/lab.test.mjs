@@ -1,0 +1,26 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const read = (p) => readFile(new URL("../" + p, import.meta.url), "utf8");
+
+test("model lab results cover every farm loan in sites.json", async () => {
+  const sites = JSON.parse(await read("analysis/sites.json"));
+  const res = JSON.parse(await read("analysis/results.json"));
+  assert.deepEqual(res.sites.map((s) => s.id), sites.map((s) => s.id));
+  for (const s of sites) {
+    const p = res.per[s.id];
+    assert.ok(p, `missing per-site results for ${s.id}`);
+    assert.equal(p.surface.base.length, res.grids.deficit.length);
+    assert.equal(p.surface.base[0].length, res.grids.loss.length);
+  }
+});
+
+test("the lab page has its placeholders and the desk links to it", async () => {
+  const lab = await read("src/lab.html");
+  assert.match(lab, /\/\*__RESULTS_VERSION__\*\//);
+  assert.match(lab, /lab-results\.json/);
+  const app = await read("src/app.html");
+  assert.match(app, /href="lab"/);
+  assert.match(app, /lab#\$\{a\.id\.toLowerCase\(\)\}/);
+});
