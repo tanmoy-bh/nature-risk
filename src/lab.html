@@ -188,6 +188,14 @@ td.n{text-align:right;white-space:nowrap}
 .chip{display:inline-flex;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
 .chip.risk{background:var(--risk-bg);color:var(--risk-ink)} .chip.stable{background:var(--stable-bg);color:var(--stable-ink)} .chip.gain{background:var(--gain-bg);color:var(--gain-ink)}
 footer{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:90ch}
+.js-plotly-plot .hoverlayer .hovertext{opacity:0}
+.tip{position:fixed;z-index:30;pointer-events:none;max-width:300px;background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 12px;
+  box-shadow:0 10px 28px rgba(0,0,0,.18),0 0 0 .5px var(--line);font-size:13px;line-height:1.45;font-variant-numeric:tabular-nums;opacity:0;transform:translateY(2px);transition:opacity .12s,transform .12s}
+.tip.on{opacity:1;transform:none}
+.tip .h{font-weight:600;font-size:13.5px;margin-bottom:2px}
+.tip .l{color:var(--ink)}
+.tip .f{margin-top:6px;padding-top:6px;border-top:.5px solid var(--line);color:var(--muted);font-size:12px;display:flex;align-items:center;gap:6px}
+.tip .f i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
 code{font-family:var(--mono);font-size:12.5px}
 .loading{color:var(--muted);font-size:14px;padding:24px}
 
@@ -716,7 +724,30 @@ function drawH(T){
     layout(T,{barmode:"stack",bargap:.35,xaxis:{title:{text:"Lending in each zone, $m"},range:[0,RES.portfolio.total]},yaxis:{tickfont:{size:12,color:T.ink},gridcolor:"rgba(0,0,0,0)",autorange:"reversed"},margin:{l:10,r:16,t:40,b:10},legend:{orientation:"h",x:0,y:1.25,traceorder:"normal"}}),CFG);
 }
 const DRAW={"exp-a":drawA,"exp-b":drawB,"exp-c":drawC,"exp-d":drawD,"exp-e":drawE,"exp-f":drawF,"exp-g":drawG,"exp-h":drawH};
-function drawView(){ const f=DRAW[st.view]; if(f&&window.Plotly){ f(theme()); wireZoom(); } }
+function drawView(){ const f=DRAW[st.view]; if(f&&window.Plotly){ f(theme()); wireZoom(); (EXP[st.view]?EXP[st.view].charts:[]).forEach(id=>attachTip(document.getElementById(id))); } }
+
+// ---------------- hover card ----------------
+// Plotly still works out what to show; we read its (hidden) label and show it as a card in the app's style.
+const tipEl=document.createElement("div"); tipEl.className="tip"; tipEl.setAttribute("role","tooltip"); document.body.appendChild(tipEl);
+let mouse={x:0,y:0}; document.addEventListener("pointermove",e=>{ mouse={x:e.clientX,y:e.clientY}; if(tipEl.classList.contains("on")) placeTip(); },{passive:true});
+function placeTip(){ const w=tipEl.offsetWidth, h=tipEl.offsetHeight, pad=14;
+  let x=mouse.x+pad, y=mouse.y+pad; if(x+w>innerWidth-8) x=mouse.x-w-pad; if(y+h>innerHeight-8) y=mouse.y-h-pad;
+  tipEl.style.left=Math.max(8,x)+"px"; tipEl.style.top=Math.max(8,y)+"px"; }
+function hideTip(){ tipEl.classList.remove("on"); }
+function attachTip(el){
+  if(!el||!el.on||el._tip) return; el._tip=true;
+  el.on("plotly_hover",ev=>requestAnimationFrame(()=>{
+    const g=el.querySelector(".hoverlayer .hovertext"); if(!g) return;
+    const nums=g.querySelector("text.nums"); if(!nums) return;
+    const lines=[...nums.querySelectorAll("tspan.line")].map(s=>s.textContent.trim()).filter(Boolean);
+    if(!lines.length) lines.push(nums.textContent.trim());
+    const name=(g.querySelector("text.name")||{}).textContent||"";
+    const pt=ev&&ev.points&&ev.points[0], col=pt&&pt.fullData&&pt.fullData.marker&&typeof pt.fullData.marker.color==="string"?pt.fullData.marker.color:(pt&&pt.fullData&&pt.fullData.line?pt.fullData.line.color:"");
+    tipEl.innerHTML=`<div class="h">${esc(lines[0])}</div>${lines.slice(1).map(l=>`<div class="l">${esc(l)}</div>`).join("")}${name.trim()?`<div class="f">${col?`<i style="background:${esc(col)}"></i>`:""}${esc(name.trim())}</div>`:""}`;
+    tipEl.classList.add("on"); placeTip(); }));
+  el.on("plotly_unhover",hideTip);
+  el.addEventListener("mouseleave",hideTip);
+}
 function wireZoom(){
   const x=EXP[st.view], btn=document.querySelector(`[data-reset="${st.view}"]`); if(!x||!btn) return;
   x.charts.forEach(id=>{ const el=document.getElementById(id); if(el&&el.on&&!el._wired){ el._wired=true; el.on("plotly_relayout",ev=>{ if(Object.keys(ev||{}).some(k=>/range|camera|autorange/.test(k))) btn.classList.add("zoomed"); }); } });
@@ -730,7 +761,7 @@ function parseHash(){
 }
 function setHash(){ try{ history.replaceState(null,"","#"+st.view+"-"+st.id.toLowerCase()); }catch(e){} }
 function show(view,scroll){
-  if(!ORDER.includes(view)) view="summary"; st.view=view; setHash();
+  if(!ORDER.includes(view)) view="summary"; st.view=view; setHash(); hideTip();
   document.querySelectorAll("#rail a").forEach(a=>a.setAttribute("aria-current",String(a.dataset.view===view)));
   const v=document.getElementById("view");
   v.innerHTML=view==="summary"?summaryView():view==="model"?modelView():expView(view);
