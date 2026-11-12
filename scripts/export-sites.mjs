@@ -17,7 +17,7 @@ const sites = ctx.ASSETS.filter((a) => a.kind === "agri").map((a) => ({
   id: a.id, what: a.what, where: a.where, cc: a.cc, exp: a.exp,
   loss: a.raw.loss, deficit: a.raw.deficit || 0,
   ndvi: a.real && a.real.n19 != null && a.real.n25 != null ? ((a.real.n25 - a.real.n19) / a.real.n19) * 100 : null,
-  stress: a.raw.stress || 0, pa: a.raw.dist,
+  stress: a.raw.stress || 0, pa: a.raw.dist, trace: a.raw.trace,
   score: ctx.evaluate(a, "base").score, label: ctx.evaluate(a, "base").label,
 }));
 await writeFile(join(root, "analysis/sites.json"), JSON.stringify(sites, null, 1) + "\n");

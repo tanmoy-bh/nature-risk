@@ -265,15 +265,15 @@ async function loadResults(){
 // ---------------- helpers ----------------
 const fmt=(v,d=0)=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(d);
 const pct=(v,d=1)=>{ const s=(v*100).toFixed(d); return (+s===0?(0).toFixed(d):s)+"%"; };
-const $m=v=>"$"+v.toFixed(v>=10?1:2)+"m";
+const $m=v=>"$"+v.toFixed(v>=100?0:v>=10?1:2)+"m";
 const $k=v=>"$"+Math.round(v*1000).toLocaleString("en")+"k";
 const num=n=>n.toLocaleString("en");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const REAL='<span class="dp real">Real</span>', SAMPLE='<span class="dp sample">Sample</span>', CALC='<span class="dp calc">Calculated</span>', SET='<span class="dp calc">Set by design</span>';
-const SC={base:"Baseline",drought:"Repeat of driest year",defor:"Stricter deforestation rule"};
+const SC={base:"Baseline",drought:"Repeat of driest year",defor:"Stricter deforestation rule",engage:"Engagement"};
 const LABELNAME={risk:"Nature Risk",stable:"Nature Stable",gain:"Nature Gain"};
 const CN={MY:"Malaysia",SG:"Singapore",ID:"Indonesia",VN:"Vietnam",TH:"Thailand",PH:"Philippines",LK:"Sri Lanka",AU:"Australia"};
-const st={view:"summary",id:"A19",a:"base",am:"price",e:"base",ev:"3d"};
+const st={view:"summary",id:"A19",a:"base",am:"price",e:"base",ev:"3d",hv:"move",hs:"base"};
 const site=()=>SITE[st.id], per=()=>RES.per[st.id];
 const gradeOf=pd=>{ const T=[[0.0003,"1 (AA)"],[0.001,"2 (A)"],[0.002,"3 (BBB+)"],[0.004,"4 (BBB)"],[0.008,"5 (BB+)"],[0.016,"6 (BB)"],[0.032,"7 (B+)"],[0.064,"8 (B)"],[0.128,"9 (B−)"],[1,"10 (CCC)"]]; return (T.find(g=>pd<g[0])||T[9])[1]; };
 function tex(s){ try{ return window.katex?katex.renderToString(s,{output:"mathml",throwOnError:false}):`<code>${esc(s)}</code>`; }catch(e){ return `<code>${esc(s)}</code>`; } }
@@ -293,34 +293,38 @@ function segHTML(id,opts,key){ return `<div class="seg" id="${id}" role="group">
 
 // ---------------- the model, step by step ----------------
 function modelSteps(){
-  const s=site(), p=per(), n=p.inputs.nat, m=p.mc, b=s.base, r1=m.pEx*p.inputs.s*B.disc, rev=r1+m.r3, e=B.lev*rev;
+  const s=site(), p=per(), n=p.inputs.nat, m=p.mc, b=s.base, A=RES.meta.avg, tw=RES.meta.trace_w[n.trace];
+  const sgn=v=>v>=0?pct(v,2)+" lost":pct(-v,2)+" gained";
   return [
-    {stage:"From nature to lost revenue",steps:[
+    {stage:"From nature to revenue",steps:[
       {name:"Chance buyers turn the borrower away",tex:"p_{\\text{ex}}=\\dfrac{1}{1+e^{-(L-T)\\,/\\,(T/4)}}",
        explain:"Buyers with deforestation-free rules start rejecting supply as forest loss L passes the trigger T. Below the trigger the chance is near zero, at the trigger it is 50%, and at twice the trigger it is near certain.",
        vals:`Here: L = <b>${n.loss.toFixed(1)}%</b> ${REAL} · T = <b>2%</b> → p<sub>ex</sub> = <b>${pct(m.pEx,0)}</b>`},
+      {name:"Premium for clean, traceable supply",tex:"c=w_{\\text{trace}}\\cdot\\max\\!\\big(0,\\ 1-L/(T/2)\\big),\\qquad \\text{premium}=c\\,s\\,\\pi",
+       explain:"The upside. An estate with little or no clearing, whose supply buyers can verify, keeps its deforestation-free buyers and can earn a premium π on those sales. w is how well buyers can trace the supply: plot 1, mill 0.5, district 0.2.",
+       vals:`Here: traced to <b>${n.trace}</b> ${SAMPLE} (w = ${tw}) → c = <b>${pct(m.clean,0)}</b> → premium <b>${pct(m.prem,2)}</b> of revenue`},
       {name:"Harvest lost in a drought year",tex:"y=\\min\\!\\big(0.6,\\ \\beta\\,D\\,(1+W/5)\\big)",
        explain:"If the driest year since 2001 came back, the harvest would fall by the rainfall deficit D times the crop's sensitivity β, more where water is already scarce (W).",
        vals:`Here: β = <b>${p.inputs.beta.toFixed(2)}</b> ${SAMPLE} · D = <b>${n.deficit.toFixed(1)}%</b> ${REAL} · W = <b>${n.stress.toFixed(2)}</b> ${REAL} → y = <b>${pct(m.y,1)}</b>`},
-      {name:"Share of revenue lost",tex:"r=p_{\\text{ex}}\\,s\\,d\\;+\\;r_{\\text{drought}}\\;-\\;\\Delta\\text{NDVI}\\cdot v\\cdot w",
-       explain:"Three channels add up: buyers walking away (s is the share of sales to them, d the price lost), a drought year (only in the drought scenario), and the land's health trend from satellite greenness.",
-       vals:`Here: ${pct(m.pEx,0)} × ${pct(p.inputs.s,0)} × ${pct(B.disc,0)} = <b>${pct(r1,2)}</b>; vegetation <b>${m.r3>=0?pct(m.r3,2)+" lost":pct(-m.r3,2)+" gained"}</b> → r = <b>${pct(rev,2)}</b>`},
+      {name:"Revenue impact of nature",tex:"r=p_{\\text{ex}}\\,s\\,d\\;-\\;\\text{premium}\\;+\\;r_{\\text{drought}}\\;-\\;\\Delta\\text{NDVI}\\cdot v\\cdot w",
+       explain:"Buyers walking away cost revenue; the premium adds it back; a drought year costs revenue only in the drought scenario; the land's health trend works either way. A negative r is a gain.",
+       vals:`Here: r = <b>${sgn(m.r)}</b>`},
     ]},
-    {stage:"From lost revenue to the chance of default",steps:[
-      {name:"Operating profit lost",tex:"e=\\lambda\\, r",
-       explain:"Most of a plantation's costs are fixed, so profit falls faster than revenue. λ says how much faster.",
-       vals:`Here: λ = <b>${B.lev.toFixed(1)}</b> ${SAMPLE} → e = <b>${pct(e,1)}</b>`},
-      {name:"Cash cover for loan payments",tex:"\\begin{gathered}\\text{DSCR}_N=\\text{DSCR}_0\\,(1-e)\\\\[4pt]\\sigma_N=\\sqrt{\\sigma^2+(\\lambda y)^2\\,p_D\\,(1-p_D)}\\end{gathered}",
-       explain:"The debt service coverage ratio (DSCR) is cash available divided by loan payments due; DSCR₀ is its expected value from financials alone. Lost profit lowers it; the chance of a drought year makes it swing more from year to year.",
-       vals:`Here: ${B.dscr.toFixed(2)} ${SAMPLE} → <b>${m.dN.toFixed(2)}</b>; volatility ${B.sigma.toFixed(2)} → <b>${m.sN.toFixed(3)}</b>`},
+    {stage:"Against the average borrower",steps:[
+      {name:"Profit change against the book average",tex:"e=\\lambda\\,(r-\\bar r)",
+       explain:"A bank's price already carries the average nature risk of its farm book, because its default history includes droughts and lost buyers. Only the difference from that average r̄ matters, so a site better than average lowers risk.",
+       vals:`Here: book average r̄ = <b>${pct(A.r,2)}</b> ${CALC} · λ = ${B.lev.toFixed(1)} ${SAMPLE} → e = <b>${m.e>=0?pct(m.e,1)+" less profit":pct(-m.e,1)+" more profit"}</b>`},
+      {name:"Cash cover for loan payments",tex:"\\begin{gathered}\\text{DSCR}_N=\\text{DSCR}_0\\,(1-e)\\\\[4pt]\\sigma_N=\\sqrt{\\sigma^2-\\bar v+v},\\quad v=(\\lambda y)^2\\,p_D\\,(1-p_D)\\end{gathered}",
+       explain:"The debt service coverage ratio (DSCR) is cash available divided by loan payments due; DSCR₀ is this borrower's from financials alone. Drought exposure v makes cash flow swing more; a site steadier than the book average v̄ swings less.",
+       vals:`Here: DSCR₀ <b>${p.inputs.dscr.toFixed(2)}</b> ${SAMPLE} → <b>${m.dN.toFixed(2)}</b>; volatility ${B.sigma.toFixed(2)} → <b>${m.sN.toFixed(3)}</b>`},
       {name:"Chance of default in a year",tex:"\\text{PD}=\\Phi\\!\\left(\\dfrac{-\\ln\\,\\text{DSCR}}{\\sigma}\\right)",
        explain:"The chance that, next year, coverage drops below 1 and the borrower can't pay from its operations. Φ is the standard bell curve.",
        vals:`Here: <b>${pct(b.pd0,2)}</b> from financials alone → <b>${pct(b.pdN,2)}</b> with nature data`},
     ]},
     {stage:"From default risk to loss and capital",steps:[
-      {name:"Share lost if it defaults",tex:"\\text{LGD}_N=1-(1-\\text{LGD}_0)(1-h)",
-       explain:"If the borrower defaults, the bank sells the land. Land next to a protected area or with recent clearing sells for less (the cut h), so the bank loses more.",
-       vals:`Here: <b>${pct(B.lgd,0)}</b> ${SAMPLE} → <b>${pct(b.lgdN,1)}</b> · protected area ${n.pa>=60?"over 50 km":n.pa+" km"} away ${REAL}`},
+      {name:"Share lost if it defaults",tex:"\\begin{gathered}\\text{LGD}_N=1-(1-\\text{LGD}_0)\\big(1-(h-\\bar h)\\big)\\\\[4pt]h=h_{PA}\\max(0,\\,1-d_{PA}/5)+h_{\\text{clear}}\\min(1,\\,L/T)\\end{gathered}",
+       explain:"If the borrower defaults, the bank sells the land. Land near a protected area or with recent clearing sells for less (h). Land cleaner than the book average h̄ sells for more, so the bank loses less.",
+       vals:`Here: h = <b>${pct(m.h,1)}</b> vs average <b>${pct(A.h,1)}</b> ${CALC} → LGD <b>${pct(B.lgd,0)}</b> → <b>${pct(b.lgdN,1)}</b>`},
       {name:"Expected loss a year",tex:"\\text{EL}=\\text{PD}\\times\\text{LGD}\\times\\text{EAD}",
        explain:"What the bank expects to lose on the loan in an average year. EAD is the amount outstanding. Banks price this in, like an insurance premium.",
        vals:`Here, on ${$m(s.exp)} ${SAMPLE}: <b>${$k(b.el0)}</b> → <b>${$k(b.elN)}</b> a year`},
@@ -330,75 +334,77 @@ function modelSteps(){
     ]},
     {stage:"From risk to price and accounts",steps:[
       {name:"Price the loan must charge",tex:"\\text{Price}=\\text{PD}\\cdot\\text{LGD}\\;+\\;K\\,r\\;+\\;c",
-       explain:"Expected loss, plus a return r on the capital held, plus the cost c of running the loan. The difference with and without nature data is the price change.",
+       explain:"Expected loss, plus a return r on the capital held, plus the cost c of running the loan. The difference with and without nature data is the price change, up or down.",
        vals:`Here: <b>${Math.round(b.sp0)} bps</b> → <b>${Math.round(b.spN)} bps</b> a year (<b>${fmt(b.model,0)} bps</b>)`},
       {name:"Accounting provision (IFRS 9)",tex:"\\text{Provision}=\\begin{cases}\\text{PD}\\cdot\\text{LGD}\\cdot\\text{EAD} & \\text{Stage 1}\\\\[2pt] \\big(1-(1-\\text{PD})^{n}\\big)\\,\\text{LGD}\\cdot\\text{EAD} & \\text{Stage 2}\\end{cases}",
-       explain:"A healthy loan reserves one year of expected loss. If risk has risen significantly (lifetime PD doubles, or forest loss breaches the trigger with no plan), it reserves for the loan's remaining life of n years.",
+       explain:"A healthy loan reserves one year of expected loss. If risk has risen significantly (lifetime PD doubles, or forest loss breaches the trigger with no verified plan), it reserves for the loan's remaining life of n years.",
        vals:`Here: Stage 1 → <b>Stage ${b.stage}</b>; ${$k(b.prov0)} → <b>${$k(b.provN)}</b>`},
     ]},
   ];
 }
 
 // ---------------- experiments ----------------
+const SCN={base:"Baseline",drought:"Driest year",defor:"Stricter rule",engage:"Engagement"};
+const dirWord=v=>v<-5?"cheaper":v>5?"dearer":"about the same";
 const EXP={
  "exp-a":{letter:"A",title:"Traditional view against the view with nature data",scope:"All 27 loans",
-  goal:()=>"Show how a bank's usual risk view, built from the borrower's financials alone, compares with the same view once each site's nature data is added.",
+  goal:()=>"Show which loans a bank's usual risk view overprices and which it underprices, once each site's nature data is compared with the book's average nature risk.",
   data:()=>[
     {t:"27 farm and plantation loans",p:SAMPLE,d:`$${RES.sites.reduce((t,s)=>t+s.exp,0)}m across ${[...new Set(RES.sites.map(s=>s.cc))].length} countries, from the Lender desk.`},
-    {t:"Borrower financials",p:SAMPLE,d:`The same for every loan (coverage ${B.dscr.toFixed(2)}×, loss if default ${pct(B.lgd,0)}), so any difference comes from nature alone.`},
-    {t:"5 nature readings per site",p:REAL,d:"Forest loss, rainfall deficit, water stress, vegetation change and distance to protected areas."},
+    {t:"Borrower financials",p:SAMPLE,d:`Each borrower has its own expected coverage, from ${Math.min(...RES.sites.map(s=>s.dscr0)).toFixed(2)}× to ${Math.max(...RES.sites.map(s=>s.dscr0)).toFixed(2)}×, and a typical ${pct(B.lgd,0)} loss if it defaults.`},
+    {t:"5 nature readings per site",p:REAL,d:"Forest loss, rainfall deficit, water stress, vegetation change and distance to protected areas, plus traceability (sample)."},
   ],
-  details:()=>vtable(["Item","Value","Source"],[["Loans","27",SAMPLE],["Total lent","$"+RES.sites.reduce((t,s)=>t+s.exp,0)+"m",SAMPLE],["Nature readings","135 (5 per site)",REAL],["Scenarios","Baseline, repeat of driest year, stricter deforestation rule",SET]]),
+  details:()=>vtable(["Item","Value","Source"],[["Loans","27",SAMPLE],["Total lent","$"+RES.sites.reduce((t,s)=>t+s.exp,0)+"m",SAMPLE],["Nature readings","135 (5 per site)",REAL],["Book average revenue impact r̄",pct(RES.meta.avg.r,2),CALC],["Scenarios","Baseline, repeat of driest year, stricter deforestation rule, engagement",SET]]),
   method:()=>[
-    {name:"Traditional view",tex:"\\text{Price}_0=\\text{PD}_0\\,\\text{LGD}_0+K(\\text{PD}_0,\\text{LGD}_0)\\,r+c",explain:"The bank's usual calculation: default risk from financials only, then expected loss, capital and price."},
-    {name:"With nature data",tex:"\\text{Price}_N=\\text{PD}_N\\,\\text{LGD}_N+K(\\text{PD}_N,\\text{LGD}_N)\\,r+c",explain:"The same calculation, with nature feeding into default risk and loss (steps 1 to 10 of the model)."},
-    {name:"The gap",tex:"\\Delta\\text{Price}=\\text{Price}_N-\\text{Price}_0",explain:"How much the traditional view misprices the loan, in basis points a year."},
+    {name:"Traditional view",tex:"\\text{Price}_0=\\text{PD}_0\\,\\text{LGD}_0+K(\\text{PD}_0,\\text{LGD}_0)\\,r+c",explain:"The bank's usual calculation from the borrower's financials. It already carries the book's average nature risk, without knowing which loans hold more or less of it."},
+    {name:"With nature data",tex:"\\text{Price}_N=\\text{PD}_N\\,\\text{LGD}_N+K(\\text{PD}_N,\\text{LGD}_N)\\,r+c",explain:"The same calculation, with each site's nature risk measured against that average (the model's steps 1 to 11)."},
+    {name:"The gap",tex:"\\Delta\\text{Price}=\\text{Price}_N-\\text{Price}_0",explain:"Negative means the traditional view overcharges the loan; positive means it undercharges it."},
   ],
-  controls:()=>segHTML("a-measure",[["price","Required price"],["pd","Chance of default"],["el","Expected loss"]],"am")+segHTML("a-scen",Object.entries(SC),"a"),
-  result:()=>{ const sc=st.a, R=RES.sites, M=AM[st.am], f=AMFMT[st.am], v0=R.map(r=>M.f0(r[sc])), vN=R.map(r=>M.fN(r[sc])), up=R.filter(r=>r[sc].model>5).length, dn=R.filter(r=>r[sc].model<-5).length, k=site()[sc];
-    return `${SC[sc]} scenario. The traditional view gives all 27 loans the same ${AMNAME[st.am]}, <b>${f(v0[0])}</b>, because it only sees their financials. With nature data the same loans spread from <b>${f(Math.min(...vN))}</b> to <b>${f(Math.max(...vN))}</b>; <b>${up}</b> need a higher price and <b>${dn}</b> could pay less. ${esc(site().name)} moves from ${f(M.f0(k))} to <b>${f(M.fN(k))}</b>.`; },
+  controls:()=>segHTML("a-measure",[["price","Required price"],["pd","Chance of default"],["el","Expected loss"]],"am")+segHTML("a-scen",Object.entries(SCN),"a"),
+  result:()=>{ const sc=st.a, R=RES.sites, M=AM[st.am], f=AMFMT[st.am], q=RES.portfolio[sc], k=site()[sc];
+    return `${SC[sc]||SCN[sc]} scenario. Nature data prices <b>${q.cheaper}</b> loans lower (<b>${$m(q.exp_cheaper)}</b> of lending) and <b>${q.dearer}</b> higher (<b>${$m(q.exp_dearer)}</b>); the rest barely move. Across the book the average change is <b>${fmt(q.wbps,1)} bps</b>. ${esc(site().name)} moves from ${f(M.f0(k))} to <b>${f(M.fN(k))}</b>.`; },
   charts:["pA"],tall:true,
   weak:[
-    "<b>Identical financials.</b> Every borrower is given the same sample finances, so the traditional view is flat by design. Real borrowers differ, and nature's effect would sit on top of that.",
-    "<b>Uncalibrated links.</b> How nature turns into lost revenue is a sketch. It needs real loan outcomes to calibrate.",
-    "<b>One snapshot.</b> Nature readings cover 2019–2025 at a single point per site, not each estate's full boundary.",
+    "<b>The book stands in for the sector.</b> The average nature risk is taken from these 27 loans; a bank would use its whole farm book or a sector benchmark.",
+    "<b>Sample financials.</b> Each borrower's coverage is a sample value, so the traditional view's ranking is illustrative.",
+    "<b>Uncalibrated links.</b> How nature turns into revenue, and how big the premium is, needs real loan outcomes to calibrate.",
     "<b>Farms only.</b> Renewable energy projects are left out because their cash flows behave differently."]},
  "exp-b":{letter:"B",title:"Checking the default formula by simulation",scope:"This place",
-  goal:()=>`Check whether the shortcut formula for the chance of default (step 6) is accurate for ${esc(site().name)}, by simulating ${num(G.N_MC)} possible versions of next year's cash flow.`,
+  goal:()=>`Check whether the shortcut formula for the chance of default is accurate for ${esc(site().name)}, by simulating ${num(G.N_MC)} possible versions of next year's cash flow.`,
   data:()=>{ const p=per(), m=p.mc; return [
     {t:"This site's nature readings",p:REAL,d:`Forest loss ${p.inputs.nat.loss.toFixed(1)}%, rainfall deficit ${p.inputs.nat.deficit.toFixed(1)}%, water stress ${p.inputs.nat.stress.toFixed(2)}.`},
-    {t:"Borrower and crop assumptions",p:SAMPLE,d:`Coverage ${B.dscr.toFixed(2)}×, volatility ${B.sigma.toFixed(2)}, ${pct(p.inputs.s,0)} of sales to deforestation-free buyers.`},
+    {t:"Borrower and crop assumptions",p:SAMPLE,d:`Coverage ${p.inputs.dscr.toFixed(2)}×, volatility ${B.sigma.toFixed(2)}, ${pct(p.inputs.s,0)} of sales to deforestation-free buyers.`},
     {t:`${num(G.N_MC)} simulated scenarios`,p:CALC,d:`Each scenario is one possible next year. It draws the economy, whether buyers walk away (${pct(m.pEx,0)} chance) and whether the driest year repeats (${pct(m.pD,0)}).`},
   ]; },
-  details:()=>{ const p=per(), m=p.mc; return vtable(["Symbol","Meaning","Value","Source"],[["N","Simulated scenarios of next year",num(G.N_MC),SET],["DSCR̄, σ","Expected coverage, volatility",`${B.dscr.toFixed(2)}×, ${B.sigma.toFixed(2)}`,SAMPLE],["λ","Operating leverage",B.lev.toFixed(1)+"×",SAMPLE],["p<sub>ex</sub>","Chance buyers walk away",pct(m.pEx,1),CALC],["s × d","Revenue lost if they do",pct(p.inputs.s*B.disc,1),SAMPLE],["p<sub>D</sub>, y","Drought chance and harvest lost",`${pct(m.pD,0)}, ${pct(m.y,1)}`,CALC],["Seed","Random seed",String(RES.meta.seed),SET]]); },
+  details:()=>{ const p=per(), m=p.mc; return vtable(["Symbol","Meaning","Value","Source"],[["N","Simulated scenarios of next year",num(G.N_MC),SET],["DSCR₀, σ","Expected coverage, volatility",`${p.inputs.dscr.toFixed(2)}×, ${B.sigma.toFixed(2)}`,SAMPLE],["λ","Operating leverage",B.lev.toFixed(1)+"×",SAMPLE],["p<sub>ex</sub>","Chance buyers walk away",pct(m.pEx,1),CALC],["s × d","Revenue lost if they do",pct(p.inputs.s*B.disc,1),SAMPLE],["premium","Premium for clean supply",pct(m.prem,2),CALC],["p<sub>D</sub>, y","Drought chance and harvest lost",`${pct(m.pD,0)}, ${pct(m.y,1)}`,CALC],["r̄","Book average revenue impact",pct(RES.meta.avg.r,2),CALC],["Seed","Random seed",String(RES.meta.seed),SET]]); },
   method:()=>[
-    {name:"One scenario of next year",tex:"\\begin{gathered}\\text{DSCR}_t=\\text{DSCR}_0\\;e^{\\sigma Z_t}\\\\[4pt]\\times\\,\\big(1-\\lambda\\,(X_t\\,s\\,d+Y_t\\,y+r_{\\text{veg}})\\big)\\end{gathered}",explain:"Coverage in scenario t. Z is that scenario's luck, a draw from the bell curve. X is 1 if buyers walk away in that scenario, Y is 1 if the drought hits; each is either 0 or 1."},
+    {name:"One scenario of next year",tex:"\\begin{gathered}\\text{DSCR}_t=\\text{DSCR}_0\\;e^{\\sigma_b Z_t}\\\\[4pt]\\times\\,\\big(1-\\lambda\\,(X_t\\,s\\,d-\\text{premium}+(Y_t-p_D)\\,y+r_{\\text{veg}}-\\bar r)\\big)\\end{gathered}",explain:"Coverage in scenario t. Z is that scenario's luck, a draw from the bell curve. X is 1 if buyers walk away, Y is 1 if the drought hits; each is either 0 or 1. σ_b is the volatility left once the average drought is taken out."},
     {name:"Simulated chance of default",tex:"\\text{PD}_{\\text{sim}}=\\dfrac{\\#\\{t:\\ \\text{DSCR}_t<1\\}}{N}",explain:"Count the scenarios in which coverage falls below 1 and divide by the number of scenarios."},
-    {name:"Compared with the shortcut",tex:"\\text{PD}=\\Phi\\!\\left(\\dfrac{-\\ln\\,\\text{DSCR}_N}{\\sigma_N}\\right)",explain:"The formula used everywhere else, which spreads the yes-or-no shocks evenly over every year."},
+    {name:"Compared with the shortcut",tex:"\\text{PD}=\\Phi\\!\\left(\\dfrac{-\\ln\\,\\text{DSCR}_N}{\\sigma_N}\\right)",explain:"The formula used everywhere else, which spreads the yes-or-no shocks evenly over every scenario."},
   ],
   result:()=>{ const m=per().mc, gap=(m.pd_mcN/m.pd_anN-1)*100;
-    return `Simulation gives a <b>${pct(m.pd_mcN,2)}</b> chance of default against the formula's <b>${pct(m.pd_anN,2)}</b>${Math.abs(gap)<3?": the shortcut is accurate for this loan.":`, <b>${Math.abs(gap).toFixed(0)}% ${gap>0?"higher":"lower"}</b>. The formula smooths shocks that really arrive all at once, so a production model should simulate.`} Without nature data both give ${pct(m.pd_mc0,2)}.`; },
+    return `Simulation gives a <b>${pct(m.pd_mcN,2)}</b> chance of default against the formula's <b>${pct(m.pd_anN,2)}</b>${Math.abs(gap)<5?": the shortcut is close for this loan.":`, <b>${Math.abs(gap).toFixed(0)}% ${gap>0?"higher":"lower"}</b>. The formula smooths shocks that really arrive all at once, so a production model should simulate.`} Without nature data, simulation gives ${pct(m.pd_mc0,2)} against ${pct(m.pd_an0,2)}.`; },
   charts:["pB"],
   weak:[
-    "<b>Shape assumed.</b> Year-to-year coverage is assumed to follow a log-normal curve; real farm cash flows can have fatter tails.",
-    "<b>Shocks assumed independent.</b> A drought, buyers walking away and a bad economy are drawn separately, but in reality they can hit together.",
+    "<b>Shape assumed.</b> Coverage is assumed to follow a log-normal curve; real farm cash flows can have fatter tails.",
+    "<b>Shocks drawn independently.</b> A drought, buyers walking away and a bad economy are drawn separately, but in reality they can hit together.",
     "<b>One year at a time.</b> It ignores how a bad year weakens the next one.",
     "<b>Same shock sizes.</b> It checks the formula, not whether the shock sizes themselves are right."]},
  "exp-c":{letter:"C",title:"How sure are we of the price?",scope:"This place",
   goal:()=>`Measure how much the price change for ${esc(site().name)} depends on assumptions we don't know exactly, by re-pricing the loan ${num(G.N_U)} times.`,
   data:()=>[
     {t:"This site's nature readings",p:REAL,d:"Held fixed at the measured values."},
-    {t:"10 uncertain assumptions",p:SAMPLE,d:"Borrower finances, crop and buyer sensitivities, land value cuts and the bank's required return, each varied between a low and a high value."},
-    {t:`${num(G.N_U)} re-pricings`,p:CALC,d:"Each draws a fresh, plausible set of all ten assumptions at once."},
+    {t:"11 uncertain assumptions",p:SAMPLE,d:"This borrower's coverage, plus ten sector-wide assumptions: buyer and crop sensitivities, the clean-supply premium, land value cuts and the bank's required return."},
+    {t:`${num(G.N_U)} re-pricings`,p:CALC,d:"Each draws a fresh, plausible set of assumptions. Sector assumptions move the book average too, as they would in reality."},
   ],
   details:()=>rangeTable(per().unc.ranges),
   method:()=>[
     {name:"Draw the assumptions",tex:"\\theta_{k,i}\\sim \\text{Triangular}(\\text{low}_k,\\ \\text{central}_k,\\ \\text{high}_k)",explain:"For each re-pricing i, each assumption k is drawn between its low and high value, most often near the central value."},
-    {name:"Re-price the loan",tex:"\\Delta\\text{Price}_i=f(\\text{nature data},\\ \\theta_i)",explain:"Run the whole model with that set of assumptions."},
+    {name:"Re-price against the moved average",tex:"\\Delta\\text{Price}_i=f\\big(\\text{nature data},\\ \\theta_i,\\ \\bar r(\\theta_i)\\big)",explain:"Run the whole model with that set of assumptions. A sector-wide change, such as a bigger buyer penalty, also shifts the book average it is compared with."},
     {name:"Summarise",tex:"P_{5},\\ P_{50},\\ P_{95}\\ \\text{of}\\ \\Delta\\text{Price}_i",explain:"The 5th and 95th percentiles bound the middle 90% of outcomes; the 50th is the median."},
   ],
   result:()=>{ const u=per().unc, pos=u.share_pos;
-    return `In 90% of re-pricings the price change falls between <b>${fmt(u.p5)}</b> and <b>${fmt(u.p95)} bps</b>, with a median of <b>${fmt(u.p50)} bps</b>. ${pos>0.995?"Every draw is above zero: whatever the assumptions, this loan needs a higher price once nature is counted.":pos<0.005?"Every draw is below zero: nature data points to lower risk whatever the assumptions.":`${pct(pos,0)} of draws are above zero, so the direction depends on the assumptions.`}`; },
+    return `In 90% of re-pricings the price change falls between <b>${fmt(u.p5)}</b> and <b>${fmt(u.p95)} bps</b>, with a median of <b>${fmt(u.p50)} bps</b>. ${pos>0.995?"Every draw is above zero: whatever the assumptions, this loan is underpriced today.":pos<0.005?"Every draw is below zero: whatever the assumptions, this loan is overpriced today.":`${pct(pos,0)} of draws are above zero, so the direction depends on the assumptions.`}`; },
   charts:["pC"],
   weak:[
     "<b>Ranges are judgement.</b> The low and high values are reasoned, not estimated from data.",
@@ -408,8 +414,8 @@ const EXP={
  "exp-d":{letter:"D",title:"Which assumption matters most?",scope:"This place",
   goal:()=>`Find which single assumption moves ${esc(site().name)}'s price the most, so we know where better data pays off.`,
   data:()=>[
-    {t:"Same 10 assumptions as C",p:SAMPLE,d:"Each moved to its low end and its high end."},
-    {t:"Everything else at central values",p:SAMPLE,d:"Only one assumption changes at a time."},
+    {t:"Same 11 assumptions as C",p:SAMPLE,d:"Each moved to its low end and its high end."},
+    {t:"Everything else at central values",p:SAMPLE,d:"Only one assumption changes at a time; a sector-wide one also moves the book average."},
     {t:"This site's nature readings",p:REAL,d:"Held fixed."},
   ],
   details:()=>rangeTable(per().unc.ranges),
@@ -425,21 +431,21 @@ const EXP={
     "<b>Depends on the ranges.</b> A wider range makes a bar longer, so the ranking is only as good as the ranges in C.",
     "<b>Local view.</b> It describes this loan, not the whole book."]},
  "exp-e":{letter:"E",title:"Price across forest loss and drought",scope:"This place",
-  goal:()=>`See how the price change for a loan like ${esc(site().name)} responds when forest loss and drought change together.`,
+  goal:()=>`See how the price change for a loan like ${esc(site().name)} responds when forest loss and drought change together, in both directions.`,
   data:()=>{ const n=per().inputs.nat; return [
     {t:"A grid of two readings",p:CALC,d:`Forest loss 0–20% in ${G.loss.length} steps × rainfall deficit 0–70% in ${G.deficit.length} steps.`},
     {t:"This site's other readings",p:REAL,d:`Water stress ${n.stress.toFixed(2)}, vegetation change ${n.ndvi==null?"no data":(n.ndvi>0?"+":"")+n.ndvi.toFixed(1)+"%"}, protected area ${n.pa>=60?"over 50 km":n.pa+" km"} away.`},
-    {t:"Crop and bank assumptions",p:SAMPLE,d:"At their central values for this crop."},
+    {t:"Crop and bank assumptions",p:SAMPLE,d:"At their central values for this crop, against the book average."},
   ]; },
-  details:()=>{ const n=per().inputs.nat; return vtable(["Reading","This site","Source"],[["Forest loss",n.loss.toFixed(1)+"%",REAL],["Rainfall deficit",n.deficit.toFixed(1)+"%",REAL],["Water stress",n.stress.toFixed(2),REAL],["Vegetation change",n.ndvi==null?"no data":(n.ndvi>0?"+":"")+n.ndvi.toFixed(1)+"%",REAL],["Protected area",n.pa>=60?"over 50 km":n.pa+" km",REAL]]); },
+  details:()=>{ const n=per().inputs.nat; return vtable(["Reading","This site","Source"],[["Forest loss",n.loss.toFixed(1)+"%",REAL],["Rainfall deficit",n.deficit.toFixed(1)+"%",REAL],["Water stress",n.stress.toFixed(2),REAL],["Vegetation change",n.ndvi==null?"no data":(n.ndvi>0?"+":"")+n.ndvi.toFixed(1)+"%",REAL],["Protected area",n.pa>=60?"over 50 km":n.pa+" km",REAL],["Traceability",n.trace,SAMPLE]]); },
   method:()=>[
-    {name:"The surface",tex:"\\Delta\\text{Price}(L,D)=f(L,\\ D,\\ \\text{other readings fixed})",explain:"Re-price the loan at every combination of forest loss L and rainfall deficit D on the grid."},
+    {name:"The surface",tex:"\\Delta\\text{Price}(L,D)=f(L,\\ D,\\ \\text{other readings fixed})",explain:"Re-price the loan at every combination of forest loss L and rainfall deficit D. Blue is cheaper than today, red dearer."},
     {name:"Drought scenario",tex:"p_D=25\\%,\\qquad r_{\\text{drought}}=y/n",explain:"In the drought scenario the driest year repeats once before the loan ends, so its cost is spread over the remaining n years."},
   ],
   controls:()=>segHTML("e-scen",[["base","Baseline"],["drought","Repeat of driest year"]],"e")+segHTML("e-view",[["3d","3D surface"],["map","Contour map"]],"ev"),
   result:()=>{ const p=per(), z=p.surface[st.e], X=G.loss, Y=G.deficit, ix=Math.max(0,X.findIndex(v=>v>=Math.min(20,p.here[0]))), iy=Math.max(0,Y.findIndex(v=>v>=Math.min(70,p.here[1])));
-    const row=z[iy], col=z.map(r=>r[ix]);
-    return `Forest loss moves the price by up to <b>${Math.round(Math.max(...row)-Math.min(...row))} bps</b>; rainfall deficit by up to <b>${Math.round(Math.max(...col)-Math.min(...col))} bps</b>. ${st.e==="base"?"The steep step is the 2% trigger, where buyers start walking away.":"In a drought scenario, rainfall becomes a second steep slope."} ${esc(site().name)} sits at about <b>${fmt(z[iy][ix])} bps</b>.`; },
+    const row=z[iy], col=z.map(r=>r[ix]), lo=Math.min(...z.flat());
+    return `Forest loss moves the price by up to <b>${Math.round(Math.max(...row)-Math.min(...row))} bps</b>; rainfall deficit by up to <b>${Math.round(Math.max(...col)-Math.min(...col))} bps</b>. ${lo<-1?`With no clearing and mild droughts the loan would be up to <b>${Math.round(-lo)} bps cheaper</b> than today. `:""}${esc(site().name)} sits at about <b>${fmt(z[iy][ix])} bps</b>.`; },
   charts:["pE"],surf:true,
   weak:[
     "<b>Other readings fixed.</b> In reality forest loss and water stress tend to move together.",
@@ -455,45 +461,73 @@ const EXP={
   details:()=>{ const sc=RES.sites, pds=sc.map(s=>s.base.pdN), R=pd=>{ const q=(1-Math.exp(-50*pd))/(1-Math.exp(-50)); return 0.12*q+0.24*(1-q); }, Rs=pds.map(R);
     return vtable(["Symbol","Meaning","Range","Source"],[["N","Simulated scenarios of next year",num(RES.portfolio.hist.N),SET],["PD<sub>i</sub>","Chance of default, with nature",`${pct(Math.min(...pds),2)} to ${pct(Math.max(...pds),2)}`,CALC],["R<sub>i</sub>","Link to the economy (Basel)",`${pct(Math.min(...Rs),1)} to ${pct(Math.max(...Rs),1)}`,CALC],["LGD<sub>i</sub>","Share lost if default",`${pct(Math.min(...sc.map(s=>s.base.lgdN)),1)} to ${pct(Math.max(...sc.map(s=>s.base.lgdN)),1)}`,CALC]]); },
   method:()=>[
-    {name:"When a loan defaults",tex:"\\sqrt{R_i}\\,Z_t+\\sqrt{1-R_i}\\;\\varepsilon_{i,t}<\\Phi^{-1}(\\text{PD}_i)",explain:"Z is the economy that year, shared by everyone; ε is the borrower's own luck. When the two together fall below the loan's threshold, it defaults."},
-    {name:"The year's loss",tex:"\\text{Loss}_t=\\sum_i \\mathbf{1}[\\text{default}_{i,t}]\\;\\text{LGD}_i\\;\\text{EAD}_i",explain:"Add up what is lost on every loan that defaults that year."},
+    {name:"When a loan defaults",tex:"\\sqrt{R_i}\\,Z_t+\\sqrt{1-R_i}\\;\\varepsilon_{i,t}<\\Phi^{-1}(\\text{PD}_i)",explain:"Z is the economy in that scenario, shared by everyone; ε is the borrower's own luck. When the two together fall below the loan's threshold, it defaults."},
+    {name:"The scenario's loss",tex:"\\text{Loss}_t=\\sum_i \\mathbf{1}[\\text{default}_{i,t}]\\;\\text{LGD}_i\\;\\text{EAD}_i",explain:"Add up what is lost on every loan that defaults in that scenario."},
     {name:"Reading the tail",tex:"P(\\text{Loss}>x),\\qquad \\text{Loss}_{99.9\\%}",explain:"How often each size of loss is exceeded, and the loss exceeded in only 1 of every 1,000 scenarios."},
   ],
-  result:()=>{ const b=RES.portfolio.base;
-    return `With nature data, the average yearly loss rises from ${$m(b.without.EL)} to <b>${$m(b.with.EL)}</b>, and the worst-case loss (exceeded in only 1 of every 1,000 scenarios) from ${$m(b.without.q999)} to <b>${$m(b.with.q999)}</b>. Basel capital rises from ${$m(b.without.regK)} to <b>${$m(b.with.regK)}</b>.`; },
+  result:()=>{ const b=RES.portfolio.base, dt=b.with.q999-b.without.q999;
+    return `With nature data, the average yearly loss goes from ${$m(b.without.EL)} to <b>${$m(b.with.EL)}</b>, and the worst 1-in-1,000 loss from ${$m(b.without.q999)} to <b>${$m(b.with.q999)}</b>. ${Math.abs(dt)<2?"In the baseline the book's total risk barely changes: nature data moves risk between loans rather than adding it.":dt>0?"The tail gets heavier.":"The tail gets lighter."}`; },
   charts:["pF"],
   weak:[
-    "<b>No shared nature factor.</b> A regional drought hits many estates at once, but here only the economy links them. The real tail is probably worse.",
+    "<b>No shared nature factor.</b> A regional drought hits many estates at once, but here only the economy links them. The real tail is probably heavier.",
     "<b>Basel links, not measured ones.</b> The correlations come from the regulatory formula, not this book's history.",
     "<b>Fixed recovery.</b> In a bad year land sells for less, so loss given default should rise too.",
     "<b>Small book.</b> 27 loans make the losses lumpy."]},
  "exp-g":{letter:"G",title:"What each scenario does to the book",scope:"All 27 loans",
-  goal:()=>"Compare the book's expected loss, regulatory capital and accounting provisions across three scenarios, with and without nature data.",
+  goal:()=>"Compare the book's expected loss, regulatory capital and accounting provisions across four scenarios, including one where flagged borrowers engage.",
   data:()=>[
     {t:"All 27 loans",p:SAMPLE,d:`${$m(RES.portfolio.total)} in total, at central assumptions.`},
     {t:"Nature readings per site",p:REAL,d:"The same five readings as experiment A."},
-    {t:"Three scenarios",p:SET,d:"Today's conditions, a repeat of the driest year, and a stricter deforestation rule."},
+    {t:"Four scenarios",p:SET,d:"Today's conditions, a repeat of the driest year, a stricter deforestation rule, and engagement: loans that breach the trigger adopt a verified no-deforestation plan."},
   ],
-  details:()=>vtable(["Scenario","What changes","Values"],[["Baseline","Nothing","Trigger 2%, drought chance 5% a year"],["Repeat of driest year","The driest year since 2001 returns once before the loan ends",`Drought chance 25%, harvest loss spread over ${B.tenor} years`],["Stricter deforestation rule","Buyers and regulators tighten sourcing","Trigger 0.5%"]]),
+  details:()=>vtable(["Scenario","What changes","Values"],[["Baseline","Nothing","Trigger 2%, drought chance 5% a year"],["Driest year","The driest year since 2001 returns once before the loan ends",`Drought chance 25%, harvest loss spread over ${B.tenor} years`],["Stricter rule","Buyers and regulators tighten sourcing","Trigger 0.5%"],["Engagement","Loans with forest loss above 2% adopt a verified plan","Chance of losing buyers × 0.3, clearing cut × 0.3, no automatic Stage 2"]]),
   method:()=>[
     {name:"Expected loss",tex:"\\text{EL}=\\sum_i \\text{PD}_i\\,\\text{LGD}_i\\,\\text{EAD}_i",explain:"Average yearly loss across the book."},
     {name:"Regulatory capital",tex:"\\text{Capital}=\\sum_i K_i\\,\\text{EAD}_i",explain:"Shareholder money the bank must hold, from the Basel formula."},
     {name:"Provisions",tex:"\\text{Provision}=\\sum_i \\text{PD}_i^{\\text{used}}\\,\\text{LGD}_i\\,\\text{EAD}_i",explain:"Reserves in the accounts, using one-year PD for Stage 1 loans and lifetime PD for Stage 2."},
   ],
-  result:()=>{ const p=RES.portfolio, d=p.drought, b=p.base;
-    return `Provisions move most: in the baseline they rise from ${$m(b.prov0)} to <b>${$m(b.provN)}</b> as ${b.stage2} loans move to Stage 2. In the drought scenario expected loss reaches <b>${$m(d.with.EL)}</b> and provisions <b>${$m(d.provN)}</b>, with ${d.stage2} of 27 loans in Stage 2.`; },
+  result:()=>{ const p=RES.portfolio, b=p.base, d=p.drought, e=p.engage;
+    return `In the baseline, expected loss barely moves (${$m(b.without.EL)} → <b>${$m(b.with.EL)}</b>) but provisions rise to <b>${$m(b.provN)}</b>, because ${b.stage2} loans breach the trigger. A drought doubles expected loss to <b>${$m(d.with.EL)}</b>. If flagged borrowers engage, expected loss falls to <b>${$m(e.with.EL)}</b>, capital to <b>${$m(e.with.regK)}</b>, and no loan stays in Stage 2.`; },
   charts:["pG1","pG2","pG3"],multi:true,
   weak:[
     "<b>No probability weighting.</b> IFRS 9 asks for scenarios weighted by likelihood; these are shown one by one.",
     "<b>No discounting.</b> Provisions aren't discounted to today, to keep the arithmetic visible.",
     "<b>Simplified staging.</b> Stage 2 uses two rules (lifetime PD doubling, or the trigger); banks use more.",
-    "<b>The traditional view can't see scenarios.</b> Without nature data the grey bars don't change, by design."]},
+    "<b>Engagement is assumed to work.</b> A verified plan is taken at face value; in practice it needs annual checks."]},
+ "exp-h":{letter:"H",title:"The book as a risk map",scope:"All 27 loans",
+  goal:()=>"Picture the whole book on one plane, chance of default against loan size, and see where the money sits in the green and red zones with and without nature data.",
+  data:()=>[
+    {t:"27 loans",p:SAMPLE,d:`Each placed by its loan size and its chance of default, ${$m(RES.portfolio.total)} in total.`},
+    {t:"Chance of default, two views",p:CALC,d:"From financials alone, and with each site's nature data against the book average."},
+    {t:"Risk zones",p:SET,d:"Shaded by expected loss a year: green below $100k, amber $100k–$250k, red above $250k."},
+  ],
+  details:()=>vtable(["Zone","Expected loss a year","Meaning"],[["Green","Below $100k","Small expected losses for the bank"],["Amber","$100k to $250k","Worth watching"],["Red","Above $250k","Large expected losses: review, reprice or engage"]]),
+  method:()=>[
+    {name:"The shading",tex:"\\text{EL}(\\text{PD},\\ \\text{size})=\\text{PD}\\times\\text{LGD}_0\\times\\text{size}",explain:"Every point on the map has an expected loss a year. The further up and right, the more money at risk, from green to red."},
+    {name:"Each loan's move",tex:"(\\text{PD}_0,\\ \\text{EAD})\\ \\longrightarrow\\ (\\text{PD}_N,\\ \\text{EAD})",explain:"Nature data doesn't change the loan's size, only its chance of default, so loans move left (safer) or right (riskier)."},
+    {name:"Money in each zone",tex:"\\text{Exposure}_{\\text{zone}}=\\sum_{i\\,\\in\\,\\text{zone}}\\text{EAD}_i",explain:"Add up the loans that sit in each zone, before and after."},
+  ],
+  controls:()=>segHTML("h-view",[["move","How loans moved"],["without","Without nature data"],["with","With nature data"]],"hv")+segHTML("h-scen",Object.entries(SCN),"hs"),
+  chartHTML:()=>`<div id="pH" class="plot surf" role="img" aria-label="Risk map of the book"></div><div id="pH2" class="plot" style="min-height:200px" role="img" aria-label="Exposure by risk zone"></div>`,
+  result:()=>{ const sc=st.hs, z=zoneTotals(sc), q=RES.portfolio[sc];
+    return `${SC[sc]||SCN[sc]} scenario. <b>${q.cheaper}</b> loans move left to safer ground (green arrows) and <b>${q.dearer}</b> move right to riskier ground (red arrows). Lending in the red zone goes from ${$m(z.without.red)} to <b>${$m(z.with.red)}</b>; the traditional view can't tell which loans those are.`; },
+  charts:["pH","pH2"],
+  weak:[
+    "<b>Zone lines are set by design.</b> A bank would set them from its own risk appetite.",
+    "<b>Shading uses one loss rate.</b> The background assumes 45% loss if default; each loan's own loss rate differs slightly.",
+    "<b>Loan sizes are sample.</b> The vertical positions are illustrative.",
+    "<b>A snapshot.</b> It shows one year's view, not how loans drift over time."]},
 };
-const ORDER=["summary","model","exp-a","exp-b","exp-c","exp-d","exp-e","exp-f","exp-g"];
-const ULABEL={s:"Sales to deforestation-free buyers",disc:"Price lost when those buyers walk away",lev:"Operating leverage",sigma:"Cash flow volatility",dscr:"Expected debt service coverage",
+const ORDER=["summary","model","exp-a","exp-b","exp-c","exp-d","exp-e","exp-f","exp-g","exp-h"];
+const ULABEL={s:"Sales to deforestation-free buyers",disc:"Price lost when those buyers walk away",prem:"Premium for clean, traceable supply",lev:"Operating leverage",sigma:"Cash flow volatility",dscr:"Expected debt service coverage",
   lgd:"Loss if default, before nature",hPA:"Land value cut near a protected area",hClear:"Land value cut for recent clearing",beta:"Yield response to rainfall deficit",hurdle:"Return required on capital"};
-const UFMT={s:v=>pct(v,0),disc:v=>pct(v,0),lev:v=>v.toFixed(1)+"×",sigma:v=>v.toFixed(2),dscr:v=>v.toFixed(2)+"×",lgd:v=>pct(v,0),hPA:v=>pct(v,0),hClear:v=>pct(v,0),beta:v=>v.toFixed(2),hurdle:v=>pct(v,0)};
+const UFMT={s:v=>pct(v,0),disc:v=>pct(v,0),prem:v=>pct(v,0),lev:v=>v.toFixed(1)+"×",sigma:v=>v.toFixed(2),dscr:v=>v.toFixed(2)+"×",lgd:v=>pct(v,0),hPA:v=>pct(v,0),hClear:v=>pct(v,0),beta:v=>v.toFixed(2),hurdle:v=>pct(v,0)};
 function rangeTable(r){ return vtable(["Assumption","Low","Central","High","Source"],Object.entries(r).map(([k,[lo,mo,hi]])=>[ULABEL[k],UFMT[k](lo),UFMT[k](mo),UFMT[k](hi),SAMPLE])); }
+// risk zones for experiment H, by expected loss a year in $m
+const ZONE=[0.1,0.25];
+const zoneOf=el=>el<ZONE[0]?"green":el<ZONE[1]?"amber":"red";
+function zoneTotals(sc){ const t={without:{green:0,amber:0,red:0},with:{green:0,amber:0,red:0}};
+  RES.sites.forEach(r=>{ const v=r[sc]; t.without[zoneOf(v.pd0*v.lgd0*r.exp)]+=r.exp; t.with[zoneOf(v.pdN*v.lgdN*r.exp)]+=r.exp; }); return t; }
 
 // ---------------- views ----------------
 function railHTML(){
@@ -503,28 +537,30 @@ function railHTML(){
   return `<span class="grp">Start here</span>${item("summary")}${item("model")}<span class="grp">Experiments</span>${ORDER.slice(2).map(item).join("")}`;
 }
 function summaryView(){
-  const p=RES.portfolio, b=p.base, d=p.drought, s=site(), u=per().unc, mc=per().mc;
+  const p=RES.portfolio, b=p.base, e=p.engage, s=site(), u=per().unc;
   const tiles=[
-    ["Expected loss, whole book",`${$m(b.without.EL)} → ${$m(b.with.EL)}`,`${fmt((b.with.EL/b.without.EL-1)*100,0)}% a year on ${$m(p.total)} once nature is counted.`],
-    ["Accounting provisions",`${$m(b.prov0)} → ${$m(b.provN)}`,`${b.stage2} of 27 loans move to Stage 2; ${d.stage2} in a drought.`],
+    ["Loans repriced by nature data",`${b.cheaper} cheaper · ${b.dearer} dearer`,`${$m(b.exp_cheaper)} of lending priced lower, ${$m(b.exp_dearer)} higher. Average change ${fmt(b.wbps,1)} bps.`],
+    ["Expected loss, whole book",`${$m(b.without.EL)} → ${$m(b.with.EL)}`,`Risk is re-sorted between loans rather than added. A drought takes it to ${$m(p.drought.with.EL)}.`],
+    ["If flagged loans engage",`${$m(e.with.EL)}`,`Expected loss once loans that breach the trigger adopt verified plans; none left in Stage 2.`],
     [`${s.name}: price change`,`${fmt(u.point)} bps`,`90% range ${fmt(u.p5)} to ${fmt(u.p95)} bps.`],
-    [`${s.name}: chance of default`,`${pct(s.base.pd0,2)} → ${pct(s.base.pdN,2)}`,`Simulation says ${pct(mc.pd_mcN,2)}.`],
   ];
-  const short={"exp-a":()=>{ const s0=st.am,a0=st.a; st.am="price"; st.a="base"; const r=EXP["exp-a"].result().replace(/^[^.]*scenario\. /,""); st.am=s0; st.a=a0; return r; },"exp-b":()=>EXP["exp-b"].result(),"exp-c":()=>EXP["exp-c"].result(),"exp-d":()=>EXP["exp-d"].result(),"exp-e":()=>EXP["exp-e"].result(),"exp-f":()=>EXP["exp-f"].result(),"exp-g":()=>EXP["exp-g"].result()};
-  const first=html=>{ const t=html.replace(/<[^>]+>/g,""); const m=t.match(/^.*?[.:](\s|$)/); return esc(m?m[0].trim().replace(/:$/,"."):t); };
-  return `<section class="panel"><div class="vhead"><h2>Summary</h2><p class="goal">Seven experiments on one question: what does a bank miss when it judges farm loans from financials alone?</p></div>
+  const short=k=>{ const x=EXP[k]; if(k==="exp-a"||k==="exp-h"){ const s0=[st.am,st.a,st.hs]; st.am="price"; st.a="base"; st.hs="base"; const r=x.result().replace(/^[^.]*scenario\. /,""); [st.am,st.a,st.hs]=s0; return r; } return x.result(); };
+  const first=html=>{ const t=html.replace(/<[^>]+>/g,""); const m=t.match(/^.*?[.:;](\s|$)/); return esc(m?m[0].trim().replace(/[:;]$/,"."):t); };
+  return `<section class="panel"><div class="vhead"><h2>Summary</h2><p class="goal">Eight experiments on one question: which farm loans does a bank misprice when it judges them from financials alone, and in which direction?</p></div>
     <div class="tiles">${tiles.map(([l,v,t])=>`<div class="tile"><span class="lab">${esc(l)}</span><span class="big">${v}</span><p>${t}</p></div>`).join("")}</div></section>
-  <section class="panel"><h3>The experiments</h3><div class="xlist">${ORDER.slice(2).map(k=>{ const x=EXP[k]; return `<a class="xitem" href="#${k}" data-view="${k}"><span class="ltr">${x.letter}</span><span class="tt"><b>${x.title}</b><span>${x.goal()}</span><span class="r">${first(short[k]())}</span></span><span class="chev" aria-hidden="true">›</span></a>`; }).join("")}</div>
-    <p class="small muted">Experiments A, F and G cover all 27 loans; B to E use the place picked at the top.</p></section>`;
+  <section class="panel"><h3>The experiments</h3><div class="xlist">${ORDER.slice(2).map(k=>{ const x=EXP[k]; return `<a class="xitem" href="#${k}" data-view="${k}"><span class="ltr">${x.letter}</span><span class="tt"><b>${x.title}</b><span>${x.goal()}</span><span class="r">${first(short(k))}</span></span><span class="chev" aria-hidden="true">›</span></a>`; }).join("")}</div>
+    <p class="small muted">Experiments A, F, G and H cover all 27 loans; B to E use the place picked at the top.</p></section>`;
 }
 function modelView(){
   const groups=modelSteps(); let i=0;
   return `<section class="panel"><div class="vhead"><span class="kicker">The model <span class="scope">· values shown for ${esc(site().name)}</span></span><h2>How the model works</h2>
-    <p class="goal">Eleven steps turn a site's nature readings into the numbers a bank prices with. Each step shows the equation, what it means, and its values for the place you've picked.</p></div>
+    <p class="goal">Twelve steps turn a site's nature readings into the numbers a bank prices with, measured against the book's average nature risk so a site can come out safer or riskier. Each step shows the equation, what it means, and its values for the place you've picked.</p></div>
     ${groups.map((g,gi)=>`<div class="stage"><div class="sth"><span class="no">${gi+1}</span><b>${g.stage}</b></div><div class="eqs">${g.steps.map(s=>eqRow(s,++i)).join("")}</div></div>`).join("")}
   </section>
   <section class="panel"><h3>Weaknesses of the model</h3>${weakList([
-    "<b>Uncalibrated.</b> The links from nature to revenue are reasoned, not fitted to real loan outcomes. A pilot bank's history would calibrate them.",
+    "<b>Uncalibrated.</b> The links from nature to revenue, and the size of the clean-supply premium, are reasoned, not fitted to real loan outcomes. A pilot bank's history would calibrate them.",
+    "<b>The book stands in for the sector.</b> The average nature risk a bank already prices is taken from these 27 loans; a bank would use its whole farm book or a sector benchmark.",
+    "<b>Upsides are smaller than downsides.</b> The evidence for premiums and resilience is thinner than for lost buyers, so they are kept modest on purpose.",
     "<b>Tree cover isn't forest.</b> The forest-loss data counts plantations as trees, so replanting old palms can look like clearing.",
     "<b>Greenness saturates.</b> Satellite greenness (NDVI) stops changing in dense canopy and is noisy for seasonal crops.",
     "<b>Coarse in places.</b> Water stress is measured per river basin and rainfall in cells tens of kilometres wide.",
@@ -534,7 +570,7 @@ function modelView(){
 function expView(k){
   const x=EXP[k], i=ORDER.indexOf(k), prev=ORDER[i-1], next=ORDER[i+1];
   const label=v=>v==="summary"?"Summary":v==="model"?"How the model works":`${EXP[v].letter}. ${EXP[v].title}`;
-  const chartHTML=x.multi?`<div class="multi">${x.charts.map(id=>`<div id="${id}" class="plot short" role="img"></div>`).join("")}</div>`
+  const chartHTML=x.chartHTML?x.chartHTML():x.multi?`<div class="multi">${x.charts.map(id=>`<div id="${id}" class="plot short" role="img"></div>`).join("")}</div>`
     :`<div id="${x.charts[0]}" class="plot${x.tall?" tall":x.surf?" surf":""}" role="img" aria-label="${esc(x.title)}"></div>`;
   return `<section class="panel">
     <div class="vhead"><span class="kicker">Experiment ${x.letter} <span class="scope">· ${x.scope==="This place"?esc(site().name):x.scope}</span></span><h2>${x.title}</h2></div>
@@ -550,7 +586,7 @@ function expView(k){
 }
 
 // ---------------- charts ----------------
-function theme(){ return {ink:css("--ink"),muted:css("--muted"),line:css("--line"),surf:css("--surface"),nat:css("--nat"),base:css("--base"),risk:css("--risk"),
+function theme(){ return {ink:css("--ink"),muted:css("--muted"),line:css("--line"),surf:css("--surface"),nat:css("--nat"),base:css("--base"),risk:css("--risk"),gain:css("--gain"),stable:css("--stable"),
   s1:css("--s1"),s2:css("--s2"),neg:css("--div-neg"),mid:css("--div-mid"),pos:css("--div-pos"),font:css("--font-body")||"system-ui"}; }
 function layout(T,extra={}){
   const ax=a=>Object.assign({gridcolor:T.line,zerolinecolor:T.line,linecolor:T.line,tickfont:{color:T.muted,size:12},title:{font:{color:T.muted,size:12.5}},automargin:true},a||{});
@@ -564,17 +600,20 @@ const AM={price:{axis:"Required price above funding cost, bps a year",f0:r=>r.sp
 function drawA(T){
   const sc=st.a, M=AM[st.am], rows=[...RES.sites].sort((x,y)=>M.fN(x[sc])-M.fN(y[sc]));
   const el=document.getElementById("pA"), narrow=el.clientWidth<560, names=rows.map(r=>narrow?r.name:`${r.name} · ${r.commodity}`);
-  const sx=[],sy=[]; rows.forEach((r,i)=>{ sx.push(M.f0(r[sc]),M.fN(r[sc]),null); sy.push(names[i],names[i],null); });
-  const hov=r=>{ const v=r[sc]; return `<b>${r.name}</b>, ${r.what}<br>Traditional: PD ${pct(v.pd0,2)} · grade ${gradeOf(v.pd0)} · ${Math.round(v.sp0)} bps<br>With nature data: PD ${pct(v.pdN,2)} · grade ${gradeOf(v.pdN)} · ${Math.round(v.spN)} bps<br>IFRS 9 Stage ${v.stage}<extra></extra>`; };
+  const dirCol=r=>r[sc].model<-5?T.gain:r[sc].model>5?T.risk:T.muted;
+  const hov=r=>{ const v=r[sc]; return `<b>${r.name}</b>, ${r.what}<br>Traditional: PD ${pct(v.pd0,2)} · grade ${gradeOf(v.pd0)} · ${Math.round(v.sp0)} bps<br>With nature data: PD ${pct(v.pdN,2)} · grade ${gradeOf(v.pdN)} · ${Math.round(v.spN)} bps<br>${fmt(v.model,1)} bps (${dirWord(v.model)}) · IFRS 9 Stage ${v.stage}<extra></extra>`; };
   const sel=rows.findIndex(r=>r.id===st.id);
-  Plotly.react(el,[
-    {x:sx,y:sy,mode:"lines",line:{color:T.line,width:2},hoverinfo:"skip",showlegend:false},
-    {x:rows.map(r=>M.f0(r[sc])),y:names,mode:"markers",name:"Traditional view (financials only)",marker:{size:10,color:T.base,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
-    {x:rows.map(r=>M.fN(r[sc])),y:names,mode:"markers",name:"With nature data",marker:{size:11,color:T.nat,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+  const segs=rows.map((r,i)=>({x:[M.f0(r[sc]),M.fN(r[sc])],y:[names[i],names[i]],mode:"lines",line:{color:dirCol(r),width:3},opacity:.55,hoverinfo:"skip",showlegend:false}));
+  const grp=(name,test,color)=>{ const rr=rows.filter(test); return {x:rr.map(r=>M.fN(r[sc])),y:rr.map(r=>names[rows.indexOf(r)]),mode:"markers",name,marker:{size:11,color,line:{color:T.surf,width:2}},hovertemplate:rr.map(hov)}; };
+  Plotly.react(el,[...segs,
+    {x:rows.map(r=>M.f0(r[sc])),y:names,mode:"markers",name:"Traditional view",marker:{size:9,color:T.base,line:{color:T.surf,width:2}},hovertemplate:rows.map(hov)},
+    grp("Cheaper with nature data",r=>r[sc].model<-5,T.gain),
+    grp("Dearer with nature data",r=>r[sc].model>5,T.risk),
+    grp("About the same",r=>Math.abs(r[sc].model)<=5,T.muted),
     {x:[M.fN(rows[sel][sc])],y:[names[sel]],mode:"markers",name:"Selected place",marker:{size:22,color:"rgba(0,0,0,0)",line:{color:T.ink,width:2}},hoverinfo:"skip"},
-  ],layout(T,{xaxis:{title:{text:M.axis}},yaxis:{tickfont:{size:11.5,color:T.ink},gridcolor:"rgba(0,0,0,0)"},height:el.clientHeight||640}),CFG);
-  const tb=document.getElementById("a-table"); if(tb) tb.innerHTML=`<table><thead><tr><th>Loan</th><th>Nature label</th><th>Loan size</th><th>Chance of default</th><th>Internal grade</th><th>Expected loss</th><th>Required price</th><th>IFRS 9</th></tr></thead><tbody>${
-    [...RES.sites].sort((a,b)=>b[sc].model-a[sc].model).map(r=>{ const v=r[sc]; return `<tr><td>${r.name}, ${r.what}</td><td><span class="chip ${r.label}">${LABELNAME[r.label]}</span></td><td>$${r.exp}m</td><td>${pct(v.pd0,2)} → ${pct(v.pdN,2)}</td><td>${gradeOf(v.pd0)} → ${gradeOf(v.pdN)}</td><td>${$k(v.el0)} → ${$k(v.elN)}</td><td>${Math.round(v.sp0)} → ${Math.round(v.spN)} bps</td><td>Stage 1 → ${v.stage}</td></tr>`; }).join("")}</tbody></table><p class="small muted" style="margin-top:8px">Each cell reads traditional view → with nature data.</p>`;
+  ],layout(T,{xaxis:{title:{text:M.axis}},yaxis:{tickfont:{size:11.5,color:T.ink},gridcolor:"rgba(0,0,0,0)"},height:el.clientHeight||640,margin:{l:10,r:16,t:56,b:10},legend:{orientation:"h",x:0,y:1.08,font:{color:T.ink,size:12}}}),CFG);
+  const tb=document.getElementById("a-table"); if(tb) tb.innerHTML=`<table><thead><tr><th>Loan</th><th>Coverage</th><th>Chance of default</th><th>Internal grade</th><th>Expected loss</th><th>Required price</th><th>Change</th><th>With verified plan</th><th>IFRS 9</th></tr></thead><tbody>${
+    [...RES.sites].sort((a,b)=>a[sc].model-b[sc].model).map(r=>{ const v=r[sc]; return `<tr><td>${r.name}, ${r.what}</td><td>${r.dscr0.toFixed(2)}×</td><td>${pct(v.pd0,2)} → ${pct(v.pdN,2)}</td><td>${gradeOf(v.pd0)} → ${gradeOf(v.pdN)}</td><td>${$k(v.el0)} → ${$k(v.elN)}</td><td>${Math.round(v.sp0)} → ${Math.round(v.spN)} bps</td><td><b style="color:${v.model<-5?"var(--gain-ink)":v.model>5?"var(--risk-ink)":"inherit"}">${fmt(v.model,1)} bps</b></td><td>${fmt(r.planbps,1)} bps</td><td>Stage 1 → ${v.stage}</td></tr>`; }).join("")}</tbody></table><p class="small muted" style="margin-top:8px">Each cell reads traditional view → with nature data. Sorted from most overpriced to most underpriced today.</p>`;
 }
 function drawB(T){
   const m=per().mc, E=G.mc_edges, mids=E.slice(0,-1).map((e,i)=>(e+E[i+1])/2), ymax=Math.max(...m.h0,...m.hN)*1.12;
@@ -635,17 +674,48 @@ function drawF(T){
     annotations:[{x:b.with.q999,y:-3,xanchor:"left",yanchor:"bottom",showarrow:false,text:` Worst 1 in 1,000: ${$m(b.without.q999)} → <b>${$m(b.with.q999)}</b>`,font:{size:12,color:T.ink}}]}),CFG);
 }
 function drawG(T){
-  const p=RES.portfolio, keys=["base","drought","defor"], xs=["Baseline","Driest year","Stricter rule"];
+  const p=RES.portfolio, keys=["base","drought","defor","engage"], xs=keys.map(k=>SCN[k]);
   const panel=(id,title,f0,fN)=>Plotly.react(id,[
     {type:"bar",x:xs,y:keys.map(f0),name:"Without",marker:{color:T.base},hovertemplate:"%{x}<br>Without nature data: $%{y:.1f}m<extra></extra>"},
     {type:"bar",x:xs,y:keys.map(fN),name:"With",marker:{color:T.nat},hovertemplate:"%{x}<br>With nature data: $%{y:.1f}m<extra></extra>"},
-  ],layout(T,{barmode:"group",bargap:.35,bargroupgap:.08,title:{text:title,font:{size:14,color:T.ink},x:0,xanchor:"left",y:.98},margin:{l:10,r:10,t:60,b:10},
-    legend:{orientation:"h",x:0,y:1.12,font:{size:12}},yaxis:{title:{text:"$m"},rangemode:"tozero"},xaxis:{tickfont:{size:11.5,color:T.muted}}}),CFG);
+  ],layout(T,{barmode:"group",bargap:.3,bargroupgap:.08,title:{text:title,font:{size:14,color:T.ink},x:0,xanchor:"left",y:.98},margin:{l:10,r:10,t:60,b:10},
+    legend:{orientation:"h",x:0,y:1.12,font:{size:12}},yaxis:{title:{text:"$m"},rangemode:"tozero"},xaxis:{tickfont:{size:11,color:T.muted}}}),CFG);
   panel("pG1","Expected loss a year",k=>p[k].without.EL,k=>p[k].with.EL);
   panel("pG2","Regulatory capital",k=>p[k].without.regK,k=>p[k].with.regK);
   panel("pG3","IFRS 9 provisions",k=>p[k].prov0,k=>p[k].provN);
 }
-const DRAW={"exp-a":drawA,"exp-b":drawB,"exp-c":drawC,"exp-d":drawD,"exp-e":drawE,"exp-f":drawF,"exp-g":drawG};
+function drawH(T){
+  const sc=st.hs, view=st.hv, R=RES.sites, LG=B.lgd;
+  const xs=[], N=90, lo=Math.log10(0.001), hi=Math.log10(0.1); for(let i=0;i<=N;i++) xs.push(Math.pow(10,lo+(hi-lo)*i/N));
+  const ys=[]; for(let j=0;j<=60;j++) ys.push(j*70/60);
+  const z=ys.map(y=>xs.map(x=>Math.min(0.6,x*LG*y)));          // expected loss a year, $m, capped for colour
+  const g=T.gain, a=T.stable, r=T.risk;
+  const cs=[[0,g],[ZONE[0]/0.6*0.85,g],[ZONE[0]/0.6,a],[ZONE[1]/0.6*0.9,a],[ZONE[1]/0.6,r],[1,r]];
+  const data=[{type:"heatmap",x:xs,y:ys,z,colorscale:cs,zmin:0,zmax:0.6,opacity:.28,showscale:false,hoverinfo:"skip"}];
+  // zone boundaries: PD = EL / (LGD × size)
+  [[ZONE[0],"$100k a year"],[ZONE[1],"$250k a year"]].forEach(([el,lab])=>{ const yy=[],xx=[]; for(let y=2;y<=70;y+=0.5){ const pd=el/(LG*y); if(pd>=0.001&&pd<=0.1){ xx.push(pd); yy.push(y);} }
+    data.push({x:xx,y:yy,mode:"lines",line:{color:T.muted,width:1,dash:"dot"},hoverinfo:"skip",showlegend:false}); });
+  const pt=(r,which)=>which==="w"?r[sc].pd0:r[sc].pdN;
+  const hov=(r,which)=>{ const v=r[sc], pd=pt(r,which), el=pd*(which==="w"?v.lgd0:v.lgdN)*r.exp; return `<b>${r.name}</b>, ${r.what}<br>$${r.exp}m · PD ${pct(pd,2)}<br>Expected loss ${$k(el)} a year (${zoneOf(el)})<extra>${which==="w"?"Without nature data":"With nature data"}</extra>`; };
+  const size=r=>8+Math.sqrt(r.exp)*2.2;
+  const anns=[];
+  if(view!=="with") data.push({x:R.map(r=>pt(r,"w")),y:R.map(r=>r.exp),mode:"markers",name:"Without nature data",marker:{size:R.map(size),color:view==="move"?"rgba(0,0,0,0)":T.base,line:{color:view==="move"?T.muted:T.surf,width:view==="move"?1.5:2}},hovertemplate:R.map(r=>hov(r,"w"))});
+  if(view!=="without"){ const col=r=>r[sc].model<-5?T.gain:r[sc].model>5?T.risk:T.muted;
+    data.push({x:R.map(r=>pt(r,"n")),y:R.map(r=>r.exp),mode:"markers",name:"With nature data",marker:{size:R.map(size),color:R.map(col),line:{color:T.surf,width:2}},hovertemplate:R.map(r=>hov(r,"n"))});
+    if(view==="move") R.forEach(r=>{ const a0=r[sc].pd0, a1=r[sc].pdN; if(Math.abs(Math.log10(a1/a0))<0.01) return;
+      anns.push({x:Math.log10(a1),y:r.exp,ax:Math.log10(a0),ay:r.exp,xref:"x",yref:"y",axref:"x",ayref:"y",showarrow:true,arrowhead:3,arrowsize:1,arrowwidth:1.6,arrowcolor:col(r),standoff:size(r)/2,startstandoff:size(r)/2,text:""}); }); }
+  const sel=R.find(r=>r.id===st.id);
+  if(sel) anns.push({x:Math.log10(view==="without"?pt(sel,"w"):pt(sel,"n")),y:sel.exp,text:sel.name,showarrow:false,yshift:size(sel)/2+10,font:{size:12,color:T.ink}});
+  anns.push({x:Math.log10(0.0012),y:66,xanchor:"left",showarrow:false,text:"<b>Green</b>: small expected loss",font:{size:12,color:css("--gain-ink")}});
+  anns.push({x:Math.log10(0.085),y:66,xanchor:"right",showarrow:false,text:"<b>Red</b>: large expected loss",font:{size:12,color:css("--risk-ink")}});
+  Plotly.react("pH",data,layout(T,{xaxis:{title:{text:"Chance of default in a year (log scale)"},type:"log",range:[lo,hi],tickvals:[0.001,0.002,0.005,0.01,0.02,0.05,0.1],ticktext:["0.1%","0.2%","0.5%","1%","2%","5%","10%"]},
+    yaxis:{title:{text:"Loan size, $m"},range:[0,70]},annotations:anns,margin:{l:10,r:16,t:40,b:10},legend:{orientation:"h",x:0,y:1.1}}),CFG);
+  const zt=zoneTotals(sc), cats=["Without nature data","With nature data"];
+  Plotly.react("pH2",[["green","Green zone",T.gain],["amber","Amber zone",T.stable],["red","Red zone",T.risk]].map(([k,nm,c])=>({type:"bar",orientation:"h",y:cats,x:[zt.without[k],zt.with[k]],name:nm,marker:{color:c},
+      text:[zt.without[k],zt.with[k]].map(v=>v>=15?"$"+Math.round(v)+"m":""),textposition:"inside",insidetextanchor:"middle",textfont:{color:"#fff",size:12},hovertemplate:`${nm}: $%{x:.0f}m<extra>%{y}</extra>`})),
+    layout(T,{barmode:"stack",bargap:.35,xaxis:{title:{text:"Lending in each zone, $m"},range:[0,RES.portfolio.total]},yaxis:{tickfont:{size:12,color:T.ink},gridcolor:"rgba(0,0,0,0)",autorange:"reversed"},margin:{l:10,r:16,t:40,b:10},legend:{orientation:"h",x:0,y:1.25,traceorder:"normal"}}),CFG);
+}
+const DRAW={"exp-a":drawA,"exp-b":drawB,"exp-c":drawC,"exp-d":drawD,"exp-e":drawE,"exp-f":drawF,"exp-g":drawG,"exp-h":drawH};
 function drawView(){ const f=DRAW[st.view]; if(f&&window.Plotly){ f(theme()); wireZoom(); } }
 function wireZoom(){
   const x=EXP[st.view], btn=document.querySelector(`[data-reset="${st.view}"]`); if(!x||!btn) return;
@@ -654,7 +724,7 @@ function wireZoom(){
 
 // ---------------- routing ----------------
 function parseHash(){
-  const m=/^#(summary|model|exp-[a-g])?-?(a\d{2})?$/i.exec(location.hash||"");
+  const m=/^#(summary|model|exp-[a-h])?-?(a\d{2})?$/i.exec(location.hash||"");
   if(!m) return {};
   return {view:m[1]?m[1].toLowerCase():null,id:m[2]&&SITE[m[2].toUpperCase()]?m[2].toUpperCase():null};
 }

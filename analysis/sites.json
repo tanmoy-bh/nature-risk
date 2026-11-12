@@ -10,6 +10,7 @@
   "ndvi": 15.875370919881302,
   "stress": 0,
   "pa": 35,
+  "trace": "mill",
   "score": 86.03576187715065,
   "label": "stable"
  },
@@ -24,6 +25,7 @@
   "ndvi": -19.758064516129036,
   "stress": 0,
   "pa": 35,
+  "trace": "mill",
   "score": 38.41314549976515,
   "label": "risk"
  },
@@ -38,6 +40,7 @@
   "ndvi": 3.7647058823529442,
   "stress": 0,
   "pa": 0,
+  "trace": "plot",
   "score": 72.5418348602986,
   "label": "gain"
  },
@@ -52,6 +55,7 @@
   "ndvi": -0.39318479685452196,
   "stress": 0,
   "pa": 35,
+  "trace": "district",
   "score": 50.85000000000001,
   "label": "risk"
  },
@@ -66,6 +70,7 @@
   "ndvi": -25.03703703703704,
   "stress": 0,
   "pa": 20,
+  "trace": "plot",
   "score": 54.74399999999999,
   "label": "risk"
  },
@@ -80,6 +85,7 @@
   "ndvi": -3.1505250875145885,
   "stress": 1.48,
   "pa": 2,
+  "trace": "mill",
   "score": 57.84049563245817,
   "label": "stable"
  },
@@ -94,6 +100,7 @@
   "ndvi": 18.083670715249664,
   "stress": 2.52,
   "pa": 35,
+  "trace": "district",
   "score": 80.046,
   "label": "gain"
  },
@@ -108,6 +115,7 @@
   "ndvi": 1.3054830287206278,
   "stress": 0,
   "pa": 35,
+  "trace": "plot",
   "score": 50.901273405228,
   "label": "risk"
  },
@@ -122,6 +130,7 @@
   "ndvi": -2.6573426573426597,
   "stress": 0,
   "pa": 35,
+  "trace": "district",
   "score": 78.86776187715066,
   "label": "stable"
  },
@@ -136,6 +145,7 @@
   "ndvi": -65.5083655083655,
   "stress": 2.8,
   "pa": 35,
+  "trace": "district",
   "score": 57.81203649157396,
   "label": "stable"
  },
@@ -150,6 +160,7 @@
   "ndvi": 37.440758293838854,
   "stress": 0,
   "pa": 60,
+  "trace": "plot",
   "score": 94.04536982490728,
   "label": "gain"
  },
@@ -164,6 +175,7 @@
   "ndvi": 41.40786749482403,
   "stress": 1.43,
   "pa": 20,
+  "trace": "plot",
   "score": 80.84422691254194,
   "label": "gain"
  },
@@ -178,6 +190,7 @@
   "ndvi": 11.673699015471179,
   "stress": 2.77,
   "pa": 5,
+  "trace": "plot",
   "score": 61.85625927885767,
   "label": "stable"
  },
@@ -192,6 +205,7 @@
   "ndvi": -4.28015564202335,
   "stress": 0.26,
   "pa": 10,
+  "trace": "plot",
   "score": 60.94328563145197,
   "label": "stable"
  },
@@ -206,6 +220,7 @@
   "ndvi": 1.0590015128593049,
   "stress": 1.65,
   "pa": 1,
+  "trace": "plot",
   "score": 57.93532005650641,
   "label": "stable"
  },
@@ -220,6 +235,7 @@
   "ndvi": null,
   "stress": 0,
   "pa": 5,
+  "trace": "district",
   "score": 73.25,
   "label": "stable"
  },
@@ -234,6 +250,7 @@
   "ndvi": 13.43283582089552,
   "stress": 0,
   "pa": 20,
+  "trace": "plot",
   "score": 71.24395023159913,
   "label": "risk"
  },
@@ -248,6 +265,7 @@
   "ndvi": 21.42857142857143,
   "stress": 0,
   "pa": 20,
+  "trace": "mill",
   "score": 73.20794007189465,
   "label": "risk"
  },
@@ -262,6 +280,7 @@
   "ndvi": -1.8867924528301903,
   "stress": 0,
   "pa": 2,
+  "trace": "plot",
   "score": 37.1169753542733,
   "label": "risk"
  },
@@ -276,6 +295,7 @@
   "ndvi": -4.919908466819226,
   "stress": 0,
   "pa": 60,
+  "trace": "mill",
   "score": 49.86995229811864,
   "label": "risk"
  },
@@ -290,6 +310,7 @@
   "ndvi": 0.41152263374485637,
   "stress": 0.01,
   "pa": 35,
+  "trace": "plot",
   "score": 72.47555612061703,
   "label": "risk"
  },
@@ -304,6 +325,7 @@
   "ndvi": 40.28776978417265,
   "stress": 0,
   "pa": 10,
+  "trace": "mill",
   "score": 80.5784017964687,
   "label": "gain"
  },
@@ -318,6 +340,7 @@
   "ndvi": 3.1446540880503036,
   "stress": 0,
   "pa": 35,
+  "trace": "district",
   "score": 51.0453698249073,
   "label": "risk"
  },
@@ -332,6 +355,7 @@
   "ndvi": 3.412462908011856,
   "stress": 0,
   "pa": 1,
+  "trace": "district",
   "score": 63.742247331539645,
   "label": "stable"
  },
@@ -346,6 +370,7 @@
   "ndvi": 23.318385650224226,
   "stress": 0.97,
   "pa": 20,
+  "trace": "district",
   "score": 78.72395229811865,
   "label": "gain"
  },
@@ -360,6 +385,7 @@
   "ndvi": 10.331125827814564,
   "stress": 0,
   "pa": 20,
+  "trace": "district",
   "score": 57.92038084193596,
   "label": "risk"
  },
@@ -374,6 +400,7 @@
   "ndvi": 12.62798634812288,
   "stress": 0.01,
   "pa": 2,
+  "trace": "plot",
   "score": 62.14666666666666,
   "label": "risk"
  }

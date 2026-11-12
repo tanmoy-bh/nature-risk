@@ -9,7 +9,7 @@ Live at **https://projects.tanmoybh.com/nature-risk/** (passphrase protected).
 | Lender desk | An APAC agri and commodities loan book. Each loan gets a Nature Risk, Stable or Gain label, a score, an evidence trail, a suggested credit action and a pricing signal, with a drought and a deforestation-rule stress test. |
 | Nature map | Malaysia and Singapore sites with nature data only: score, sub-scores, evidence trail, last-5-year trends and the data sources. Click a place to zoom in. |
 | Architecture | How the full platform would be built in Nature Signal's three layers, and a 90-day plan. |
-| Model lab (`/lab`) | Seven numerical experiments on the credit model: Monte Carlo, parameter uncertainty, sensitivity, a response surface and a portfolio loss distribution. Each card explains the experiment, its equations and the values used. Every farm loan on the Lender desk links to it. |
+| Model lab (`/lab`) | Eight numerical experiments on the credit model: Monte Carlo, parameter uncertainty, sensitivity, a response surface, a portfolio loss distribution, scenarios and a risk map of the book. Nature data is measured against the book's average nature risk, so loans can come out cheaper or dearer. Each experiment shows its goal, data, equations, result and weaknesses. Every farm loan on the Lender desk links to it. |
 
 ## What is real and what is sample
 
