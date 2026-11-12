@@ -314,7 +314,7 @@ function modelSteps(){
        explain:"The debt service coverage ratio (DSCR) is cash available divided by loan payments due; DSCR₀ is its expected value from financials alone. Lost profit lowers it; the chance of a drought year makes it swing more from year to year.",
        vals:`Here: ${B.dscr.toFixed(2)} ${SAMPLE} → <b>${m.dN.toFixed(2)}</b>; volatility ${B.sigma.toFixed(2)} → <b>${m.sN.toFixed(3)}</b>`},
       {name:"Chance of default in a year",tex:"\\text{PD}=\\Phi\\!\\left(\\dfrac{-\\ln\\,\\text{DSCR}}{\\sigma}\\right)",
-       explain:"The share of years in which coverage drops below 1, so the borrower can't pay from its operations. Φ is the standard bell curve.",
+       explain:"The chance that, next year, coverage drops below 1 and the borrower can't pay from its operations. Φ is the standard bell curve.",
        vals:`Here: <b>${pct(b.pd0,2)}</b> from financials alone → <b>${pct(b.pdN,2)}</b> with nature data`},
     ]},
     {stage:"From default risk to loss and capital",steps:[
@@ -325,7 +325,7 @@ function modelSteps(){
        explain:"What the bank expects to lose on the loan in an average year. EAD is the amount outstanding. Banks price this in, like an insurance premium.",
        vals:`Here, on ${$m(s.exp)} ${SAMPLE}: <b>${$k(b.el0)}</b> → <b>${$k(b.elN)}</b> a year`},
       {name:"Capital the bank must hold",tex:"\\begin{gathered}K=\\Big[\\,\\text{LGD}\\;\\Phi\\!\\Big(\\dfrac{\\Phi^{-1}(\\text{PD})+\\sqrt{R}\\,\\Phi^{-1}(0.999)}{\\sqrt{1-R}}\\Big)\\\\[4pt]-\\,\\text{PD}\\cdot\\text{LGD}\\,\\Big]\\times\\dfrac{1+(M-2.5)\\,b}{1-1.5\\,b}\\end{gathered}",
-       explain:"The Basel rule regulators use: enough shareholder money to survive a 1-in-1,000-year downturn. R is how much the borrower moves with the economy; b adjusts for loan length M.",
+       explain:"The Basel rule regulators use: enough shareholder money to survive a downturn so severe it happens only once in 1,000 cases. R is how much the borrower moves with the economy; b adjusts for loan length M.",
        vals:`Here: K = <b>${pct(b.K0,2)}</b> → <b>${pct(b.KN,2)}</b> of the loan, or ${$m(b.K0*s.exp)} → <b>${$m(b.KN*s.exp)}</b>`},
     ]},
     {stage:"From risk to price and accounts",steps:[
@@ -364,16 +364,16 @@ const EXP={
     "<b>One snapshot.</b> Nature readings cover 2019–2025 at a single point per site, not each estate's full boundary.",
     "<b>Farms only.</b> Renewable energy projects are left out because their cash flows behave differently."]},
  "exp-b":{letter:"B",title:"Checking the default formula by simulation",scope:"This place",
-  goal:()=>`Check whether the shortcut formula for the chance of default (step 6) is accurate for ${esc(site().name)}, by simulating ${num(G.N_MC)} years of the borrower's cash flow.`,
+  goal:()=>`Check whether the shortcut formula for the chance of default (step 6) is accurate for ${esc(site().name)}, by simulating ${num(G.N_MC)} possible versions of next year's cash flow.`,
   data:()=>{ const p=per(), m=p.mc; return [
     {t:"This site's nature readings",p:REAL,d:`Forest loss ${p.inputs.nat.loss.toFixed(1)}%, rainfall deficit ${p.inputs.nat.deficit.toFixed(1)}%, water stress ${p.inputs.nat.stress.toFixed(2)}.`},
     {t:"Borrower and crop assumptions",p:SAMPLE,d:`Coverage ${B.dscr.toFixed(2)}×, volatility ${B.sigma.toFixed(2)}, ${pct(p.inputs.s,0)} of sales to deforestation-free buyers.`},
-    {t:`${num(G.N_MC)} simulated years`,p:CALC,d:`Each year draws the economy, whether buyers walk away (${pct(m.pEx,0)} chance) and whether the driest year repeats (${pct(m.pD,0)}).`},
+    {t:`${num(G.N_MC)} simulated scenarios`,p:CALC,d:`Each scenario is one possible next year. It draws the economy, whether buyers walk away (${pct(m.pEx,0)} chance) and whether the driest year repeats (${pct(m.pD,0)}).`},
   ]; },
-  details:()=>{ const p=per(), m=p.mc; return vtable(["Symbol","Meaning","Value","Source"],[["N","Simulated years",num(G.N_MC),SET],["DSCR̄, σ","Expected coverage, volatility",`${B.dscr.toFixed(2)}×, ${B.sigma.toFixed(2)}`,SAMPLE],["λ","Operating leverage",B.lev.toFixed(1)+"×",SAMPLE],["p<sub>ex</sub>","Chance buyers walk away",pct(m.pEx,1),CALC],["s × d","Revenue lost if they do",pct(p.inputs.s*B.disc,1),SAMPLE],["p<sub>D</sub>, y","Drought chance and harvest lost",`${pct(m.pD,0)}, ${pct(m.y,1)}`,CALC],["Seed","Random seed",String(RES.meta.seed),SET]]); },
+  details:()=>{ const p=per(), m=p.mc; return vtable(["Symbol","Meaning","Value","Source"],[["N","Simulated scenarios of next year",num(G.N_MC),SET],["DSCR̄, σ","Expected coverage, volatility",`${B.dscr.toFixed(2)}×, ${B.sigma.toFixed(2)}`,SAMPLE],["λ","Operating leverage",B.lev.toFixed(1)+"×",SAMPLE],["p<sub>ex</sub>","Chance buyers walk away",pct(m.pEx,1),CALC],["s × d","Revenue lost if they do",pct(p.inputs.s*B.disc,1),SAMPLE],["p<sub>D</sub>, y","Drought chance and harvest lost",`${pct(m.pD,0)}, ${pct(m.y,1)}`,CALC],["Seed","Random seed",String(RES.meta.seed),SET]]); },
   method:()=>[
-    {name:"One simulated year",tex:"\\begin{gathered}\\text{DSCR}_t=\\text{DSCR}_0\\;e^{\\sigma Z_t}\\\\[4pt]\\times\\,\\big(1-\\lambda\\,(X_t\\,s\\,d+Y_t\\,y+r_{\\text{veg}})\\big)\\end{gathered}",explain:"Coverage in year t. Z is the year's luck, a draw from the bell curve. X is 1 if buyers walk away that year, Y is 1 if the drought year hits; each is either 0 or 1."},
-    {name:"Simulated chance of default",tex:"\\text{PD}_{\\text{sim}}=\\dfrac{\\#\\{t:\\ \\text{DSCR}_t<1\\}}{N}",explain:"Count the years in which coverage falls below 1 and divide by the number of years simulated."},
+    {name:"One scenario of next year",tex:"\\begin{gathered}\\text{DSCR}_t=\\text{DSCR}_0\\;e^{\\sigma Z_t}\\\\[4pt]\\times\\,\\big(1-\\lambda\\,(X_t\\,s\\,d+Y_t\\,y+r_{\\text{veg}})\\big)\\end{gathered}",explain:"Coverage in scenario t. Z is that scenario's luck, a draw from the bell curve. X is 1 if buyers walk away in that scenario, Y is 1 if the drought hits; each is either 0 or 1."},
+    {name:"Simulated chance of default",tex:"\\text{PD}_{\\text{sim}}=\\dfrac{\\#\\{t:\\ \\text{DSCR}_t<1\\}}{N}",explain:"Count the scenarios in which coverage falls below 1 and divide by the number of scenarios."},
     {name:"Compared with the shortcut",tex:"\\text{PD}=\\Phi\\!\\left(\\dfrac{-\\ln\\,\\text{DSCR}_N}{\\sigma_N}\\right)",explain:"The formula used everywhere else, which spreads the yes-or-no shocks evenly over every year."},
   ],
   result:()=>{ const m=per().mc, gap=(m.pd_mcN/m.pd_anN-1)*100;
@@ -450,17 +450,17 @@ const EXP={
   data:()=>[
     {t:"Each loan's PD and LGD",p:CALC,d:"From the model, without and with nature data, in the baseline scenario."},
     {t:"Loan sizes",p:SAMPLE,d:`${$m(RES.portfolio.total)} in total, from $${Math.min(...RES.sites.map(s=>s.exp))}m to $${Math.max(...RES.sites.map(s=>s.exp))}m.`},
-    {t:`${num(RES.portfolio.hist.N)} simulated years`,p:CALC,d:"One shared economic factor plus each borrower's own luck, the setup behind the Basel formula."},
+    {t:`${num(RES.portfolio.hist.N)} simulated scenarios`,p:CALC,d:"Each is one possible next year for the whole book: one shared economic factor plus each borrower's own luck, the setup behind the Basel formula."},
   ],
   details:()=>{ const sc=RES.sites, pds=sc.map(s=>s.base.pdN), R=pd=>{ const q=(1-Math.exp(-50*pd))/(1-Math.exp(-50)); return 0.12*q+0.24*(1-q); }, Rs=pds.map(R);
-    return vtable(["Symbol","Meaning","Range","Source"],[["N","Simulated years",num(RES.portfolio.hist.N),SET],["PD<sub>i</sub>","Chance of default, with nature",`${pct(Math.min(...pds),2)} to ${pct(Math.max(...pds),2)}`,CALC],["R<sub>i</sub>","Link to the economy (Basel)",`${pct(Math.min(...Rs),1)} to ${pct(Math.max(...Rs),1)}`,CALC],["LGD<sub>i</sub>","Share lost if default",`${pct(Math.min(...sc.map(s=>s.base.lgdN)),1)} to ${pct(Math.max(...sc.map(s=>s.base.lgdN)),1)}`,CALC]]); },
+    return vtable(["Symbol","Meaning","Range","Source"],[["N","Simulated scenarios of next year",num(RES.portfolio.hist.N),SET],["PD<sub>i</sub>","Chance of default, with nature",`${pct(Math.min(...pds),2)} to ${pct(Math.max(...pds),2)}`,CALC],["R<sub>i</sub>","Link to the economy (Basel)",`${pct(Math.min(...Rs),1)} to ${pct(Math.max(...Rs),1)}`,CALC],["LGD<sub>i</sub>","Share lost if default",`${pct(Math.min(...sc.map(s=>s.base.lgdN)),1)} to ${pct(Math.max(...sc.map(s=>s.base.lgdN)),1)}`,CALC]]); },
   method:()=>[
     {name:"When a loan defaults",tex:"\\sqrt{R_i}\\,Z_t+\\sqrt{1-R_i}\\;\\varepsilon_{i,t}<\\Phi^{-1}(\\text{PD}_i)",explain:"Z is the economy that year, shared by everyone; ε is the borrower's own luck. When the two together fall below the loan's threshold, it defaults."},
     {name:"The year's loss",tex:"\\text{Loss}_t=\\sum_i \\mathbf{1}[\\text{default}_{i,t}]\\;\\text{LGD}_i\\;\\text{EAD}_i",explain:"Add up what is lost on every loan that defaults that year."},
-    {name:"Reading the tail",tex:"P(\\text{Loss}>x),\\qquad \\text{Loss}_{99.9\\%}",explain:"How often each size of loss is exceeded, and the loss reached only once in 1,000 years."},
+    {name:"Reading the tail",tex:"P(\\text{Loss}>x),\\qquad \\text{Loss}_{99.9\\%}",explain:"How often each size of loss is exceeded, and the loss exceeded in only 1 of every 1,000 scenarios."},
   ],
   result:()=>{ const b=RES.portfolio.base;
-    return `With nature data, the average yearly loss rises from ${$m(b.without.EL)} to <b>${$m(b.with.EL)}</b>, and the 1-in-1,000-year loss from ${$m(b.without.q999)} to <b>${$m(b.with.q999)}</b>. Basel capital rises from ${$m(b.without.regK)} to <b>${$m(b.with.regK)}</b>.`; },
+    return `With nature data, the average yearly loss rises from ${$m(b.without.EL)} to <b>${$m(b.with.EL)}</b>, and the worst-case loss (exceeded in only 1 of every 1,000 scenarios) from ${$m(b.without.q999)} to <b>${$m(b.with.q999)}</b>. Basel capital rises from ${$m(b.without.regK)} to <b>${$m(b.with.regK)}</b>.`; },
   charts:["pF"],
   weak:[
     "<b>No shared nature factor.</b> A regional drought hits many estates at once, but here only the economy links them. The real tail is probably worse.",
@@ -581,9 +581,9 @@ function drawB(T){
   Plotly.react("pB",[
     {x:mids,y:m.h0,type:"scatter",mode:"lines",line:{shape:"hvh",color:T.base,width:2},fill:"tozeroy",fillcolor:T.base+"33",name:"Without nature data",hovertemplate:"Coverage %{x:.2f}<br>density %{y:.2f}<extra>Without nature data</extra>"},
     {x:mids,y:m.hN,type:"scatter",mode:"lines",line:{shape:"hvh",color:T.nat,width:2.5},fill:"tozeroy",fillcolor:T.nat+"33",name:"With nature data",hovertemplate:"Coverage %{x:.2f}<br>density %{y:.2f}<extra>With nature data</extra>"},
-  ],layout(T,{xaxis:{title:{text:"Debt service coverage in a simulated year"},range:[0.2,4]},yaxis:{title:{text:"Share of simulated years"},range:[0,ymax]},
+  ],layout(T,{xaxis:{title:{text:"Debt service coverage in one scenario of next year"},range:[0.2,4]},yaxis:{title:{text:"Share of scenarios"},range:[0,ymax]},
     shapes:[{type:"rect",x0:0.2,x1:1,y0:0,y1:ymax,fillcolor:css("--risk-bg"),opacity:.5,line:{width:0},layer:"below"},{type:"line",x0:1,x1:1,y0:0,y1:ymax,line:{color:T.risk,width:1.5}}],
-    annotations:[{x:3.95,y:ymax*0.92,xanchor:"right",showarrow:false,align:"right",font:{color:css("--risk-ink"),size:12.5},text:`<b>Years below 1 (can't pay)</b><br>without: ${pct(m.pd_mc0,2)}<br>with: ${pct(m.pd_mcN,2)}`}]}),CFG);
+    annotations:[{x:3.95,y:ymax*0.92,xanchor:"right",showarrow:false,align:"right",font:{color:css("--risk-ink"),size:12.5},text:`<b>Scenarios below 1 (can't pay)</b><br>without: ${pct(m.pd_mc0,2)}<br>with: ${pct(m.pd_mcN,2)}`}]}),CFG);
 }
 function drawC(T){
   const u=per().unc, E=u.edges, mids=E.slice(0,-1).map((e,i)=>(e+E[i+1])/2), w=E[1]-E[0];
@@ -624,15 +624,15 @@ function drawE(T){
   Plotly.react("pE",data,lay,CFG);
 }
 function drawF(T){
-  const p=RES.portfolio, e=p.exceed, b=p.base, N=p.hist.N, cut=a=>a.map(v=>v>0?v:null), oneIn=v=>v>0?"1 year in "+num(Math.round(1/v)):"never";
+  const p=RES.portfolio, e=p.exceed, b=p.base, N=p.hist.N, cut=a=>a.map(v=>v>0?v:null), oneIn=v=>v>0?"1 scenario in "+num(Math.round(1/v)):"never";
   Plotly.react("pF",[
     {x:e.x,y:cut(e.without),type:"scatter",mode:"lines",line:{color:T.base,width:2.5},name:"Without nature data",customdata:e.without.map(oneIn),hovertemplate:"Loss above $%{x:.1f}m<br>%{customdata}<extra>Without nature data</extra>"},
     {x:e.x,y:cut(e.with_),type:"scatter",mode:"lines",line:{color:T.nat,width:2.5},name:"With nature data",customdata:e.with_.map(oneIn),hovertemplate:"Loss above $%{x:.1f}m<br>%{customdata}<extra>With nature data</extra>"},
     {x:[b.without.q999,b.with.q999],y:[0.001,0.001],mode:"markers",marker:{size:10,color:[T.base,T.nat],line:{color:T.surf,width:2}},showlegend:false,hoverinfo:"skip"},
-  ],layout(T,{xaxis:{title:{text:"Credit loss on the 27 loans in one year, $m"},rangemode:"tozero"},
-    yaxis:{title:{text:"How often the loss is exceeded"},type:"log",range:[Math.log10(5/N),0],tickvals:[1,0.1,0.01,0.001,0.0001],ticktext:["Every year","1 in 10","1 in 100","1 in 1,000","1 in 10,000"]},
+  ],layout(T,{xaxis:{title:{text:"Credit loss on the 27 loans next year, $m"},rangemode:"tozero"},
+    yaxis:{title:{text:"Share of scenarios with a bigger loss"},type:"log",range:[Math.log10(5/N),0],tickvals:[1,0.1,0.01,0.001,0.0001],ticktext:["Always","1 in 10","1 in 100","1 in 1,000","1 in 10,000"]},
     shapes:[{type:"line",xref:"paper",x0:0,x1:1,y0:0.001,y1:0.001,line:{color:T.line,width:1,dash:"dot"}}],
-    annotations:[{x:b.with.q999,y:-3,xanchor:"left",yanchor:"bottom",showarrow:false,text:` 1-in-1,000-year loss: ${$m(b.without.q999)} → <b>${$m(b.with.q999)}</b>`,font:{size:12,color:T.ink}}]}),CFG);
+    annotations:[{x:b.with.q999,y:-3,xanchor:"left",yanchor:"bottom",showarrow:false,text:` Worst 1 in 1,000: ${$m(b.without.q999)} → <b>${$m(b.with.q999)}</b>`,font:{size:12,color:T.ink}}]}),CFG);
 }
 function drawG(T){
   const p=RES.portfolio, keys=["base","drought","defor"], xs=["Baseline","Driest year","Stricter rule"];
