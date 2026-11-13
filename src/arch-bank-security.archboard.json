@@ -1,0 +1,393 @@
+{
+  "version": 1,
+  "title": "Bank integration: security view",
+  "nodes": [
+    {
+      "id": "bank",
+      "gx": 2,
+      "gy": 3,
+      "icon": "server",
+      "label": "Bank systems (internals not shown)"
+    },
+    {
+      "id": "bperim",
+      "gx": 2,
+      "gy": 6.5,
+      "icon": "firewall",
+      "label": "Bank perimeter: firewall and gateway"
+    },
+    {
+      "id": "bkeys",
+      "gx": 2,
+      "gy": 10,
+      "icon": "key",
+      "label": "Bank-held keys and secrets"
+    },
+    {
+      "id": "a_key",
+      "gx": 6.3,
+      "gy": 5,
+      "icon": "key",
+      "label": "API key or OAuth token"
+    },
+    {
+      "id": "a_mtls",
+      "gx": 9,
+      "gy": 5,
+      "icon": "lock",
+      "label": "Mutual TLS (stronger option)"
+    },
+    {
+      "id": "a_allow",
+      "gx": 11.7,
+      "gy": 5,
+      "icon": "filter",
+      "label": "IP allow-list and rate limit"
+    },
+    {
+      "id": "b_retry",
+      "gx": 6.3,
+      "gy": 8.5,
+      "icon": "queue",
+      "label": "Retries and dead-letter queue"
+    },
+    {
+      "id": "b_sig",
+      "gx": 9,
+      "gy": 8.5,
+      "icon": "guard",
+      "label": "Signed payload and timestamp"
+    },
+    {
+      "id": "b_hook",
+      "gx": 11.7,
+      "gy": 8.5,
+      "icon": "webhook",
+      "label": "Webhook callback to the bank"
+    },
+    {
+      "id": "c_sftp",
+      "gx": 7.5,
+      "gy": 11.4,
+      "icon": "files",
+      "label": "SFTP with PGP encryption"
+    },
+    {
+      "id": "c_chk",
+      "gx": 10.5,
+      "gy": 11.4,
+      "icon": "filter",
+      "label": "Checksum and malware scan"
+    },
+    {
+      "id": "t_broker",
+      "gx": 6,
+      "gy": 1.5,
+      "icon": "network",
+      "label": "Integration broker or open banking hub"
+    },
+    {
+      "id": "t_ca",
+      "gx": 8,
+      "gy": 1.5,
+      "icon": "key",
+      "label": "Certificate authority"
+    },
+    {
+      "id": "t_idp",
+      "gx": 10,
+      "gy": 1.5,
+      "icon": "identity",
+      "label": "Identity provider"
+    },
+    {
+      "id": "t_clean",
+      "gx": 12,
+      "gy": 1.5,
+      "icon": "archive",
+      "label": "Data clean room: tokenised data"
+    },
+    {
+      "id": "nperim",
+      "gx": 16,
+      "gy": 5,
+      "icon": "firewall",
+      "label": "Our perimeter: WAF and API gateway"
+    },
+    {
+      "id": "platform",
+      "gx": 15,
+      "gy": 8.25,
+      "icon": "svc",
+      "label": "Nature Risk platform (internals not shown)"
+    },
+    {
+      "id": "nkeys",
+      "gx": 17,
+      "gy": 8.25,
+      "icon": "key",
+      "label": "Keys and secrets, one set per bank"
+    },
+    {
+      "id": "audit",
+      "gx": 16,
+      "gy": 11,
+      "icon": "doc",
+      "label": "Audit log and monitoring"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "bank",
+      "to": "bperim",
+      "label": "request leaves the bank",
+      "step": 1
+    },
+    {
+      "id": "e2",
+      "from": "bkeys",
+      "to": "bperim",
+      "label": "client certificate",
+      "dash": true
+    },
+    {
+      "id": "e3",
+      "from": "bperim",
+      "to": "a_key",
+      "label": "API call",
+      "step": 2,
+      "hot": true
+    },
+    {
+      "id": "e4",
+      "from": "a_key",
+      "to": "a_mtls",
+      "label": "upgrade for higher assurance"
+    },
+    {
+      "id": "e5",
+      "from": "a_mtls",
+      "to": "a_allow",
+      "label": "known senders only"
+    },
+    {
+      "id": "e6",
+      "from": "a_allow",
+      "to": "nperim",
+      "label": "checked request",
+      "step": 3,
+      "hot": true
+    },
+    {
+      "id": "e7",
+      "from": "bperim",
+      "to": "c_sftp",
+      "label": "batch files",
+      "dash": true,
+      "step": 2
+    },
+    {
+      "id": "e8",
+      "from": "c_sftp",
+      "to": "c_chk",
+      "label": "encrypted file"
+    },
+    {
+      "id": "e9",
+      "from": "c_chk",
+      "to": "nperim",
+      "label": "scanned file",
+      "dash": true,
+      "step": 3
+    },
+    {
+      "id": "e10",
+      "from": "nperim",
+      "to": "platform",
+      "label": "allowed calls only",
+      "step": 3
+    },
+    {
+      "id": "e11",
+      "from": "nkeys",
+      "to": "platform",
+      "label": "keys on demand"
+    },
+    {
+      "id": "e12",
+      "from": "platform",
+      "to": "b_hook",
+      "label": "label changed",
+      "step": 4,
+      "dash": true
+    },
+    {
+      "id": "e13",
+      "from": "b_hook",
+      "to": "b_sig",
+      "label": "sign the body"
+    },
+    {
+      "id": "e14",
+      "from": "b_sig",
+      "to": "b_retry",
+      "label": "deliver and retry"
+    },
+    {
+      "id": "e15",
+      "from": "b_retry",
+      "to": "bperim",
+      "label": "signed callback",
+      "step": 4,
+      "dash": true
+    },
+    {
+      "id": "e16",
+      "from": "t_ca",
+      "to": "a_mtls",
+      "label": "issues certificates",
+      "dash": true,
+      "step": 5
+    },
+    {
+      "id": "e17",
+      "from": "t_idp",
+      "to": "a_key",
+      "label": "issues tokens",
+      "dash": true,
+      "step": 5
+    },
+    {
+      "id": "e18",
+      "from": "bperim",
+      "to": "t_broker",
+      "label": "optional relay",
+      "dash": true,
+      "step": 5
+    },
+    {
+      "id": "e19",
+      "from": "t_broker",
+      "to": "nperim",
+      "label": "relayed and re-checked",
+      "dash": true
+    },
+    {
+      "id": "e20",
+      "from": "t_clean",
+      "to": "platform",
+      "label": "tokens, not personal data",
+      "dash": true
+    },
+    {
+      "id": "e21",
+      "from": "platform",
+      "to": "audit",
+      "label": "every call logged",
+      "step": 6,
+      "hot": true
+    }
+  ],
+  "texts": [
+    {
+      "id": "t1",
+      "gx": 9,
+      "gy": 6.1,
+      "text": "Simplest: an API key. Stronger: OAuth 2.0 token tied to a client certificate",
+      "size": "s"
+    },
+    {
+      "id": "t2",
+      "gx": 9,
+      "gy": 9.6,
+      "text": "Verify the signature and timestamp; ignore replays",
+      "size": "s"
+    },
+    {
+      "id": "t3",
+      "gx": 9,
+      "gy": 12.4,
+      "text": "Encrypt, checksum, scan, then process",
+      "size": "s"
+    },
+    {
+      "id": "t4",
+      "gx": 9,
+      "gy": 2.6,
+      "text": "Neutral parties add trust when two sides do not trust each other directly",
+      "size": "s"
+    },
+    {
+      "id": "t5",
+      "gx": 9,
+      "gy": 14.0,
+      "text": "Security view only: both sides' internal systems are left out on purpose. Design targets; compliance also needs written policies and independent audits.",
+      "size": "s"
+    }
+  ],
+  "zones": [
+    {
+      "id": "z1",
+      "label": "Bank (internals not shown)",
+      "gx": 0,
+      "gy": 0,
+      "w": 4,
+      "h": 12.75,
+      "color": "#8a93a3"
+    },
+    {
+      "id": "z2",
+      "label": "1. API integration: the bank calls us",
+      "gx": 5,
+      "gy": 3.5,
+      "w": 8,
+      "h": 3,
+      "color": "#4f8cff"
+    },
+    {
+      "id": "z3",
+      "label": "2. Webhook: we call the bank",
+      "gx": 5,
+      "gy": 7,
+      "w": 8,
+      "h": 3,
+      "color": "#9b7cf0"
+    },
+    {
+      "id": "z4",
+      "label": "3. Secure file transfer (batch)",
+      "gx": 5,
+      "gy": 10.5,
+      "w": 8,
+      "h": 2.25,
+      "color": "#e0a526"
+    },
+    {
+      "id": "z5",
+      "label": "Trusted third party (only if required)",
+      "gx": 5,
+      "gy": 0,
+      "w": 8,
+      "h": 3,
+      "color": "#2bb5a8"
+    },
+    {
+      "id": "z6",
+      "label": "Nature Risk (internals not shown)",
+      "gx": 14,
+      "gy": 0,
+      "w": 4,
+      "h": 12.75,
+      "color": "#3fb67a"
+    }
+  ],
+  "steps": [
+    "A request or file leaves the bank from inside its own perimeter.",
+    "It crosses one of three channels: an API call with an API key or OAuth token, a signed webhook from us, or an encrypted file drop.",
+    "At our perimeter every channel is encrypted in transit and checked: keys, allow-lists, rate limits and malware scans. Only allowed calls reach the platform.",
+    "When something changes, we call the bank's webhook: the body is signed and timestamped, delivered with retries, and checked by the bank.",
+    "A trusted third party is optional: a broker or hub that relays messages, a certificate authority, an identity provider, or a clean room so neither side sees raw personal data.",
+    "Both sides log every call, keep keys apart per bank, and rotate them on a schedule."
+  ]
+}

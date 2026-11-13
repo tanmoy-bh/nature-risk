@@ -15,7 +15,7 @@ test("every architecture tab has a panel, including the 3D view", async () => {
 test("each board view embeds a published Archboard 3D board, loaded only when its tab opens", async () => {
   const html = await read("src/app.html");
   const frames = [...html.matchAll(/<iframe id="([^"]+)"([^>]*)>/g)];
-  assert.deepEqual(frames.map((m) => m[1]).sort(), ["frame3d", "frameBank"]);
+  assert.deepEqual(frames.map((m) => m[1]).sort(), ["frame3d", "frameBank", "frameBankSec"]);
   const ids = new Set();
   for (const [, id, attrs] of frames) {
     const src = attrs.match(/data-src="([^"]+)"/)?.[1];
@@ -23,11 +23,11 @@ test("each board view embeds a published Archboard 3D board, loaded only when it
     assert.doesNotMatch(attrs, /\ssrc=/, `${id}: no src until the tab opens`);
     ids.add(src);
   }
-  assert.equal(ids.size, 2, "the two views show different boards");
+  assert.equal(ids.size, 3, "every embed shows a different board");
   assert.match(html, /archboard:theme/); // follows the page's light and dark theme
 });
 
-for (const [file, min, zones] of [["src/arch-3d.archboard.json", 20, 6], ["src/arch-bank.archboard.json", 30, 6]]) {
+for (const [file, min, zones] of [["src/arch-3d.archboard.json", 20, 6], ["src/arch-bank.archboard.json", 30, 6], ["src/arch-bank-security.archboard.json", 15, 6]]) {
   test(`the board behind ${file} is kept in the repo and is consistent`, async () => {
     const doc = JSON.parse(await read(file));
     assert.equal(doc.version, 1);
