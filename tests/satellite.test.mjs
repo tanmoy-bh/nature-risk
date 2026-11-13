@@ -32,3 +32,14 @@ test("the satellite strip shows five years with attribution, below the map", () 
   const map = app.indexOf('class="panel mapshell"'), sat = app.indexOf('id="nsat"'), trends = app.indexOf('id="ntrends"');
   assert.ok(map > 0 && sat > map && sat < trends, "strip sits between the map and the trends");
 });
+
+test("the Lender desk has a daily nature debrief kept for 24 hours", () => {
+  const desk = app.indexOf('id="screen-desk"'), brief = app.indexOf('id="brief"'), stats = app.indexOf('class="panel stats"');
+  assert.ok(desk > 0 && brief > desk && brief < stats, "debrief sits above the desk stats");
+  assert.match(app, />Load daily debrief</);
+  assert.match(app, /fetch\("api\/brief"/);
+  assert.match(app, /86400000/);
+  assert.match(app, /createObjectStore\("brief"\)/);
+  assert.match(app, /rel="noopener"/);
+  assert.doesNotMatch(app, /sk-or-|OPENROUTER_API_KEY|openrouter\.ai\/api/i, "no key or direct model call in the page");
+});

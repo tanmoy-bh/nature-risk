@@ -110,3 +110,11 @@ Right below the map, the selected site is shown from above in five yearly cloud-
 
 - Tiles load in the viewer's browser straight from EOX's public [Sentinel-2 cloudless](https://s2maps.eu) service; no key is needed. The tile maths is `satFrame()` in `src/app.html`, tested in `tests/satellite.test.mjs`.
 - Licence: EOX licenses these mosaics for non-commercial use, with attribution (shown under the strip). A commercial product would need an EOX licence or another source.
+
+## Daily nature debrief (Lender desk)
+
+**Load daily debrief** at the top of the Lender desk reads today's nature news and shows the 3–5 stories that could change how the book is priced, each tied to the loans it touches.
+
+- `POST /api/brief` (`functions/api/brief.js`, logic in `lib/brief.mjs`) reads four feeds (Mongabay, Eco-Business, Dialogue Earth, Carbon Brief), keeps the last 3 days, ranks them for a farm-and-commodities book and sends the top 30, numbered, to the model.
+- The model only returns story numbers and labels (topic, risk direction, countries, crops, one sentence on why). Headlines, links, sources and dates always come from the feeds; any number in its text must appear in the article it cites, or the draft is rejected. Loans are matched by country and crop from the model results.
+- A debrief is served for 24 hours (server cache and the browser's IndexedDB). **Refresh** rebuilds it, at most once every 10 minutes. Without a key or a usable draft, the ranked headlines are shown, labelled as not yet analysed.

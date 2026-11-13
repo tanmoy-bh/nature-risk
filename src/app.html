@@ -248,6 +248,56 @@ details[open] summary::after{content:"Hide"}
 
 /* trends */
 .trendpanel{padding:20px;display:flex;flex-direction:column;gap:16px}
+/* Daily nature debrief (Lender desk) */
+.brief{padding:18px 20px;display:flex;flex-direction:column;gap:14px;position:relative}
+.bf-idle,.bf-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bf-mark{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(125,122,255,.16),rgba(48,176,199,.16))}
+.bf-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.bf-t b{font-size:17px;letter-spacing:-.01em} .bf-t span{color:var(--muted);font-size:14px}
+.bf-load{position:relative;overflow:hidden;font:inherit;font-size:14.5px;font-weight:600;border:0;border-radius:12px;padding:10px 16px;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#5856D6,#2F9FB5);display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(88,86,214,.28);transition:transform .15s,box-shadow .15s}
+.bf-load:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(88,86,214,.36)} .bf-load:active{transform:none}
+.bf-load:focus-visible,.bf-ib:focus-visible,.bf-loan:focus-visible,.bf-card a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bf-sh{position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);background-size:260% 100%;background-position:130% 0;animation:bfshine 3.4s ease-in-out infinite}
+@keyframes bfshine{0%,55%{background-position:130% 0}100%{background-position:-130% 0}}
+.bf-meta{margin-left:auto;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.bf-ib{border:0;background:var(--fill);color:var(--ink);height:30px;border-radius:9px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:500}
+.bf-ib:hover{background:var(--soft)}
+.bf-sum{font-size:16.5px;line-height:1.5;letter-spacing:-.005em;margin:0;max-width:85ch}
+.bf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.bf-card{background:var(--soft);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;animation:bfin .35s ease both}
+.bf-card:nth-child(2){animation-delay:.05s} .bf-card:nth-child(3){animation-delay:.1s} .bf-card:nth-child(4){animation-delay:.15s} .bf-card:nth-child(5){animation-delay:.2s}
+@keyframes bfin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bf-tags{display:flex;gap:6px;flex-wrap:wrap}
+.bf-chip{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--fill);color:var(--muted)}
+.bf-dir{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
+.bf-dir.up{background:var(--risk-bg);color:var(--risk-ink)} .bf-dir.down{background:var(--gain-bg);color:var(--gain-ink)} .bf-dir.mix{background:var(--stable-bg);color:var(--stable-ink)}
+.bf-card a.bf-h{font-size:15.5px;font-weight:600;line-height:1.35;color:var(--ink);text-decoration:none}
+.bf-card a.bf-h:hover{text-decoration:underline}
+.bf-card a.bf-h::after{content:" ↗";color:var(--muted);font-weight:400}
+.bf-src{font-size:12.5px;color:var(--muted)}
+.bf-why{font-size:14px;line-height:1.5;margin:0}
+.bf-book{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.bf-book>span:first-child{font-size:11.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.bf-loan{font:inherit;font-size:12.5px;font-weight:500;border:0;border-radius:999px;padding:3px 10px;background:var(--surface);color:var(--ink);cursor:pointer;box-shadow:inset 0 0 0 .5px var(--line)}
+.bf-loan:hover{background:var(--fill)}
+.bf-more{font-size:12.5px;color:var(--muted)}
+.bf-foot{font-size:12px;color:var(--muted);margin:0}
+.bf-note{font-size:13px;color:var(--muted);margin:0}
+.bf-err{font-size:13.5px;color:var(--risk-ink);margin:0}
+.bf-skel{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.bf-skel div{height:132px;border-radius:14px;background:linear-gradient(90deg,var(--fill) 25%,rgba(125,122,255,.14) 50%,var(--fill) 75%);background-size:300% 100%;animation:bfsk 1.3s linear infinite}
+.bf-skel i{display:block;height:14px;width:70%;border-radius:7px;margin-bottom:4px;background:linear-gradient(90deg,var(--fill) 25%,rgba(125,122,255,.14) 50%,var(--fill) 75%);background-size:300% 100%;animation:bfsk 1.3s linear infinite}
+@keyframes bfsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@property --ai-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+.brief.busy::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:2;
+  background:conic-gradient(from var(--ai-a),#7D7AFF,#30B0C7,#34C759,#7D7AFF 45%,rgba(125,122,255,0) 62%,rgba(125,122,255,0) 88%,#7D7AFF);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:bfspin 2.4s linear infinite}
+.brief.busy{animation:bfglow 2.4s ease-in-out infinite}
+@keyframes bfspin{to{--ai-a:360deg}}
+@keyframes bfglow{0%,100%{box-shadow:0 0 0 0 rgba(125,122,255,0)}50%{box-shadow:0 0 26px 2px rgba(125,122,255,.3)}}
+@media (max-width:600px){ .bf-load{width:100%;justify-content:center} .bf-meta{margin-left:0;width:100%} .brief{padding:16px} }
+@media (prefers-reduced-motion: reduce){ .bf-sh,.bf-card,.bf-skel div,.bf-skel i,.brief.busy,.brief.busy::before{animation:none} }
 /* Satellite view: one cloud-free Sentinel-2 image a year, same scale, centred on the site. */
 .satpanel{padding:20px;display:flex;flex-direction:column;gap:14px}
 .satpanel .thead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:flex-end;justify-content:space-between}
@@ -539,6 +589,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-desk"></select></label>
     </div>
     <p class="scen-note" hidden></p>
+    <section class="panel brief" id="brief" aria-live="polite" aria-label="Daily nature debrief"></section>
     <div class="panel stats">
       <div class="stat"><span class="label">Exposure by label<span class="dp sample" title="Sample value, not real data">Sample</span></span><div class="mixbar" id="mixbar" role="img"></div><div class="keys" id="mixkeys"></div></div>
       <div class="stat"><span class="label">Book<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-total"></span><span class="sub" id="s-count"></span></div>
@@ -1169,6 +1220,65 @@ function renderMap(){
   document.getElementById("ntrends").innerHTML = trendPanel(a);
   const sp=document.getElementById("nsat"); if(sp && sp.dataset.id!==a.id){ sp.dataset.id=a.id; sp.innerHTML=satPanel(a); satWire(sp); }
 }
+
+// ---------- daily nature debrief ----------
+// Loaded on request from /api/brief (the server reads the feeds and asks the model; the key stays there).
+// A debrief is kept in IndexedDB for 24 hours, so later visits open it instantly; Refresh asks for a fresh one.
+const BRIEF_TTL=86400000, BRIEF_SRC="Mongabay, Eco-Business, Dialogue Earth and Carbon Brief";
+const hx=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const BF_SPARK=(c)=>`<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="${c}" d="M10 2.5c.5 3.9 2.6 6 6.5 6.5-3.9.5-6 2.6-6.5 6.5-.5-3.9-2.6-6-6.5-6.5 3.9-.5 6-2.6 6.5-6.5Z"/><path fill="${c}" d="M18 13.5c.3 2 1.3 3 3.3 3.3-2 .3-3 1.3-3.3 3.3-.3-2-1.3-3-3.3-3.3 2-.3 3-1.3 3.3-3.3Z"/></svg>`;
+let briefDbP=null, briefTok=0;
+function briefDb(){ if(briefDbP) return briefDbP;
+  briefDbP=new Promise((ok,no)=>{ try{ const r=indexedDB.open("nature-risk-desk",1);
+    r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains("brief")) r.result.createObjectStore("brief"); };
+    r.onblocked=()=>no(new Error("blocked"));
+    r.onsuccess=()=>{ const d=r.result; d.onversionchange=()=>{ d.close(); briefDbP=null; }; ok(d); }; r.onerror=()=>no(r.error); }catch(e){ no(e); } });
+  briefDbP.catch(()=>{ briefDbP=null; }); return briefDbP; }
+async function briefGet(){ try{ const db=await briefDb(); const v=await new Promise(ok=>{ const q=db.transaction("brief").objectStore("brief").get("latest"); q.onsuccess=()=>ok(q.result); q.onerror=()=>ok(undefined); });
+  return v&&Date.now()-v.at<BRIEF_TTL?v.value:undefined; }catch(e){ return undefined; } }
+async function briefPut(b){ try{ const db=await briefDb(); db.transaction("brief","readwrite").objectStore("brief").put({value:b,at:Date.parse(b.generatedAt)||Date.now()},"latest"); }catch(e){} }
+function bfAgo(iso){ const m=Math.round((Date.now()-Date.parse(iso))/60000); return !(m>=1)?"just now":m<60?`${m} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} d ago`; }
+function briefIdle(err){ return `<div class="bf-idle"><span class="bf-mark">${BF_SPARK("url(#bfg)")}<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="bfg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7D7AFF"/><stop offset="1" stop-color="#30B0C7"/></linearGradient></defs></svg></span>
+  <div class="bf-t"><b>Daily nature debrief</b><span>Today's nature news that could change how this book is priced, picked by AI from ${BRIEF_SRC}.</span></div>
+  <button class="bf-load" type="button" data-brief="load"><span class="bf-sh"></span>${BF_SPARK("#fff")}<span>Load daily debrief</span></button></div>${err?`<p class="bf-err">${hx(err)}</p>`:""}`; }
+function briefLoading(){ return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>Reading today's nature news…</span></div></div>
+  <div class="bf-skel" aria-hidden="true"><div></div><div></div><div></div></div>`; }
+const BF_DIR={"raises risk":["up","↑ Raises risk"],"lowers risk":["down","↓ Lowers risk"],"mixed":["mix","↕ Mixed"]};
+function briefCard(s){
+  const d=BF_DIR[s.direction], loans=s.loans||[], more=loans.length-4;
+  return `<article class="bf-card">${s.channel?`<div class="bf-tags"><span class="bf-chip">${hx(s.channel)}</span>${d?`<span class="bf-dir ${d[0]}">${d[1]}</span>`:""}</div>`:""}
+    <a class="bf-h" href="${hx(s.link)}" target="_blank" rel="noopener">${hx(s.title)}</a>
+    <span class="bf-src">${hx(s.source)} · ${bfAgo(s.date)}</span>
+    ${s.why?`<p class="bf-why">${hx(s.why)}</p>`:""}
+    ${loans.length?`<div class="bf-book"><span>In your book</span>${loans.slice(0,4).map(l=>`<button class="bf-loan" type="button" data-brief-loan="${hx(l.id)}" title="${hx(l.commodity)}: open on the desk">${hx(l.name)}</button>`).join("")}${more>0?`<span class="bf-more">+${more} more</span>`:""}</div>`:""}
+  </article>`; }
+function briefView(b){
+  const ai=b.source==="model", at=new Date(b.generatedAt);
+  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>${ai?`${b.stories.length} stories picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
+    <span class="bf-meta">Updated ${at.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}, ${at.toLocaleDateString([],{day:"numeric",month:"short"})}
+    <button class="bf-ib" type="button" data-brief="refresh" title="Get fresh news"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh</button></span></div>
+  ${b.throttled?`<p class="bf-note">This debrief was refreshed a few minutes ago, so it's still current.</p>`:""}
+  ${ai&&b.summary?`<p class="bf-sum">${hx(b.summary)}</p>`:""}
+  ${!ai?`<p class="bf-note">The AI reading isn't available right now, so these are the most relevant headlines from ${BRIEF_SRC}.</p>`:""}
+  ${b.stories.length?`<div class="bf-grid">${b.stories.map(briefCard).join("")}</div>`:`<p class="bf-note">No nature stories relevant to this book in the last three days.</p>`}
+  <p class="bf-foot">Sources: ${BRIEF_SRC}. Open a story to read it at the source; loan matches are by country and crop.</p>`; }
+async function loadBrief(again){
+  const el=document.getElementById("brief"); if(!el) return; const tok=++briefTok;
+  el.classList.add("busy"); el.innerHTML=briefLoading();
+  try{ const r=await fetch("api/brief",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({again:!!again})});
+    const j=await r.json(); if(!r.ok) throw new Error(j.error||("HTTP "+r.status)); if(tok!==briefTok) return;
+    if(j.source==="model") briefPut(j); el.classList.remove("busy"); el.innerHTML=briefView(j);
+  }catch(e){ if(tok!==briefTok) return; el.classList.remove("busy"); el.innerHTML=briefIdle(e.message||"The debrief couldn't load. Try again in a moment."); }
+}
+async function initBrief(){ const el=document.getElementById("brief"); if(!el||el.dataset.ready) return; el.dataset.ready="1"; el.innerHTML=briefIdle();
+  const b=await briefGet(); if(b&&!el.classList.contains("busy")) el.innerHTML=briefView(b); }
+function openLoan(id){ if(!ASSETS.some(a=>a.id===id)) return; state.screen="desk"; state.book="agri"; state.filter="all"; state.sel=id; render();
+  const d=document.getElementById("detail"); if(d) d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }
+document.addEventListener("click",ev=>{
+  const b=ev.target.closest("[data-brief]"); if(b){ loadBrief(b.dataset.brief==="refresh"); return; }
+  const l=ev.target.closest("[data-brief-loan]"); if(l) openLoan(l.dataset.briefLoan);
+});
+initBrief();
 
 // ---------- satellite view ----------
 // Tiles load straight from EOX's public Sentinel-2 cloudless service in the viewer's browser (no key).
