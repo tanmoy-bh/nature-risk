@@ -4,134 +4,134 @@
   "nodes": [
     {
       "id": "bank",
-      "gx": 2,
-      "gy": 3,
+      "gx": 1.25,
+      "gy": 2.5,
       "icon": "server",
       "label": "Bank systems (internals not shown)"
     },
     {
       "id": "bperim",
-      "gx": 2,
-      "gy": 6.5,
+      "gx": 1.25,
+      "gy": 5.5,
       "icon": "firewall",
       "label": "Bank perimeter: firewall and gateway"
     },
     {
       "id": "bkeys",
-      "gx": 2,
-      "gy": 10,
+      "gx": 1.25,
+      "gy": 8.5,
       "icon": "key",
       "label": "Bank-held keys and secrets"
     },
     {
       "id": "a_key",
-      "gx": 6.3,
-      "gy": 5,
+      "gx": 3.8,
+      "gy": 3.95,
       "icon": "key",
       "label": "API key or OAuth token"
     },
     {
       "id": "a_mtls",
-      "gx": 9,
-      "gy": 5,
+      "gx": 5.5,
+      "gy": 3.95,
       "icon": "lock",
       "label": "Mutual TLS (stronger option)"
     },
     {
       "id": "a_allow",
-      "gx": 11.7,
-      "gy": 5,
+      "gx": 7.2,
+      "gy": 3.95,
       "icon": "filter",
       "label": "IP allow-list and rate limit"
     },
     {
       "id": "b_retry",
-      "gx": 6.3,
-      "gy": 8.5,
+      "gx": 3.8,
+      "gy": 6.95,
       "icon": "queue",
       "label": "Retries and dead-letter queue"
     },
     {
       "id": "b_sig",
-      "gx": 9,
-      "gy": 8.5,
+      "gx": 5.5,
+      "gy": 6.95,
       "icon": "guard",
       "label": "Signed payload and timestamp"
     },
     {
       "id": "b_hook",
-      "gx": 11.7,
-      "gy": 8.5,
+      "gx": 7.2,
+      "gy": 6.95,
       "icon": "webhook",
       "label": "Webhook callback to the bank"
     },
     {
       "id": "c_sftp",
-      "gx": 7.5,
-      "gy": 11.4,
+      "gx": 4.55,
+      "gy": 9.85,
       "icon": "files",
       "label": "SFTP with PGP encryption"
     },
     {
       "id": "c_chk",
-      "gx": 10.5,
-      "gy": 11.4,
+      "gx": 6.45,
+      "gy": 9.85,
       "icon": "filter",
       "label": "Checksum and malware scan"
     },
     {
       "id": "t_broker",
-      "gx": 6,
-      "gy": 1.5,
+      "gx": 3.65,
+      "gy": 0.95,
       "icon": "network",
       "label": "Integration broker or open banking hub"
     },
     {
       "id": "t_ca",
-      "gx": 8,
-      "gy": 1.5,
+      "gx": 4.9,
+      "gy": 0.95,
       "icon": "key",
       "label": "Certificate authority"
     },
     {
       "id": "t_idp",
-      "gx": 10,
-      "gy": 1.5,
+      "gx": 6.15,
+      "gy": 0.95,
       "icon": "identity",
       "label": "Identity provider"
     },
     {
       "id": "t_clean",
-      "gx": 12,
-      "gy": 1.5,
+      "gx": 7.4,
+      "gy": 0.95,
       "icon": "archive",
       "label": "Data clean room: tokenised data"
     },
     {
       "id": "nperim",
-      "gx": 16,
-      "gy": 5,
+      "gx": 9.75,
+      "gy": 4.25,
       "icon": "firewall",
       "label": "Our perimeter: WAF and API gateway"
     },
     {
       "id": "platform",
-      "gx": 15,
-      "gy": 8.25,
+      "gx": 9.15,
+      "gy": 7.05,
       "icon": "svc",
       "label": "Nature Risk platform (internals not shown)"
     },
     {
       "id": "nkeys",
-      "gx": 17,
-      "gy": 8.25,
+      "gx": 10.4,
+      "gy": 7.05,
       "icon": "key",
       "label": "Keys and secrets, one set per bank"
     },
     {
       "id": "audit",
-      "gx": 16,
-      "gy": 11,
+      "gx": 9.75,
+      "gy": 9.45,
       "icon": "doc",
       "label": "Audit log and monitoring"
     }
@@ -292,36 +292,36 @@
   "texts": [
     {
       "id": "t1",
-      "gx": 9,
-      "gy": 6.1,
+      "gx": 4.8,
+      "gy": 5.05,
       "text": "Simplest: an API key. Stronger: OAuth 2.0 token tied to a client certificate",
       "size": "s"
     },
     {
       "id": "t2",
-      "gx": 9,
-      "gy": 9.6,
+      "gx": 5.5,
+      "gy": 8.05,
       "text": "Verify the signature and timestamp; ignore replays",
       "size": "s"
     },
     {
       "id": "t3",
-      "gx": 9,
-      "gy": 12.4,
+      "gx": 5.5,
+      "gy": 10.7,
       "text": "Encrypt, checksum, scan, then process",
       "size": "s"
     },
     {
       "id": "t4",
-      "gx": 9,
-      "gy": 2.6,
+      "gx": 4.8,
+      "gy": 2.05,
       "text": "Neutral parties add trust when two sides do not trust each other directly",
       "size": "s"
     },
     {
       "id": "t5",
-      "gx": 9,
-      "gy": 14.0,
+      "gx": 5.5,
+      "gy": 12.05,
       "text": "Security view only: both sides' internal systems are left out on purpose. Design targets; compliance also needs written policies and independent audits.",
       "size": "s"
     }
@@ -332,53 +332,53 @@
       "label": "Bank (internals not shown)",
       "gx": 0,
       "gy": 0,
-      "w": 4,
-      "h": 12.75,
+      "w": 2.5,
+      "h": 11,
       "color": "#8a93a3"
     },
     {
       "id": "z2",
       "label": "1. API integration: the bank calls us",
-      "gx": 5,
-      "gy": 3.5,
-      "w": 8,
-      "h": 3,
+      "gx": 3,
+      "gy": 3,
+      "w": 5,
+      "h": 2.5,
       "color": "#4f8cff"
     },
     {
       "id": "z3",
       "label": "2. Webhook: we call the bank",
-      "gx": 5,
-      "gy": 7,
-      "w": 8,
-      "h": 3,
+      "gx": 3,
+      "gy": 6,
+      "w": 5,
+      "h": 2.5,
       "color": "#9b7cf0"
     },
     {
       "id": "z4",
       "label": "3. Secure file transfer (batch)",
-      "gx": 5,
-      "gy": 10.5,
-      "w": 8,
-      "h": 2.25,
+      "gx": 3,
+      "gy": 9,
+      "w": 5,
+      "h": 2,
       "color": "#e0a526"
     },
     {
       "id": "z5",
       "label": "Trusted third party (only if required)",
-      "gx": 5,
+      "gx": 3,
       "gy": 0,
-      "w": 8,
-      "h": 3,
+      "w": 5,
+      "h": 2.5,
       "color": "#2bb5a8"
     },
     {
       "id": "z6",
       "label": "Nature Risk (internals not shown)",
-      "gx": 14,
+      "gx": 8.5,
       "gy": 0,
-      "w": 4,
-      "h": 12.75,
+      "w": 2.5,
+      "h": 11,
       "color": "#3fb67a"
     }
   ],

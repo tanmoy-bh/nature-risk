@@ -4,246 +4,246 @@
   "nodes": [
     {
       "id": "los",
-      "gx": 2.5,
-      "gy": 1.25,
+      "gx": 2,
+      "gy": 1.05,
       "icon": "svc",
       "label": "Loan origination system"
     },
     {
       "id": "analyst",
-      "gx": 0.9,
-      "gy": 1.25,
+      "gx": 0.7,
+      "gy": 1.05,
       "icon": "person",
       "label": "Credit analyst"
     },
     {
       "id": "bgw",
-      "gx": 4.1,
-      "gy": 1.25,
+      "gx": 3.3,
+      "gy": 1.05,
       "icon": "gateway",
       "label": "Bank API gateway"
     },
     {
       "id": "idp",
-      "gx": 0.9,
-      "gy": 3.0,
+      "gx": 0.7,
+      "gy": 2.55,
       "icon": "identity",
       "label": "Bank identity provider"
     },
     {
       "id": "dwh",
-      "gx": 2.5,
-      "gy": 3.0,
+      "gx": 2,
+      "gy": 2.55,
       "icon": "warehouse",
       "label": "Bank risk data warehouse"
     },
     {
       "id": "bsftp",
-      "gx": 4.1,
-      "gy": 3.0,
+      "gx": 3.3,
+      "gy": 2.55,
       "icon": "files",
       "label": "Batch file drop"
     },
     {
       "id": "plink",
-      "gx": 6.4,
-      "gy": 1.25,
+      "gx": 5.2,
+      "gy": 1.05,
       "icon": "network",
       "label": "Private link or VPN"
     },
     {
       "id": "allow",
-      "gx": 8.0,
-      "gy": 1.25,
+      "gx": 6.5,
+      "gy": 1.05,
       "icon": "filter",
       "label": "IP allow-list"
     },
     {
       "id": "mtls",
-      "gx": 8.0,
-      "gy": 3.0,
+      "gx": 6.5,
+      "gy": 2.55,
       "icon": "lock",
       "label": "Mutual TLS"
     },
     {
       "id": "sign",
-      "gx": 9.6,
-      "gy": 1.25,
+      "gx": 7.8,
+      "gy": 1.05,
       "icon": "key",
       "label": "Request signing"
     },
     {
       "id": "sftpgw",
-      "gx": 6.4,
-      "gy": 3.0,
+      "gx": 5.2,
+      "gy": 2.55,
       "icon": "files",
       "label": "Encrypted file transfer"
     },
     {
       "id": "waf",
-      "gx": 11.9,
-      "gy": 1.25,
+      "gx": 9.7,
+      "gy": 1.05,
       "icon": "firewall",
       "label": "WAF and DDoS shield"
     },
     {
       "id": "apigw",
-      "gx": 13.5,
-      "gy": 1.25,
+      "gx": 11,
+      "gy": 1.05,
       "icon": "gateway",
       "label": "API gateway: OAuth 2.0, quotas"
     },
     {
       "id": "adapt",
-      "gx": 15.1,
-      "gy": 1.25,
+      "gx": 12.3,
+      "gy": 1.05,
       "icon": "etl",
       "label": "Integration adapters"
     },
     {
       "id": "hooks",
-      "gx": 15.1,
-      "gy": 3.0,
+      "gx": 12.3,
+      "gy": 2.55,
       "icon": "webhook",
       "label": "Signed webhook sender"
     },
     {
       "id": "dlq",
-      "gx": 11.9,
-      "gy": 3.0,
+      "gx": 9.7,
+      "gy": 2.55,
       "icon": "queue",
       "label": "Retry and dead-letter queue"
     },
     {
       "id": "idem",
-      "gx": 13.5,
-      "gy": 3.0,
+      "gx": 11,
+      "gy": 2.55,
       "icon": "redis",
       "label": "Idempotency and replay store"
     },
     {
       "id": "score",
-      "gx": 15.1,
-      "gy": 6.5,
+      "gx": 12.3,
+      "gy": 5.55,
       "icon": "rest",
       "label": "Scoring API"
     },
     {
       "id": "signal",
-      "gx": 13.5,
-      "gy": 6.5,
+      "gx": 11,
+      "gy": 5.55,
       "icon": "svc",
       "label": "Signal engine"
     },
     {
       "id": "cache",
-      "gx": 15.1,
-      "gy": 8.25,
+      "gx": 12.3,
+      "gy": 7.05,
       "icon": "redis",
       "label": "Score cache"
     },
     {
       "id": "bus",
-      "gx": 13.5,
-      "gy": 8.25,
+      "gx": 11,
+      "gy": 7.05,
       "icon": "queue",
       "label": "Event bus"
     },
     {
       "id": "workers",
-      "gx": 11.9,
-      "gy": 8.25,
+      "gx": 9.7,
+      "gy": 7.05,
       "icon": "cluster",
       "label": "Job workers, autoscaled"
     },
     {
       "id": "notes",
-      "gx": 11.9,
-      "gy": 6.5,
+      "gx": 9.7,
+      "gy": 5.55,
       "icon": "prompt",
       "label": "Notes service"
     },
     {
       "id": "pg",
-      "gx": 9.6,
-      "gy": 6.5,
+      "gx": 7.8,
+      "gy": 5.55,
       "icon": "db",
       "label": "PostgreSQL with row-level security"
     },
     {
       "id": "vault",
-      "gx": 8.0,
-      "gy": 6.5,
+      "gx": 6.5,
+      "gy": 5.55,
       "icon": "lock",
       "label": "Token vault"
     },
     {
       "id": "obj",
-      "gx": 9.6,
-      "gy": 8.25,
+      "gx": 7.8,
+      "gy": 7.05,
       "icon": "blob",
       "label": "Write-once object storage"
     },
     {
       "id": "kms",
-      "gx": 8.0,
-      "gy": 8.25,
+      "gx": 6.5,
+      "gy": 7.05,
       "icon": "key",
       "label": "Key service: one key per bank"
     },
     {
       "id": "bkp",
-      "gx": 6.4,
-      "gy": 6.5,
+      "gx": 5.2,
+      "gy": 5.55,
       "icon": "archive",
       "label": "Backups and recovery region"
     },
     {
       "id": "replica",
-      "gx": 6.4,
-      "gy": 8.25,
+      "gx": 5.2,
+      "gy": 7.05,
       "icon": "db",
       "label": "Standby replica"
     },
     {
       "id": "iam",
-      "gx": 2.5,
-      "gy": 6.5,
+      "gx": 2,
+      "gy": 5.55,
       "icon": "identity",
       "label": "Access control: SSO, MFA, just in time"
     },
     {
       "id": "audit",
-      "gx": 4.1,
-      "gy": 6.5,
+      "gx": 3.3,
+      "gy": 5.55,
       "icon": "doc",
       "label": "Immutable audit log"
     },
     {
       "id": "siem",
-      "gx": 4.1,
-      "gy": 8.25,
+      "gx": 3.3,
+      "gy": 7.05,
       "icon": "alarm",
       "label": "Monitoring and SIEM"
     },
     {
       "id": "secrets",
-      "gx": 2.5,
-      "gy": 8.25,
+      "gx": 2,
+      "gy": 7.05,
       "icon": "key",
       "label": "Secrets manager"
     },
     {
       "id": "cicd",
-      "gx": 0.9,
-      "gy": 6.5,
+      "gx": 0.7,
+      "gy": 5.55,
       "icon": "loop",
       "label": "CI/CD with change approvals"
     },
     {
       "id": "priv",
-      "gx": 0.9,
-      "gy": 8.25,
+      "gx": 0.7,
+      "gy": 7.05,
       "icon": "guard",
       "label": "Privacy operations"
     }
@@ -487,50 +487,50 @@
   "texts": [
     {
       "id": "t1",
-      "gx": 2.5,
-      "gy": 4.15,
+      "gx": 2,
+      "gy": 3.5,
       "text": "Their network, their controls",
       "size": "s"
     },
     {
       "id": "t2",
-      "gx": 8.0,
-      "gy": 4.15,
+      "gx": 6.5,
+      "gy": 3.5,
       "text": "Encrypted in transit, known senders only",
       "size": "s"
     },
     {
       "id": "t3",
-      "gx": 13.5,
-      "gy": 4.15,
+      "gx": 11,
+      "gy": 3.5,
       "text": "Verify every call: zero trust",
       "size": "s"
     },
     {
       "id": "t4",
-      "gx": 2.5,
-      "gy": 9.4,
+      "gx": 2,
+      "gy": 8,
       "text": "SOC 2 and SOX: access reviews, change control, audit trail",
       "size": "s"
     },
     {
       "id": "t5",
-      "gx": 8.0,
-      "gy": 9.4,
+      "gx": 6.5,
+      "gy": 8,
       "text": "GDPR and PDPA: minimise, keep in region, erase on request",
       "size": "s"
     },
     {
       "id": "t6",
-      "gx": 13.5,
-      "gy": 9.4,
+      "gx": 11,
+      "gy": 8,
       "text": "Stateless and autoscaled; 95th percentile under 300 ms (target)",
       "size": "s"
     },
     {
       "id": "t7",
-      "gx": 8,
-      "gy": 10.9,
+      "gx": 6.5,
+      "gy": 9.25,
       "text": "Design targets, not measurements. This shows controls; SOC 2, GDPR, PDPA and SOX compliance also need written policies and independent audits.",
       "size": "s"
     }
@@ -541,53 +541,53 @@
       "label": "Bank side (their network)",
       "gx": 0,
       "gy": 0,
-      "w": 5,
-      "h": 4.75,
+      "w": 4,
+      "h": 4,
       "color": "#8a93a3"
     },
     {
       "id": "z2",
       "label": "Secure link",
-      "gx": 5.5,
+      "gx": 4.5,
       "gy": 0,
-      "w": 5,
-      "h": 4.75,
+      "w": 4,
+      "h": 4,
       "color": "#4f8cff"
     },
     {
       "id": "z3",
       "label": "Our edge (DMZ)",
-      "gx": 11,
+      "gx": 9,
       "gy": 0,
-      "w": 5,
-      "h": 4.75,
+      "w": 4,
+      "h": 4,
       "color": "#e0a526"
     },
     {
       "id": "z4",
       "label": "Trust and compliance plane",
       "gx": 0,
-      "gy": 5.25,
-      "w": 5,
-      "h": 4.75,
+      "gy": 4.5,
+      "w": 4,
+      "h": 4,
       "color": "#2bb5a8"
     },
     {
       "id": "z5",
       "label": "Data: one stack per region",
-      "gx": 5.5,
-      "gy": 5.25,
-      "w": 5,
-      "h": 4.75,
+      "gx": 4.5,
+      "gy": 4.5,
+      "w": 4,
+      "h": 4,
       "color": "#3fb67a"
     },
     {
       "id": "z6",
       "label": "Core services (private network)",
-      "gx": 11,
-      "gy": 5.25,
-      "w": 5,
-      "h": 4.75,
+      "gx": 9,
+      "gy": 4.5,
+      "w": 4,
+      "h": 4,
       "color": "#9b7cf0"
     }
   ],
