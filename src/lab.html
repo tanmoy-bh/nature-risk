@@ -165,6 +165,45 @@ details.more .tablebox{margin-top:10px}
 .pager a:hover{background:var(--soft)}
 .pager a span{font-size:12px;color:var(--muted)} .pager a b{font-size:14px}
 .pager a.next{grid-column:2;text-align:right}
+/* Explain this chart: a sparkle button in the chart's top-right controls, and a reading that opens under the chart. */
+.ctrlend{display:flex;align-items:center;gap:8px;margin-left:auto} .ctrlend .resetbtn{margin-left:0}
+.aibtn{position:relative;flex:none;width:34px;height:34px;border:0;border-radius:10px;cursor:pointer;display:inline-grid;place-items:center;
+  background:var(--fill);box-shadow:inset 0 0 0 1px var(--nat-bg);overflow:visible;transition:background .15s,transform .15s}
+.aibtn:hover{background:var(--nat-bg)} .aibtn:active{transform:scale(.96)}
+.aibtn:focus-visible{outline:2px solid var(--nat);outline-offset:2px}
+.aibtn svg{position:relative;z-index:1}
+.aibtn .sh{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
+.aibtn .sh::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);
+  background-size:260% 100%;background-position:130% 0;animation:aishine 3.4s ease-in-out infinite}
+.aibtn[aria-expanded="true"]{background:var(--nat);box-shadow:none}
+.aibtn[aria-expanded="true"] .spk{fill:#fff}
+.aibtn .tl{position:absolute;bottom:calc(100% + 8px);right:0;z-index:5;white-space:nowrap;font-size:12px;font-weight:600;padding:5px 9px;border-radius:8px;
+  background:var(--ink);color:var(--surface);opacity:0;transform:translateY(3px);transition:opacity .15s,transform .15s;pointer-events:none}
+.aibtn:hover .tl,.aibtn:focus-visible .tl{opacity:1;transform:none}
+@keyframes aishine{0%,55%{background-position:130% 0}100%{background-position:-130% 0}}
+.explain{display:grid;grid-template-rows:0fr;margin-top:0;transition:grid-template-rows .28s ease,margin-top .28s ease}
+.explain.open{grid-template-rows:1fr;margin-top:12px}
+.explain>.in{overflow:hidden;min-height:0}
+.explain .card{border-radius:14px;padding:14px 16px 16px;background:linear-gradient(135deg,var(--nat-bg),rgba(0,0,0,0) 65%),var(--soft);box-shadow:inset 0 0 0 .5px var(--line)}
+.ex-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ex-h b{font-size:14.5px}
+.ex-badge{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--gain-bg);color:var(--gain-ink)}
+.ex-badge[hidden]{display:none}
+.ex-meta{margin-left:auto;font-size:12px;color:var(--muted)}
+.ex-ib{border:0;background:transparent;color:var(--muted);width:28px;height:28px;border-radius:8px;cursor:pointer;display:inline-grid;place-items:center}
+.ex-ib:hover{background:var(--fill);color:var(--ink)} .ex-ib:focus-visible{outline:2px solid var(--nat);outline-offset:1px}
+.ex-b{display:grid;grid-template-columns:minmax(130px,180px) minmax(0,1fr);gap:12px 18px;margin:14px 0 0;animation:exin .3s ease}
+.ex-b dt{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.ex-b dd{margin:0;font-size:15px;line-height:1.55;color:var(--ink)}
+.ex-skel{display:flex;flex-direction:column;gap:11px;margin-top:16px}
+.ex-skel i{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--fill) 25%,var(--nat-bg) 50%,var(--fill) 75%);background-size:300% 100%;animation:exsk 1.3s linear infinite}
+.ex-skel i:nth-child(1){width:92%} .ex-skel i:nth-child(2){width:78%} .ex-skel i:nth-child(3){width:86%} .ex-skel i:nth-child(4){width:60%}
+.ex-err{font-size:14px;color:var(--muted);margin:12px 0 0}
+.ex-err button{font:inherit;font-weight:600;border:0;background:none;color:var(--link);cursor:pointer;padding:0}
+@keyframes exsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes exin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (max-width:520px){ .ex-b{grid-template-columns:minmax(0,1fr);gap:4px} .ex-b dd{margin-bottom:10px} .ex-meta{margin-left:0;width:100%;order:9} .ex-h .ex-refresh{margin-left:auto} }
+@media (prefers-reduced-motion: reduce){ .aibtn .sh::after,.ex-skel i,.ex-b{animation:none} .explain{transition:none} }
 /* Committee note, drafted by a cloud model through the site's own /api/note function (the key stays on the server). */
 .headctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
 .notebtn{font:inherit;font-size:13.5px;font-weight:600;border:0;border-radius:10px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
@@ -288,8 +327,8 @@ code{font-family:var(--mono);font-size:12.5px}
 // ---------------- results: computed offline, cached in IndexedDB per build ----------------
 const RESULTS_URL="lab-results.json", RESULTS_VERSION="/*__RESULTS_VERSION__*/";
 let RES, B, G, SITE;
-function idb(){ return new Promise((ok,no)=>{ try{ const r=indexedDB.open("nature-risk-lab",1);
-  r.onupgradeneeded=()=>r.result.createObjectStore("results"); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); }catch(e){ no(e); } }); }
+function idb(){ return new Promise((ok,no)=>{ try{ const r=indexedDB.open("nature-risk-lab",2);
+  r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains("results")) d.createObjectStore("results"); if(!d.objectStoreNames.contains("explain")) d.createObjectStore("explain"); }; r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); }catch(e){ no(e); } }); }
 async function idbGet(key){ try{ const db=await idb(); return await new Promise(ok=>{ const q=db.transaction("results").objectStore("results").get(key); q.onsuccess=()=>ok(q.result); q.onerror=()=>ok(undefined); }); }catch(e){ return undefined; } }
 async function idbPut(key,val){ try{ const db=await idb(); const tx=db.transaction("results","readwrite"); const os=tx.objectStore("results"); os.clear(); os.put(val,key); }catch(e){} }
 async function loadResults(){
@@ -616,7 +655,7 @@ function expView(k){
     <div class="sec"><h3>Data used</h3>${dataItems(x.data())}${more("all values",x.details())}</div>
     <div class="sec"><h3>How it's calculated</h3><div class="eqs">${x.method().map(e=>eqRow(e)).join("")}</div></div>
     <div class="sec"><h3>Result</h3><p class="result-head" id="${k}-result">${x.result()}</p>
-      <div class="ctrlrow">${x.controls?x.controls():""}${resetBtn(k)}</div>${chartHTML}
+      <div class="ctrlrow">${x.controls?x.controls():""}<span class="ctrlend">${resetBtn(k)}${aiBtn(k)}</span></div>${chartHTML}${explainPanel(k)}
       ${k==="exp-a"?more("the table",`<div class="tablebox wide" id="a-table"></div>`):""}</div>
     <div class="sec"><h3>Weaknesses</h3>${weakList(x.weak)}</div>
   </section>
@@ -791,11 +830,12 @@ function parseHash(){
 }
 function setHash(){ try{ history.replaceState(null,"","#"+st.view+"-"+st.id.toLowerCase()); }catch(e){} }
 function show(view,scroll){
-  if(!ORDER.includes(view)) view="summary"; st.view=view; setHash(); hideTip();
+  if(!ORDER.includes(view)) view="summary"; const keepExplain=exOpen===view; exToken++; exOpen=null; st.view=view; setHash(); hideTip();
   document.querySelectorAll("#rail a").forEach(a=>a.setAttribute("aria-current",String(a.dataset.view===view)));
   const v=document.getElementById("view");
   v.innerHTML=view==="summary"?summaryView():view==="model"?modelView():expView(view);
   drawView();
+  if(keepExplain) openExplain(view);
   if(scroll){ const top=document.querySelector(".shell").getBoundingClientRect().top+scrollY-70; if(scrollY>top) scrollTo({top}); }
   const cur=document.querySelector(`#rail a[data-view="${view}"]`); if(cur&&cur.scrollIntoView&&matchMedia("(max-width:980px)").matches) cur.scrollIntoView({inline:"center",block:"nearest"});
 }
@@ -836,6 +876,48 @@ function initNote(){
   document.addEventListener("keydown",ev=>{ if(ev.key==="Escape") box.hidden=true; });
 }
 
+// ---------------- explain this chart ----------------
+// The page sends the experiment, place and chart settings to /api/explain, which builds the facts from the model
+// results, asks the model, checks every number and falls back to a plain summary. Model answers are kept in
+// IndexedDB for 24 hours; Refresh asks for a fresh one.
+const SPARK='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><defs><linearGradient id="aig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7D7AFF"/><stop offset="1" stop-color="#30B0C7"/></linearGradient></defs><path class="spk" fill="url(#aig)" d="M10 2.5c.5 3.9 2.6 6 6.5 6.5-3.9.5-6 2.6-6.5 6.5-.5-3.9-2.6-6-6.5-6.5 3.9-.5 6-2.6 6.5-6.5Z"/><path class="spk" fill="url(#aig)" d="M18 13.5c.3 2 1.3 3 3.3 3.3-2 .3-3 1.3-3.3 3.3-.3-2-1.3-3-3.3-3.3 2-.3 3-1.3 3.3-3.3Z"/></svg>';
+const SPARK_SM='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="var(--nat)" d="M10 2.5c.5 3.9 2.6 6 6.5 6.5-3.9.5-6 2.6-6.5 6.5-.5-3.9-2.6-6-6.5-6.5 3.9-.5 6-2.6 6.5-6.5Z"/><path fill="var(--nat)" d="M18 13.5c.3 2 1.3 3 3.3 3.3-2 .3-3 1.3-3.3 3.3-.3-2-1.3-3-3.3-3.3 2-.3 3-1.3 3.3-3.3Z"/></svg>';
+const EX_BOOK=new Set(["exp-f","exp-g"]);
+const EX_LABEL=[["look","What you're looking at"],["shows","What it shows here"],["matters","Why it matters to a bank"]];
+let exOpen=null, exToken=0;
+function aiBtn(k){ return `<button class="aibtn" type="button" data-explain="${k}" aria-label="Explain this chart" aria-expanded="false"><span class="sh"></span>${SPARK}<span class="tl" role="tooltip">Explain this</span></button>`; }
+function explainPanel(k){ return `<div class="explain" id="${k}-explain" aria-live="polite" inert><div class="in"><div class="card">
+  <div class="ex-h">${SPARK_SM}<b>Reading this chart</b><span class="ex-badge" hidden>✓ Numbers checked</span><span class="ex-meta"></span>
+  <button class="ex-ib ex-refresh" type="button" aria-label="Write a fresh explanation" title="Refresh"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="ex-ib ex-close" type="button" aria-label="Close" title="Close"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+  <div class="ex-body"></div></div></div></div>`; }
+function explainState(view){ return view==="exp-a"?{am:st.am,a:st.a}:view==="exp-e"?{e:st.e,ev:st.ev}:view==="exp-h"?{hv:st.hv,hs:st.hs}:{}; }
+function exKey(view){ const s=explainState(view); return [RESULTS_VERSION,view,EX_BOOK.has(view)?"book":st.id,...Object.keys(s).sort().map(k=>k+"="+s[k])].join("|"); }
+async function exGet(key){ try{ const db=await idb(); const v=await new Promise(ok=>{ const q=db.transaction("explain").objectStore("explain").get(key); q.onsuccess=()=>ok(q.result); q.onerror=()=>ok(undefined); });
+  return v&&Date.now()-v.at<86400000?v.value:undefined; }catch(e){ return undefined; } }
+async function exPut(key,value){ try{ const db=await idb(); db.transaction("explain","readwrite").objectStore("explain").put({value,at:Date.now()},key); }catch(e){} }
+function ago(iso){ const m=Math.round((Date.now()-new Date(iso).getTime())/60000); return !(m>=1)?"Written just now":m<60?`Written ${m} min ago`:`Written ${Math.round(m/60)} h ago`; }
+function setOpen(view,open){ const box=document.getElementById(view+"-explain"), btn=document.querySelector(`[data-explain="${view}"]`);
+  if(box){ box.classList.toggle("open",open); box.inert=!open; } if(btn) btn.setAttribute("aria-expanded",String(open)); }
+function closeExplain(view){ exToken++; exOpen=null; setOpen(view,false); }
+async function openExplain(view,opts={}){
+  const box=document.getElementById(view+"-explain"); if(!box) return;
+  exOpen=view; const tok=++exToken; setOpen(view,true);
+  const body=box.querySelector(".ex-body"), meta=box.querySelector(".ex-meta"), badge=box.querySelector(".ex-badge"), key=exKey(view);
+  let out=opts.again?undefined:await exGet(key);
+  if(tok!==exToken) return;
+  if(!out){
+    badge.hidden=true; meta.textContent="Reading the chart…"; body.innerHTML='<div class="ex-skel" aria-hidden="true"><i></i><i></i><i></i><i></i></div>';
+    try{ const r=await fetch("api/explain",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({experiment:view,id:st.id,state:explainState(view),again:!!opts.again})});
+      const j=await r.json(); if(!r.ok) throw new Error(j.error||("HTTP "+r.status)); out=j; if(j.source==="model") exPut(key,j);
+    }catch(e){ if(tok!==exToken) return; meta.textContent=""; body.innerHTML='<p class="ex-err">Couldn\'t read this chart just now. <button type="button" class="ex-retry">Try again</button></p>'; return; }
+    if(tok!==exToken) return;
+  }
+  const fromModel=out.source==="model";
+  badge.hidden=!fromModel; meta.textContent=fromModel?ago(out.written):"Summary from the model results";
+  body.innerHTML=`<dl class="ex-b">${EX_LABEL.map(([k,l])=>`<dt>${l}</dt><dd>${esc(out.explain[k])}</dd>`).join("")}</dl>`;
+}
+
 // ---------------- start ----------------
 async function init(){
   const btn=document.getElementById("theme-toggle"), root=document.documentElement;
@@ -852,8 +934,12 @@ async function init(){
   sel.addEventListener("change",()=>{ st.id=sel.value; document.getElementById("note").hidden=true; show(st.view,false); });
   document.getElementById("rail").innerHTML=railHTML();
   document.addEventListener("click",ev=>{
+    const xb=ev.target.closest("[data-explain]"); if(xb){ const v=xb.dataset.explain; if(exOpen===v) closeExplain(v); else openExplain(v); return; }
+    if(ev.target.closest(".ex-close")){ closeExplain(st.view); document.querySelector(`[data-explain="${st.view}"]`)?.focus(); return; }
+    if(ev.target.closest(".ex-refresh")){ openExplain(st.view,{again:true}); return; }
+    if(ev.target.closest(".ex-retry")){ openExplain(st.view); return; }
     const a=ev.target.closest("[data-view]"); if(a){ ev.preventDefault(); show(a.dataset.view,true); return; }
-    const b=ev.target.closest("button[data-key]"); if(b){ st[b.dataset.key]=b.dataset.k; b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); refreshText(); drawView(); return; }
+    const b=ev.target.closest("button[data-key]"); if(b){ st[b.dataset.key]=b.dataset.k; b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); refreshText(); drawView(); if(exOpen===st.view) openExplain(st.view); return; }
     const r=ev.target.closest("[data-reset]"); if(r){ drawView(); r.classList.remove("zoomed"); }
   });
   window.addEventListener("hashchange",()=>{ const h=parseHash(); if(h.id&&h.id!==st.id){ st.id=h.id; sel.value=h.id; } if(h.view&&h.view!==st.view) show(h.view,true); else if(h.id) show(st.view,false); });

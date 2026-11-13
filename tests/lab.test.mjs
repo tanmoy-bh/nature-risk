@@ -24,3 +24,14 @@ test("the lab page has its placeholders and the desk links to it", async () => {
   assert.match(app, /href="lab"/);
   assert.match(app, /lab#\$\{a\.id\.toLowerCase\(\)\}/);
 });
+
+test("every Model lab chart can be explained", async () => {
+  const lab = await read("src/lab.html");
+  assert.match(lab, /aria-label="Explain this chart"/);
+  assert.match(lab, /Explain this</);
+  assert.match(lab, /fetch\("api\/explain"/);
+  assert.match(lab, /Reading this chart/);
+  assert.match(lab, /prefers-reduced-motion/);
+  assert.match(lab, /createObjectStore\("explain"\)/);
+  assert.doesNotMatch(lab, /openrouter/i);
+});
