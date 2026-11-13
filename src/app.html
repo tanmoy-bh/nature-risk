@@ -590,13 +590,13 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <label class="scen"><span class="label">Scenario</span><select class="select scen-select" id="scen-desk"></select></label>
     </div>
     <p class="scen-note" hidden></p>
-    <section class="panel brief" id="brief" aria-live="polite" aria-label="Daily nature debrief"></section>
     <div class="panel stats">
       <div class="stat"><span class="label">Exposure by label<span class="dp sample" title="Sample value, not real data">Sample</span></span><div class="mixbar" id="mixbar" role="img"></div><div class="keys" id="mixkeys"></div></div>
       <div class="stat"><span class="label">Book<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-total"></span><span class="sub" id="s-count"></span></div>
       <div class="stat"><span class="label">In Nature Risk<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-risk"></span><span class="sub" id="s-riskshare"></span></div>
       <div class="stat"><span class="label">Pricing signal<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-bps"></span><span class="sub">bps, exposure-weighted</span></div>
     </div>
+    <section class="panel brief" id="brief" aria-live="polite" aria-label="Daily nature debrief"></section>
     <div class="desk">
       <div class="panel">
         <div class="tablehead">
@@ -1255,7 +1255,7 @@ function briefCard(s){
   </article>`; }
 function briefView(b){
   const ai=b.source==="model", at=new Date(b.generatedAt);
-  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>${ai?`${b.stories.length} stories picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
+  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>${ai?`${b.stories.length} ${b.stories.length===1?"story":"stories"} picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
     <span class="bf-meta">Updated ${at.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}, ${at.toLocaleDateString([],{day:"numeric",month:"short"})}
     <button class="bf-ib" type="button" data-brief="refresh" title="Get fresh news"${Date.now()-Date.parse(b.generatedAt)<REFRESH_GAP?" disabled":""}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh</button></span></div>
   ${b.throttled?`<p class="bf-note">This debrief was refreshed a few minutes ago, so it's still current.</p>`:""}

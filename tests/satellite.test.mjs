@@ -34,8 +34,8 @@ test("the satellite strip shows five years with attribution, below the map", () 
 });
 
 test("the Lender desk has a daily nature debrief kept for 24 hours", () => {
-  const desk = app.indexOf('id="screen-desk"'), brief = app.indexOf('id="brief"'), stats = app.indexOf('class="panel stats"');
-  assert.ok(desk > 0 && brief > desk && brief < stats, "debrief sits above the desk stats");
+  const stats = app.indexOf('class="panel stats"'), brief = app.indexOf('id="brief"'), table = app.indexOf('<div class="desk">');
+  assert.ok(stats > 0 && brief > stats && brief < table, "debrief sits right after the desk numbers");
   assert.match(app, />Load daily debrief</);
   assert.match(app, /fetch\("api\/brief"/);
   assert.match(app, /86400000/);
