@@ -87,3 +87,11 @@ Pushing to `main` runs `.github/workflows/deploy-cloudflare.yml`, which tests, b
 - `NATURE_RISK_PASSPHRASE`, a repository secret you add once
 
 The [projects hub](https://github.com/tanmoy-bh/projects) serves it at `/nature-risk/` by proxying to `https://tanmoybh-nature-risk.pages.dev`.
+
+## Committee note (cloud model)
+
+The Model lab's **Draft committee note** button calls the site's own `/api/note` function (`functions/api/note.js`). The browser sends only a loan id and scenario; the function builds the prompt from `lab-results.json`, calls a model through OpenRouter, rejects any draft containing a number the credit model didn't produce, and falls back to a fixed template after two rejected drafts. Notes are cached per loan, scenario and results version.
+
+- The key lives only in the GitHub secret `OPENROUTER_API_KEY`, which the deploy workflow copies into the Pages secret of the same name. Without it, the note uses the template.
+- The model defaults to `google/gemini-3.8-flash`; set the Pages variable `OPENROUTER_MODEL` to change it.
+- Set a spending limit on the OpenRouter key itself.

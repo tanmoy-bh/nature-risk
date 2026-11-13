@@ -160,10 +160,31 @@ details.more .tablebox{margin-top:10px}
 .weak li::before{content:"!";width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--warn);color:var(--surface);font-size:11px;font-weight:800;margin-top:1px}
 .weak li b{font-weight:600}
 
-.pager{display:flex;justify-content:space-between;gap:12px}
-.pager a{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:12px;background:var(--surface);text-decoration:none;color:var(--ink);min-width:0;max-width:48%}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pager a{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:12px 16px;border-radius:12px;background:var(--surface);text-decoration:none;color:var(--ink);min-width:0}
+.pager a:hover{background:var(--soft)}
 .pager a span{font-size:12px;color:var(--muted)} .pager a b{font-size:14px}
-.pager a.next{margin-left:auto;text-align:right}
+.pager a.next{grid-column:2;text-align:right}
+/* Committee note, drafted by a cloud model through the site's own /api/note function (the key stays on the server). */
+.headctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.notebtn{font:inherit;font-size:13.5px;font-weight:600;border:0;border-radius:10px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.notebtn:disabled{opacity:.6;cursor:progress}
+.note{position:fixed;right:16px;bottom:16px;z-index:40;width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 96px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:16px;
+  box-shadow:0 18px 48px rgba(0,0,0,.22),0 0 0 .5px var(--line);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.note[hidden]{display:none}
+.note .nh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.note .nh b{font-size:16px}
+.note .x{font:inherit;font-size:18px;line-height:1;border:0;background:var(--fill);color:var(--ink);border-radius:999px;width:28px;height:28px;cursor:pointer}
+.note .nsub{font-size:12.5px;color:var(--muted);margin:0}
+.note .nbody{display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.5}
+.note .nbody p{margin:0} .note .nbody .k{display:block;font-size:11.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+.note .nbody .wait{color:var(--muted)}
+.note .nfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:.5px solid var(--line);padding-top:10px}
+.note .badge{font-size:12px;border-radius:999px;padding:3px 9px;background:var(--gain-bg);color:var(--gain-ink);font-weight:500}
+.note .badge.tpl{background:var(--stable-bg);color:var(--stable-ink)}
+.note .badge:empty{display:none}
+.note .nfoot button{font:inherit;font-size:13px;font-weight:500;border:0;border-radius:9px;padding:6px 12px;background:var(--fill);color:var(--ink);cursor:pointer}
+.note .nfoot .sp{margin-left:auto}
 
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .tile{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -214,7 +235,7 @@ code{font-family:var(--mono);font-size:12.5px}
   .tiles{grid-template-columns:minmax(0,1fr)} .plot.tall{min-height:760px}
   .place{width:100%} .place .select{flex:1}
   .eqrow .math .k{font-size:14.5px}
-  .pager a{max-width:100%}
+  .pager{grid-template-columns:1fr} .pager a.next{grid-column:auto}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -240,13 +261,22 @@ code{font-family:var(--mono);font-size:12.5px}
       <h1>Model lab</h1>
       <p class="muted">How nature data changes a bank's view of a loan, tested seven ways. Pick an experiment on the left; each one shows its goal, the data it uses, how it's calculated, the result and its weaknesses.</p>
     </div>
-    <label class="place"><span class="lab">Place</span><select class="select" id="place" aria-label="Place"></select></label>
+    <div class="headctl">
+      <label class="place"><span class="lab">Place</span><select class="select" id="place" aria-label="Place"></select></label>
+      <button class="notebtn" id="note-btn" type="button" title="Drafted by an AI model from this loan's model results"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z M9.5 1.5V5H13 M6 8h5M6 10.5h5M6 13h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Draft committee note</button>
+    </div>
   </header>
 
   <div class="shell">
     <nav class="rail" id="rail" aria-label="Experiments"></nav>
     <main class="view" id="view"><p class="loading">Loading the model results…</p></main>
   </div>
+  <aside class="note" id="note" hidden aria-live="polite" aria-label="Committee note">
+    <div class="nh"><b>Committee note</b><button class="x" type="button" id="note-x" aria-label="Close">×</button></div>
+    <p class="nsub" id="note-sub"></p>
+    <div class="nbody" id="note-body"></div>
+    <div class="nfoot"><span class="badge" id="note-badge"></span><span class="sp"></span><button type="button" id="note-again">Write again</button><button type="button" id="note-copy">Copy</button></div>
+  </aside>
 
   <footer>
     <p><span class="dp real">Real</span> forest loss (Hansen/UMD v1.12), rainfall deficit (ERA5), vegetation change (Sentinel-2 NDVI), water stress (WRI Aqueduct) and distance to protected areas (WDPA), pulled from open data on 28 Oct 2026. <span class="dp sample">Sample</span> loan sizes, borrower financials, crop sensitivities and bank pricing inputs.</p>
@@ -773,6 +803,39 @@ function refreshText(){ // after a control change: update the result line withou
   const x=EXP[st.view]; if(x){ const r=document.getElementById(st.view+"-result"); if(r) r.innerHTML=x.result(); }
 }
 
+// ---------------- committee note, drafted by a cloud model ----------------
+// The page sends only the loan id and scenario to the site's own /api/note function. That function builds the
+// prompt from the model results, calls the model with a key held on the server, and checks every number.
+const NOTE_KEYS=[["headline","Headline"],["driver","Why"],["action","What to do"],["caveat","Caveat"]];
+let noteLast=null;
+async function writeNote(again){
+  const box=document.getElementById("note"), body=document.getElementById("note-body"), badge=document.getElementById("note-badge"), btn=document.getElementById("note-btn");
+  const sc=st.view==="exp-a"?st.a:"base", s=site();
+  box.hidden=false; btn.disabled=true; badge.textContent=""; badge.className="badge";
+  document.getElementById("note-sub").textContent=`${s.name} · ${SC[sc]}`;
+  body.innerHTML='<p class="wait">Drafting…</p>';
+  try{
+    const r=await fetch("api/note",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:s.id,scenario:sc,again:!!again})});
+    const out=await r.json(); if(!r.ok) throw new Error(out.error||("HTTP "+r.status));
+    noteLast=out;
+    body.innerHTML=NOTE_KEYS.map(([k,l])=>`<p><span class="k">${l}</span>${esc(out.note[k])}</p>`).join("");
+    const fromModel=out.source==="model";
+    badge.textContent=fromModel?"✓ Every number matches the model":"Template: the AI draft was not usable";
+    badge.className="badge"+(fromModel?"":" tpl"); badge.title=fromModel?`Drafted by ${out.model}${out.cached?" (saved copy)":""}`:(out.reason||"");
+  }catch(e){ noteLast=null; body.innerHTML=`<p class="wait">The note could not be drafted (${esc(e.message)}). Try again in a moment.</p>`; }
+  btn.disabled=false;
+}
+function initNote(){
+  const box=document.getElementById("note");
+  document.getElementById("note-btn").addEventListener("click",()=>writeNote(false));
+  document.getElementById("note-again").addEventListener("click",()=>writeNote(true));
+  document.getElementById("note-x").addEventListener("click",()=>{ box.hidden=true; });
+  document.getElementById("note-copy").addEventListener("click",async ev=>{ if(!noteLast) return;
+    const txt=`${noteLast.loan} · ${noteLast.scenario}\n`+NOTE_KEYS.map(([k,l])=>`${l}: ${noteLast.note[k]}`).join("\n");
+    try{ await navigator.clipboard.writeText(txt); ev.target.textContent="Copied"; setTimeout(()=>ev.target.textContent="Copy",1500); }catch(e){} });
+  document.addEventListener("keydown",ev=>{ if(ev.key==="Escape") box.hidden=true; });
+}
+
 // ---------------- start ----------------
 async function init(){
   const btn=document.getElementById("theme-toggle"), root=document.documentElement;
@@ -786,7 +849,7 @@ async function init(){
   RES.sites.forEach(s=>(by[s.cc]=by[s.cc]||[]).push(s));
   sel.innerHTML=["MY","SG","ID","VN","TH","PH","LK","AU"].filter(c=>by[c]).map(c=>`<optgroup label="${CN[c]}">${by[c].map(s=>`<option value="${s.id}">${esc(s.name)}: ${esc(s.what)}</option>`).join("")}</optgroup>`).join("");
   sel.value=st.id;
-  sel.addEventListener("change",()=>{ st.id=sel.value; show(st.view,false); });
+  sel.addEventListener("change",()=>{ st.id=sel.value; document.getElementById("note").hidden=true; show(st.view,false); });
   document.getElementById("rail").innerHTML=railHTML();
   document.addEventListener("click",ev=>{
     const a=ev.target.closest("[data-view]"); if(a){ ev.preventDefault(); show(a.dataset.view,true); return; }
@@ -797,6 +860,7 @@ async function init(){
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ sync(); drawView(); });
   new MutationObserver(()=>{ sync(); drawView(); }).observe(root,{attributes:true,attributeFilter:["data-theme"]});
   show(st.view,false);
+  initNote();
 }
 init();
 </script>
