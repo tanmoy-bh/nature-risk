@@ -1,0 +1,603 @@
+{
+  "version": 1,
+  "title": "Bank integration: secure, scalable, compliant",
+  "nodes": [
+    {
+      "id": "los",
+      "gx": 2.5,
+      "gy": 1.25,
+      "icon": "svc",
+      "label": "Loan origination system"
+    },
+    {
+      "id": "analyst",
+      "gx": 0.9,
+      "gy": 1.25,
+      "icon": "person",
+      "label": "Credit analyst"
+    },
+    {
+      "id": "bgw",
+      "gx": 4.1,
+      "gy": 1.25,
+      "icon": "gateway",
+      "label": "Bank API gateway"
+    },
+    {
+      "id": "idp",
+      "gx": 0.9,
+      "gy": 3.0,
+      "icon": "identity",
+      "label": "Bank identity provider"
+    },
+    {
+      "id": "dwh",
+      "gx": 2.5,
+      "gy": 3.0,
+      "icon": "warehouse",
+      "label": "Bank risk data warehouse"
+    },
+    {
+      "id": "bsftp",
+      "gx": 4.1,
+      "gy": 3.0,
+      "icon": "files",
+      "label": "Batch file drop"
+    },
+    {
+      "id": "plink",
+      "gx": 6.4,
+      "gy": 1.25,
+      "icon": "network",
+      "label": "Private link or VPN"
+    },
+    {
+      "id": "allow",
+      "gx": 8.0,
+      "gy": 1.25,
+      "icon": "filter",
+      "label": "IP allow-list"
+    },
+    {
+      "id": "mtls",
+      "gx": 8.0,
+      "gy": 3.0,
+      "icon": "lock",
+      "label": "Mutual TLS"
+    },
+    {
+      "id": "sign",
+      "gx": 9.6,
+      "gy": 1.25,
+      "icon": "key",
+      "label": "Request signing"
+    },
+    {
+      "id": "sftpgw",
+      "gx": 6.4,
+      "gy": 3.0,
+      "icon": "files",
+      "label": "Encrypted file transfer"
+    },
+    {
+      "id": "waf",
+      "gx": 11.9,
+      "gy": 1.25,
+      "icon": "firewall",
+      "label": "WAF and DDoS shield"
+    },
+    {
+      "id": "apigw",
+      "gx": 13.5,
+      "gy": 1.25,
+      "icon": "gateway",
+      "label": "API gateway: OAuth 2.0, quotas"
+    },
+    {
+      "id": "adapt",
+      "gx": 15.1,
+      "gy": 1.25,
+      "icon": "etl",
+      "label": "Integration adapters"
+    },
+    {
+      "id": "hooks",
+      "gx": 15.1,
+      "gy": 3.0,
+      "icon": "webhook",
+      "label": "Signed webhook sender"
+    },
+    {
+      "id": "dlq",
+      "gx": 11.9,
+      "gy": 3.0,
+      "icon": "queue",
+      "label": "Retry and dead-letter queue"
+    },
+    {
+      "id": "idem",
+      "gx": 13.5,
+      "gy": 3.0,
+      "icon": "redis",
+      "label": "Idempotency and replay store"
+    },
+    {
+      "id": "score",
+      "gx": 15.1,
+      "gy": 6.5,
+      "icon": "rest",
+      "label": "Scoring API"
+    },
+    {
+      "id": "signal",
+      "gx": 13.5,
+      "gy": 6.5,
+      "icon": "svc",
+      "label": "Signal engine"
+    },
+    {
+      "id": "cache",
+      "gx": 15.1,
+      "gy": 8.25,
+      "icon": "redis",
+      "label": "Score cache"
+    },
+    {
+      "id": "bus",
+      "gx": 13.5,
+      "gy": 8.25,
+      "icon": "queue",
+      "label": "Event bus"
+    },
+    {
+      "id": "workers",
+      "gx": 11.9,
+      "gy": 8.25,
+      "icon": "cluster",
+      "label": "Job workers, autoscaled"
+    },
+    {
+      "id": "notes",
+      "gx": 11.9,
+      "gy": 6.5,
+      "icon": "prompt",
+      "label": "Notes service"
+    },
+    {
+      "id": "pg",
+      "gx": 9.6,
+      "gy": 6.5,
+      "icon": "db",
+      "label": "PostgreSQL with row-level security"
+    },
+    {
+      "id": "vault",
+      "gx": 8.0,
+      "gy": 6.5,
+      "icon": "lock",
+      "label": "Token vault"
+    },
+    {
+      "id": "obj",
+      "gx": 9.6,
+      "gy": 8.25,
+      "icon": "blob",
+      "label": "Write-once object storage"
+    },
+    {
+      "id": "kms",
+      "gx": 8.0,
+      "gy": 8.25,
+      "icon": "key",
+      "label": "Key service: one key per bank"
+    },
+    {
+      "id": "bkp",
+      "gx": 6.4,
+      "gy": 6.5,
+      "icon": "archive",
+      "label": "Backups and recovery region"
+    },
+    {
+      "id": "replica",
+      "gx": 6.4,
+      "gy": 8.25,
+      "icon": "db",
+      "label": "Standby replica"
+    },
+    {
+      "id": "iam",
+      "gx": 2.5,
+      "gy": 6.5,
+      "icon": "identity",
+      "label": "Access control: SSO, MFA, just in time"
+    },
+    {
+      "id": "audit",
+      "gx": 4.1,
+      "gy": 6.5,
+      "icon": "doc",
+      "label": "Immutable audit log"
+    },
+    {
+      "id": "siem",
+      "gx": 4.1,
+      "gy": 8.25,
+      "icon": "alarm",
+      "label": "Monitoring and SIEM"
+    },
+    {
+      "id": "secrets",
+      "gx": 2.5,
+      "gy": 8.25,
+      "icon": "key",
+      "label": "Secrets manager"
+    },
+    {
+      "id": "cicd",
+      "gx": 0.9,
+      "gy": 6.5,
+      "icon": "loop",
+      "label": "CI/CD with change approvals"
+    },
+    {
+      "id": "priv",
+      "gx": 0.9,
+      "gy": 8.25,
+      "icon": "guard",
+      "label": "Privacy operations"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "los",
+      "to": "bgw",
+      "label": "score request",
+      "step": 1
+    },
+    {
+      "id": "e2",
+      "from": "idp",
+      "to": "bgw",
+      "label": "bank user identity",
+      "dash": true
+    },
+    {
+      "id": "e3",
+      "from": "dwh",
+      "to": "bsftp",
+      "label": "bulk export",
+      "dash": true
+    },
+    {
+      "id": "e4",
+      "from": "bsftp",
+      "to": "sftpgw",
+      "label": "encrypted files",
+      "dash": true
+    },
+    {
+      "id": "e5",
+      "from": "bgw",
+      "to": "plink",
+      "label": "private route",
+      "step": 1
+    },
+    {
+      "id": "e6",
+      "from": "plink",
+      "to": "allow",
+      "label": "known addresses"
+    },
+    {
+      "id": "e7",
+      "from": "bgw",
+      "to": "mtls",
+      "label": "client certificate",
+      "step": 2
+    },
+    {
+      "id": "e8",
+      "from": "bgw",
+      "to": "sign",
+      "label": "sign the request",
+      "step": 2
+    },
+    {
+      "id": "e9",
+      "from": "mtls",
+      "to": "waf",
+      "label": "encrypted",
+      "step": 2
+    },
+    {
+      "id": "e10",
+      "from": "sign",
+      "to": "apigw",
+      "label": "signed body",
+      "step": 2
+    },
+    {
+      "id": "e11",
+      "from": "waf",
+      "to": "apigw",
+      "label": "clean traffic",
+      "step": 3
+    },
+    {
+      "id": "e12",
+      "from": "apigw",
+      "to": "idem",
+      "label": "replay check"
+    },
+    {
+      "id": "e13",
+      "from": "apigw",
+      "to": "adapt",
+      "label": "validated request",
+      "step": 3
+    },
+    {
+      "id": "e14",
+      "from": "sftpgw",
+      "to": "adapt",
+      "label": "files in",
+      "dash": true
+    },
+    {
+      "id": "e15",
+      "from": "adapt",
+      "to": "score",
+      "label": "canonical request",
+      "step": 3,
+      "hot": true
+    },
+    {
+      "id": "e16",
+      "from": "score",
+      "to": "cache",
+      "label": "cached score",
+      "step": 4
+    },
+    {
+      "id": "e17",
+      "from": "score",
+      "to": "signal",
+      "label": "score",
+      "step": 4
+    },
+    {
+      "id": "e18",
+      "from": "signal",
+      "to": "pg",
+      "label": "read observations",
+      "step": 4,
+      "hot": true
+    },
+    {
+      "id": "e19",
+      "from": "score",
+      "to": "bus",
+      "label": "new site",
+      "step": 5,
+      "dash": true
+    },
+    {
+      "id": "e20",
+      "from": "bus",
+      "to": "workers",
+      "label": "jobs",
+      "step": 5,
+      "dash": true
+    },
+    {
+      "id": "e21",
+      "from": "workers",
+      "to": "pg",
+      "label": "write observations",
+      "step": 5
+    },
+    {
+      "id": "e22",
+      "from": "workers",
+      "to": "obj",
+      "label": "rasters"
+    },
+    {
+      "id": "e23",
+      "from": "bus",
+      "to": "hooks",
+      "label": "label changed",
+      "step": 6,
+      "dash": true
+    },
+    {
+      "id": "e24",
+      "from": "hooks",
+      "to": "bgw",
+      "label": "signed callback",
+      "step": 6,
+      "dash": true
+    },
+    {
+      "id": "e25",
+      "from": "hooks",
+      "to": "dlq",
+      "label": "failed deliveries"
+    },
+    {
+      "id": "e26",
+      "from": "pg",
+      "to": "vault",
+      "label": "pseudonyms"
+    },
+    {
+      "id": "e27",
+      "from": "pg",
+      "to": "kms",
+      "label": "data keys"
+    },
+    {
+      "id": "e28",
+      "from": "pg",
+      "to": "bkp",
+      "label": "continuous backup"
+    },
+    {
+      "id": "e29",
+      "from": "pg",
+      "to": "replica",
+      "label": "replication",
+      "dash": true
+    },
+    {
+      "id": "e30",
+      "from": "pg",
+      "to": "audit",
+      "label": "every access",
+      "step": 7,
+      "hot": true
+    },
+    {
+      "id": "e31",
+      "from": "audit",
+      "to": "siem",
+      "label": "stream"
+    },
+    {
+      "id": "e32",
+      "from": "secrets",
+      "to": "kms",
+      "label": "root keys"
+    },
+    {
+      "id": "e33",
+      "from": "iam",
+      "to": "pg",
+      "label": "who may read"
+    },
+    {
+      "id": "e34",
+      "from": "priv",
+      "to": "pg",
+      "label": "retention and erasure"
+    }
+  ],
+  "texts": [
+    {
+      "id": "t1",
+      "gx": 2.5,
+      "gy": 4.15,
+      "text": "Their network, their controls",
+      "size": "s"
+    },
+    {
+      "id": "t2",
+      "gx": 8.0,
+      "gy": 4.15,
+      "text": "Encrypted in transit, known senders only",
+      "size": "s"
+    },
+    {
+      "id": "t3",
+      "gx": 13.5,
+      "gy": 4.15,
+      "text": "Verify every call: zero trust",
+      "size": "s"
+    },
+    {
+      "id": "t4",
+      "gx": 2.5,
+      "gy": 9.4,
+      "text": "SOC 2 and SOX: access reviews, change control, audit trail",
+      "size": "s"
+    },
+    {
+      "id": "t5",
+      "gx": 8.0,
+      "gy": 9.4,
+      "text": "GDPR and PDPA: minimise, keep in region, erase on request",
+      "size": "s"
+    },
+    {
+      "id": "t6",
+      "gx": 13.5,
+      "gy": 9.4,
+      "text": "Stateless and autoscaled; 95th percentile under 300 ms (target)",
+      "size": "s"
+    },
+    {
+      "id": "t7",
+      "gx": 8,
+      "gy": 10.9,
+      "text": "Design targets, not measurements. This shows controls; SOC 2, GDPR, PDPA and SOX compliance also need written policies and independent audits.",
+      "size": "s"
+    }
+  ],
+  "zones": [
+    {
+      "id": "z1",
+      "label": "Bank side (their network)",
+      "gx": 0,
+      "gy": 0,
+      "w": 5,
+      "h": 4.75,
+      "color": "#8a93a3"
+    },
+    {
+      "id": "z2",
+      "label": "Secure link",
+      "gx": 5.5,
+      "gy": 0,
+      "w": 5,
+      "h": 4.75,
+      "color": "#4f8cff"
+    },
+    {
+      "id": "z3",
+      "label": "Our edge (DMZ)",
+      "gx": 11,
+      "gy": 0,
+      "w": 5,
+      "h": 4.75,
+      "color": "#e0a526"
+    },
+    {
+      "id": "z4",
+      "label": "Trust and compliance plane",
+      "gx": 0,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.75,
+      "color": "#2bb5a8"
+    },
+    {
+      "id": "z5",
+      "label": "Data: one stack per region",
+      "gx": 5.5,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.75,
+      "color": "#3fb67a"
+    },
+    {
+      "id": "z6",
+      "label": "Core services (private network)",
+      "gx": 11,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.75,
+      "color": "#9b7cf0"
+    }
+  ],
+  "steps": [
+    "The bank's loan system asks for a score through the bank's own API gateway.",
+    "The request leaves over a private, encrypted link (mutual TLS) from known addresses, and is signed.",
+    "The edge blocks bad traffic, checks identity, quotas, schema and replays, and turns the bank's format into ours.",
+    "A known site is answered from cache or stored observations within the target time.",
+    "A new site becomes a queued job; autoscaled workers write the observations.",
+    "When a label changes, a signed webhook goes back over the secure link, with retries and a dead-letter queue.",
+    "Every access is written to an immutable audit log and watched, while keys, retention and erasure are handled in the data and trust zones."
+  ]
+}

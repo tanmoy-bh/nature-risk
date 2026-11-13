@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "title": "Nature Risk Desk: what runs where",
+  "nodes": [
+    {
+      "id": "sat",
+      "gx": 2.5,
+      "gy": 1.25,
+      "icon": "globe",
+      "label": "Satellite catalogues"
+    },
+    {
+      "id": "open",
+      "gx": 4.1,
+      "gy": 1.25,
+      "icon": "doc",
+      "label": "Thematic open data"
+    },
+    {
+      "id": "partner",
+      "gx": 4.1,
+      "gy": 3.0,
+      "icon": "apps",
+      "label": "Partner data"
+    },
+    {
+      "id": "orch",
+      "gx": 6.4,
+      "gy": 1.25,
+      "icon": "etl",
+      "label": "Orchestrator (Dagster)"
+    },
+    {
+      "id": "val",
+      "gx": 6.4,
+      "gy": 3.0,
+      "icon": "filter",
+      "label": "Partner data validator"
+    },
+    {
+      "id": "workers",
+      "gx": 8.0,
+      "gy": 1.25,
+      "icon": "cluster",
+      "label": "Raster workers"
+    },
+    {
+      "id": "zonal",
+      "gx": 9.6,
+      "gy": 1.25,
+      "icon": "process",
+      "label": "Zonal statistics job *"
+    },
+    {
+      "id": "obj",
+      "gx": 11.9,
+      "gy": 3.0,
+      "icon": "blob",
+      "label": "Object storage"
+    },
+    {
+      "id": "pg",
+      "gx": 11.9,
+      "gy": 1.25,
+      "icon": "db",
+      "label": "PostgreSQL + PostGIS *"
+    },
+    {
+      "id": "vec",
+      "gx": 13.5,
+      "gy": 3.0,
+      "icon": "vector",
+      "label": "pgvector"
+    },
+    {
+      "id": "redis",
+      "gx": 13.5,
+      "gy": 1.25,
+      "icon": "redis",
+      "label": "Redis cache"
+    },
+    {
+      "id": "jev",
+      "gx": 4.1,
+      "gy": 6.5,
+      "icon": "agent",
+      "label": "Jev router"
+    },
+    {
+      "id": "guard",
+      "gx": 4.1,
+      "gy": 8.25,
+      "icon": "guard",
+      "label": "Evals and guardrails"
+    },
+    {
+      "id": "s1",
+      "gx": 2.5,
+      "gy": 6.5,
+      "icon": "embed",
+      "label": "System 1: fast, small models"
+    },
+    {
+      "id": "s2",
+      "gx": 2.5,
+      "gy": 8.25,
+      "icon": "llm",
+      "label": "System 2: LLMs"
+    },
+    {
+      "id": "signal",
+      "gx": 8.0,
+      "gy": 6.5,
+      "icon": "svc",
+      "label": "Signal engine *"
+    },
+    {
+      "id": "scen",
+      "gx": 6.4,
+      "gy": 6.5,
+      "icon": "fork",
+      "label": "Scenario engine *"
+    },
+    {
+      "id": "api",
+      "gx": 9.6,
+      "gy": 6.5,
+      "icon": "rest",
+      "label": "Scoring API (FastAPI)"
+    },
+    {
+      "id": "notes",
+      "gx": 6.4,
+      "gy": 8.25,
+      "icon": "prompt",
+      "label": "Notes service"
+    },
+    {
+      "id": "bus",
+      "gx": 9.6,
+      "gy": 8.25,
+      "icon": "queue",
+      "label": "Event bus"
+    },
+    {
+      "id": "gw",
+      "gx": 11.9,
+      "gy": 6.5,
+      "icon": "gateway",
+      "label": "API gateway"
+    },
+    {
+      "id": "web",
+      "gx": 15.1,
+      "gy": 6.5,
+      "icon": "laptop",
+      "label": "Web app *"
+    },
+    {
+      "id": "mcp",
+      "gx": 15.1,
+      "gy": 8.25,
+      "icon": "mcp",
+      "label": "MCP server"
+    },
+    {
+      "id": "hooks",
+      "gx": 11.9,
+      "gy": 8.25,
+      "icon": "webhook",
+      "label": "Webhooks and exports"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "sat",
+      "to": "workers",
+      "label": "scenes",
+      "step": 1
+    },
+    {
+      "id": "e2",
+      "from": "open",
+      "to": "workers",
+      "label": "layers",
+      "step": 1
+    },
+    {
+      "id": "e3",
+      "from": "partner",
+      "to": "val",
+      "label": "plots and loan books",
+      "step": 1
+    },
+    {
+      "id": "e4",
+      "from": "orch",
+      "to": "workers",
+      "label": "schedules",
+      "dash": true
+    },
+    {
+      "id": "e5",
+      "from": "workers",
+      "to": "zonal",
+      "label": "clips to sites",
+      "step": 2
+    },
+    {
+      "id": "e6",
+      "from": "workers",
+      "to": "obj",
+      "label": "rasters"
+    },
+    {
+      "id": "e7",
+      "from": "val",
+      "to": "pg",
+      "label": "checked data"
+    },
+    {
+      "id": "e8",
+      "from": "zonal",
+      "to": "pg",
+      "label": "observations",
+      "step": 2,
+      "hot": true
+    },
+    {
+      "id": "e9",
+      "from": "pg",
+      "to": "signal",
+      "label": "observations",
+      "step": 3,
+      "hot": true
+    },
+    {
+      "id": "e10",
+      "from": "api",
+      "to": "signal",
+      "label": "score",
+      "step": 3
+    },
+    {
+      "id": "e11",
+      "from": "api",
+      "to": "redis",
+      "label": "cache"
+    },
+    {
+      "id": "e12",
+      "from": "signal",
+      "to": "scen",
+      "label": "shocked inputs",
+      "dash": true
+    },
+    {
+      "id": "e13",
+      "from": "api",
+      "to": "bus",
+      "label": "events"
+    },
+    {
+      "id": "e14",
+      "from": "vec",
+      "to": "notes",
+      "label": "evidence search"
+    },
+    {
+      "id": "e15",
+      "from": "notes",
+      "to": "jev",
+      "label": "model calls",
+      "step": 4
+    },
+    {
+      "id": "e16",
+      "from": "jev",
+      "to": "s1",
+      "label": "fast tasks"
+    },
+    {
+      "id": "e17",
+      "from": "jev",
+      "to": "s2",
+      "label": "reasoning"
+    },
+    {
+      "id": "e18",
+      "from": "jev",
+      "to": "guard",
+      "label": "check answers"
+    },
+    {
+      "id": "e19",
+      "from": "web",
+      "to": "gw",
+      "label": "requests",
+      "step": 5
+    },
+    {
+      "id": "e20",
+      "from": "mcp",
+      "to": "gw",
+      "label": "read-only tools"
+    },
+    {
+      "id": "e21",
+      "from": "gw",
+      "to": "api",
+      "label": "scoring",
+      "step": 5
+    },
+    {
+      "id": "e22",
+      "from": "bus",
+      "to": "hooks",
+      "label": "label changed",
+      "dash": true
+    }
+  ],
+  "texts": [
+    {
+      "id": "t1",
+      "gx": 8,
+      "gy": 9.9,
+      "text": "* built in the proof of concept; everything else is the production plan",
+      "size": "s"
+    }
+  ],
+  "zones": [
+    {
+      "id": "z1",
+      "label": "Sources",
+      "gx": 0,
+      "gy": 0,
+      "w": 5,
+      "h": 4.2,
+      "color": "#8a93a3"
+    },
+    {
+      "id": "z2",
+      "label": "Ingest and process (batch)",
+      "gx": 5.5,
+      "gy": 0,
+      "w": 5,
+      "h": 4.2,
+      "color": "#4f8cff"
+    },
+    {
+      "id": "z3",
+      "label": "Store",
+      "gx": 11,
+      "gy": 0,
+      "w": 5,
+      "h": 4.2,
+      "color": "#3fb67a"
+    },
+    {
+      "id": "z4",
+      "label": "AI: every model call goes through Jev",
+      "gx": 0,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.2,
+      "color": "#9b7cf0"
+    },
+    {
+      "id": "z5",
+      "label": "Serve (stateless services)",
+      "gx": 5.5,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.2,
+      "color": "#e0a526"
+    },
+    {
+      "id": "z6",
+      "label": "Deliver",
+      "gx": 11,
+      "gy": 5.25,
+      "w": 5,
+      "h": 4.2,
+      "color": "#2bb5a8"
+    }
+  ],
+  "steps": [
+    "Sources are pulled (satellite scenes, open data) or received (partner plots and loan books, checked first).",
+    "Batch jobs clip every source to each site and save one observation per indicator and period.",
+    "A score request is served from the stored observations by the signal engine, behind a cache.",
+    "Notes and explanations call models only through Jev, which routes, checks and logs every call.",
+    "Clients reach everything through the API gateway: web app, MCP server, webhooks and exports."
+  ]
+}

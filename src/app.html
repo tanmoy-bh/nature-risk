@@ -294,6 +294,9 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
 /* architecture views *//* architecture views */
 .archtabs{align-self:flex-start}
 .archview{overflow:hidden}
+.frame3d{padding:12px 16px 4px}
+.frame3d iframe{display:block;width:100%;height:min(720px,82vh);min-height:440px;border:0;border-radius:12px;background:var(--soft)}
+.archfoot a{color:var(--link)}
 .viewhead{padding:18px 20px 4px;display:flex;flex-direction:column;gap:4px}
 .viewhead p{font-size:14px}
 .ah{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
@@ -593,6 +596,8 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <button class="chip" type="button" role="tab" aria-pressed="false" data-view="refresh">Refresh and alerts</button>
       <button class="chip" type="button" role="tab" aria-pressed="false" data-view="ai">AI routing</button>
       <button class="chip" type="button" role="tab" aria-pressed="false" data-view="layers">Data layers</button>
+      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="3d">3D view</button>
+      <button class="chip" type="button" role="tab" aria-pressed="false" data-view="bank">Bank integration</button>
     </div>
     <div class="panel archview" data-view="system">
       <div class="viewhead"><h2>What runs where</h2><p class="muted">Every deployable piece, its technology and its trust zone: clients, the edge, the platform's online and batch halves, the data stores and external sources.</p></div>
@@ -622,6 +627,16 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <div class="archwrap only-wide">/*__ARCH__*/</div>
       <div class="lanes only-narrow" style="--n:4"><div class="lane"><div class="lanehead"><span class="ah">SOURCES</span><span class="anum">Open data and partner data</span></div><div class="node"><b>Satellite imagery</b><span>Sentinel-2, Landsat via Earth Engine or Planetary Computer</span></div><div class="node"><b>Forest</b><span>GFW: Hansen loss, alerts, palm mill locations</span></div><div class="node"><b>Water</b><span>WRI Aqueduct 4.0</span></div><div class="node"><b>Biodiversity</b><span>WDPA, GBIF, IUCN Red List</span></div><div class="node"><b>Climate</b><span>NASA POWER, Open-Meteo</span></div><div class="node"><b>Partner data</b><span>Farm plots, supply chains, loan books (secure upload or API)</span></div></div><div class="lane"><div class="lanehead"><span class="ah">DATA LAYER</span><span class="anum">Ingest, store, prove</span></div><div class="node"><b>Ingestion jobs</b><span>Scheduled pulls per source, retries, versioned snapshots</span></div><div class="node"><b>Geospatial store</b><span>Cloud-optimised rasters and GeoParquet on object storage</span></div><div class="node poc"><b>Site evidence store</b><span>One row per site, indicator and date: value, source, licence, resolution, Real or Sample</span></div><div class="node"><b>Data quality and lineage</b><span>Coverage, cloud and freshness checks; every value traced to its source</span></div></div><div class="lane"><div class="lanehead"><span class="ah">INTELLIGENCE LAYER</span><span class="anum">Score, stress, explain</span></div><div class="node poc"><b>Signal engine</b><span>Sub-scores to Risk, Stable or Gain; versioned methodology (rules now, ML once labels exist)</span></div><div class="node poc"><b>Scenario engine</b><span>Drought, regulation and climate paths</span></div><div class="node poc"><b>Portfolio aggregation</b><span>Mix, concentration, migration</span></div><div class="node"><b>AI layer (Jev)</b><span>Jev routes System 1 and System 2: small models read inputs, LLMs explain and draft notes, eval gate before release</span></div></div><div class="lane"><div class="lanehead"><span class="ah">FINANCIAL LAYER</span><span class="anum">Inside the client's workflow</span></div><div class="node"><b>REST API</b><span>Scores, evidence, scenarios</span></div><div class="node"><b>MCP server</b><span>Query from their own AI tools</span></div><div class="node poc"><b>Web app</b><span>Lender desk, Nature map</span></div><div class="node"><b>Reporting</b><span>TNFD-aligned exports</span></div><div class="node"><b>Alerts</b><span>Label changes to bank systems</span></div></div></div>
       <div class="archfoot"><span><i></i>Built in this proof of concept</span><span>Everything else is the production plan</span></div>
+    </div>
+    <div class="panel archview" data-view="3d" hidden>
+      <div class="viewhead"><h2>The platform in 3D</h2><p class="muted">The same "what runs where" picture as a board you can look around. Switch between 3D and 2D, turn it, drag to pan, and hold Ctrl or Cmd while scrolling to zoom. Boxes marked with a star are built in this proof of concept.</p></div>
+      <div class="frame3d"><iframe id="frame3d" title="Nature Risk Desk architecture in 3D" data-query="play=0" data-src="https://projects.tanmoybh.com/archboard-3d/v/l4l9px31hovj" loading="lazy" allowfullscreen></iframe></div>
+      <div class="archfoot"><span>Read-only view made with Archboard 3D</span><span><a href="https://projects.tanmoybh.com/archboard-3d/v/l4l9px31hovj" target="_blank" rel="noopener">Open it full screen</a></span></div>
+    </div>
+    <div class="panel archview" data-view="bank" hidden>
+      <div class="viewhead"><h2>Connecting to a bank's systems, securely</h2><p class="muted">How the scoring API plugs into a bank's loan system and API gateway. Follow the numbered arrows: a private, signed and encrypted link; an edge that checks every call; stateless services that scale; data kept per bank and per region; and a trust plane that records and controls everything. Use the zoom buttons or Ctrl or Cmd and scroll, and switch to 2D for the clearest reading.</p></div>
+      <div class="frame3d"><iframe id="frameBank" title="Bank integration architecture" data-query="mode=2d&amp;play=0" data-src="https://projects.tanmoybh.com/archboard-3d/v/rdge0ptacoeh" loading="lazy" allowfullscreen></iframe></div>
+      <div class="archfoot"><span>Design targets, not measurements. The board shows controls; SOC 2, GDPR, PDPA and SOX compliance also need written policies and independent audits.</span><span><a href="https://projects.tanmoybh.com/archboard-3d/v/rdge0ptacoeh" target="_blank" rel="noopener">Open it full screen</a></span></div>
     </div>
     <div class="cols">
       <div class="col"><h3>Explainable before clever</h3><p>Transparent rules a credit committee can read first. ML only once there are outcome labels to train and back-test on.</p></div>
@@ -1148,10 +1163,19 @@ drawBase();
 initMapControls();
 render();
 
+// 3D architecture view: an embedded read-only board from Archboard 3D. It loads the first time its tab opens
+// (so the 3D engine is not fetched for visitors who never look) and follows this page's light or dark theme.
+const boardFrames=[...document.querySelectorAll("iframe[data-src]")];
+const themeNow=()=>document.documentElement.dataset.theme||"auto";
+function sync3dTheme(){ boardFrames.forEach(f=>{ try{ f.contentWindow&&f.contentWindow.postMessage({type:"archboard:theme",theme:themeNow()},"*"); }catch(e){} }); }
+function loadBoard(view){ const f=document.querySelector('.archview[data-view="'+view+'"] iframe[data-src]'); if(!f||f.getAttribute("src")) return; f.src=f.dataset.src+"?"+[f.dataset.query,themeNow()==="auto"?"":"theme="+themeNow()].filter(Boolean).join("&"); }
+boardFrames.forEach(f=>f.addEventListener("load",sync3dTheme));
+
 // architecture views
 document.querySelectorAll(".archtabs [data-view]").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".archtabs [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
   document.querySelectorAll(".archview").forEach(v=>v.hidden = v.dataset.view!==b.dataset.view);
+  loadBoard(b.dataset.view);
 }));
 
 // theme toggle: follows the device until the viewer picks one
@@ -1159,7 +1183,7 @@ document.querySelectorAll(".archtabs [data-view]").forEach(b=>b.addEventListener
   const btn=document.getElementById("theme-toggle"), root=document.documentElement;
   const isDark=()=>root.dataset.theme ? root.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   const sync=()=>{const d=isDark();btn.classList.toggle("isdark",d);btn.setAttribute("aria-label",d?"Switch to light theme":"Switch to dark theme")};
-  btn.addEventListener("click",()=>{const next=isDark()?"light":"dark";root.dataset.theme=next;try{localStorage.setItem("theme",next)}catch(e){}sync()});
+  btn.addEventListener("click",()=>{const next=isDark()?"light":"dark";root.dataset.theme=next;try{localStorage.setItem("theme",next)}catch(e){}sync();sync3dTheme()});
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change",sync);
   sync();
 })();
