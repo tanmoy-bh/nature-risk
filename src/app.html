@@ -194,6 +194,25 @@ details[open] summary::after{content:"Hide"}
 .zoombtns button+button{border-top:.5px solid var(--line)}
 .zoombtns button:hover:not(:disabled){background:var(--fill)}
 .zoombtns button:disabled{color:var(--border);cursor:default}
+.layerctl{position:absolute;top:52px;left:12px;display:flex;align-items:center;gap:2px;background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:9px;padding:2px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.layerctl .lab{font-size:11.5px;font-weight:600;color:var(--muted);padding:0 6px 0 8px;letter-spacing:.02em}
+.layerctl button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;padding:5px 10px;border-radius:7px;cursor:pointer;min-height:28px;display:inline-flex;align-items:center;gap:6px}
+.layerctl button[aria-pressed="true"]{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12);font-weight:600}
+.layerctl button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.layerctl svg{width:15px;height:15px;flex:none}
+.layerctl [data-layer="veg"] svg{color:#34A853} .layerctl [data-layer="temp"] svg{color:#E8590C} .layerctl [data-layer="rain"] svg{color:#2F7FD6}
+.ovlkey{display:flex;flex-direction:column;gap:5px;min-width:230px;max-width:300px;padding-bottom:8px;margin-bottom:8px;border-bottom:.5px solid var(--line)}
+.ovlkey[hidden]{display:none}
+.ovlkey b{font-size:12.5px} .ovlkey .when{font-size:11.5px;color:var(--muted)}
+.ovlkey .bar{height:9px;border-radius:5px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.15)}
+.ovlkey .ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ovlkey .src{font-size:10.5px;color:var(--muted)}
+.ovlkey .src a{color:inherit}
+.ovlkey.loading .bar{background:linear-gradient(90deg,var(--fill) 25%,rgba(125,122,255,.18) 50%,var(--fill) 75%)!important;background-size:300% 100%!important;animation:ovlsk 1.2s linear infinite}
+@keyframes ovlsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+#ovl image{opacity:.92;transition:opacity .35s ease}
+@media (max-width:600px){.layerctl button:not([data-layer="off"]) .t,.layerctl .lab{display:none}.layerctl button{padding:5px 9px}.ovlkey{min-width:180px}}
+@media (prefers-reduced-motion: reduce){.ovlkey.loading .bar{animation:none}#ovl image{transition:none}}
 .maphint{position:absolute;right:12px;bottom:12px;font-size:11.5px;color:var(--muted);background:var(--navbg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:8px;padding:5px 9px}
 #map{cursor:grab;touch-action:none}
 #map.dragging{cursor:grabbing}
@@ -419,7 +438,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   .stat:first-child{border-top:0}
   .mapside{height:380px}
   .bar{grid-template-columns:130px 1fr 26px}
-  .mapkey{display:none}
+  .mapkey:not(:has(.ovlkey:not([hidden]))){display:none} .mapkey .keys{display:none} .mapkey .ovlkey{border:0;margin:0;padding:0}
 }
 .scalenote{background:color-mix(in srgb,var(--accent) 12%,var(--surface));border:1.5px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
 .scalehead{display:flex;align-items:center;gap:10px;color:var(--accent)}
@@ -688,13 +707,19 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
           <button id="zm-sg" type="button" aria-pressed="false" data-zoom="sg">Singapore</button>
           <button id="zm-bor" type="button" aria-pressed="false" data-zoom="bor">Borneo</button>
         </div>
+        <div class="layerctl" role="group" aria-label="Map layer"><span class="lab">LAYER</span>
+          <button type="button" data-layer="off" aria-pressed="true"><span class="t">Off</span></button>
+          <button type="button" data-layer="veg" aria-pressed="false" aria-label="Vegetation"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 2.5C7 2.5 3 5.6 3 10c0 1.2.4 2.3 1 3.2C5.2 9.6 8 7.3 11 6.3 8.3 7.8 6.2 10.3 5.2 13.6c.8.4 1.8.6 2.8.6 4 0 5.5-4.4 5.5-11.7Z" fill="currentColor"/></svg><span class="t">Vegetation</span></button>
+          <button type="button" data-layer="temp" aria-pressed="false" aria-label="Temperature"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 2.5a1.5 1.5 0 0 1 3 0v6.3a3 3 0 1 1-3 0Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11.5" r="1.5" fill="currentColor"/><path d="M8 6v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="t">Temperature</span></button>
+          <button type="button" data-layer="rain" aria-pressed="false" aria-label="Rainfall"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 9.5a3 3 0 0 1 .3-6A4 4 0 0 1 12.4 5a2.3 2.3 0 0 1 .1 4.5Z" fill="currentColor" opacity=".85"/><path d="M5.5 11.5 5 13.5M8.5 11.5 8 13.5M11.5 11.5 11 13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="t">Rainfall</span></button>
+        </div>
         <div class="zoombtns" role="group" aria-label="Zoom controls">
           <button id="zm-in" type="button" aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
           <button id="zm-out" type="button" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
           <button id="zm-reset" type="button" aria-label="Reset map view" title="Reset view"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.2 6.2A5 5 0 1 1 3 9.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.6 2.8v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="maphint">Click a place to zoom in · drag to pan · pinch or ⌘/Ctrl + scroll to zoom</div>
-        <div class="mapkey"><div class="keys" id="mapkeys"></div></div>
+        <div class="mapkey"><div class="ovlkey" id="ovlkey" hidden aria-live="polite"></div><div class="keys" id="mapkeys"></div></div>
       </div>
       <aside class="card" id="ndetail" aria-live="polite"></aside>
     </div>
@@ -1157,7 +1182,9 @@ function drawBase(){
   const land = GEO.map(g=>`<path class="land ${g.c==="MYS"||g.c==="SGP"?"home":""}" d="${g.d}"></path>`).join("");
   const st = GEO.filter(g=>g.c==="MYS" && SHOW.has(g.n)).map(g=>`<text class="lbl" data-fs="11" x="${g.lx}" y="${g.ly}">${g.n}</text>`).join("");
   const ctx = [["THAILAND",100.9,7.15,11],["INDONESIA",101.6,1.0,11],["INDONESIA",114.0,1.2,11],["BRUNEI",114.65,4.25,10],["SINGAPORE",103.82,1.24,9]].map(([t,lon,lat,fs])=>{const [x,y]=proj(lon,lat);return `<text class="lbl country" data-fs="${fs}" x="${x}" y="${y}">${t}</text>`;}).join("");
-  svg.innerHTML = `<rect x="-3000" y="-3000" width="8000" height="8000" fill="var(--sea)"/><g>${land}</g><line class="gapline" x1="540" y1="-2000" x2="540" y2="3000"/><g id="labels">${st}${ctx}</g><g id="pins"></g>`;
+  const clip = GEO.map(g=>`<path d="${g.d}"/>`).join("");
+  svg.innerHTML = `<defs><clipPath id="landclip">${clip}</clipPath></defs><rect x="-3000" y="-3000" width="8000" height="8000" fill="var(--sea)"/><g>${land}</g><g id="ovl" clip-path="url(#landclip)"></g><line class="gapline" x1="540" y1="-2000" x2="540" y2="3000"/><g id="labels">${st}${ctx}</g><g id="pins"></g>`;
+  if (state.layer && state.layer!=="off") applyLayer();
 }
 function ppu(){ const b = document.getElementById("map").getBoundingClientRect(); return (b.width&&b.height) ? Math.min(b.width/vbNow[2], b.height/vbNow[3]) : 0.5; }
 function setViewBox(vb){
@@ -1363,6 +1390,95 @@ document.addEventListener("click",ev=>{
   const l=ev.target.closest("[data-brief-loan]"); if(l) openLoan(l.dataset.briefLoan);
 });
 initBrief();
+
+// ---------- map layers: pure helpers ----------
+// Vegetation, temperature and rainfall from NASA GIBS (no key). Temperature and rainfall are read back to real
+// values through NASA's own colour tables and redrawn on a local scale, so the tropics show contrast.
+const OVL={
+  veg:{label:"Vegetation",layer:"MODIS_Terra_L3_NDVI_Monthly",cadence:"monthly",recolor:false,what:"Vegetation greenness (NDVI)",src:"NASA Terra MODIS · monthly · 1 km",
+    grad:"linear-gradient(90deg,#F2ECEA 0%,#C4A58C 20%,#8C5A43 30%,#C8DE6A 31%,#6EAA2C 50%,#2D7D1A 70%,#0B4D10 90%,#021A03 100%)",ticks:["0","0.3","0.6","1.0"],note:"Dense forest is dark green; cleared or bare land is pale."},
+  temp:{label:"Temperature",layer:"MODIS_Terra_L3_Land_Surface_Temp_Monthly_Day",cadence:"monthly",recolor:true,cmap:"MODIS_Land_Surface_Temp",what:"Daytime land surface temperature",src:"NASA Terra MODIS · monthly · 5 km",
+    stops:[[20,[255,243,217]],[24,[253,201,131]],[28,[244,134,74]],[32,[210,64,42]],[36,[126,20,20]]],ticks:["20 °C","24","28","32","36 °C"],note:"The ground's skin temperature in daytime, hotter than the air."},
+  rain:{label:"Rainfall",layer:"IMERG_Precipitation_Rate",cadence:"daily",recolor:true,cmap:"GPM_Precipitation_Rate",what:"Rainfall",src:"NASA GPM IMERG · daily · 10 km",
+    stops:[[0,[214,232,250]],[.25,[125,183,236]],[.5,[47,127,214]],[.75,[20,70,160]],[1,[11,31,92]]],ticks:["2 mm","10","50","240 mm a day"],note:"Total rain that day; blank means dry."},
+};
+function ovlParseColormap(xml){
+  // the first block with visible colours (skips "No Data" and all-transparent "Classifications" blocks)
+  const maps=[...String(xml).matchAll(/<ColorMap\b([^>]*)>([\s\S]*?)<\/ColorMap>/g)].filter(m=>!/No Data/i.test(m[1])&&/transparent="false"/.test(m[2]));
+  const out=new Map(); out.list=[]; if(!maps.length) return out;
+  const es=[...maps[0][2].matchAll(/<ColorMapEntry\b[^>]*>/g)].map(m=>m[0]).filter(e=>!/transparent="true"/.test(e));
+  es.forEach((e,i)=>{ const rgb=(e.match(/rgb="([^"]+)"/)||[])[1], v=(e.match(/value="\[([^,]+),([^)\]]+)[)\]]"/)||[]);
+    if(!rgb||!v.length) return; const lo=parseFloat(v[1]), hi=parseFloat(v[2]);
+    const val=i===0||!isFinite(lo)?hi:i===es.length-1||!isFinite(hi)?lo:Math.round((lo+hi)/2*1e6)/1e6;
+    out.set(rgb.replace(/\s/g,""),val); out.list.push([...rgb.split(",").map(Number),val]); });
+  return out;
+}
+function ovlRamp(stops,x){ if(x<=stops[0][0]) return stops[0][1]; for(let i=1;i<stops.length;i++){ const [a,ca]=stops[i-1],[b,cb]=stops[i]; if(x<=b){ const f=(x-a)/(b-a); return ca.map((c,k)=>Math.round(c+(cb[k]-c)*f)); } } return stops[stops.length-1][1]; }
+// Kelvin → °C for temperature; mm an hour (daily mean) → mm a day on a log scale for rain. null = leave clear.
+function ovlPaint(kind,v){
+  if(kind==="temp") return ovlRamp(OVL.temp.stops,v-273.15);
+  if(kind==="rain"){ if(!(v>=0.1)) return null; const day=v*24, f=Math.log10(day/2.4)/Math.log10(100); return ovlRamp(OVL.rain.stops,Math.max(0,Math.min(1,f))); }
+  return null;
+}
+function ovlDates(cadence,now){
+  const d=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate())), out=[], iso=x=>x.toISOString().slice(0,10);
+  if(cadence==="monthly"){ for(let i=0;i<4;i++) out.push(iso(new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-i,1)))); }
+  else { for(let i=1;i<=6;i++) out.push(iso(new Date(d.getTime()-i*86400000))); }
+  return out;
+}
+// ---------- map layers: end helpers ----------
+const GIBS="https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi", OVL_BOX={w:98.5,e:120,n:8.5,s:-0.5,ppd:80,penE:104.9,borW:109.4};
+const ovlCache={}, cmapCache={};
+const gibsUrl=(layer,date)=>`${GIBS}?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=${layer}&STYLES=&CRS=EPSG:4326&BBOX=${OVL_BOX.s},${OVL_BOX.w},${OVL_BOX.n},${OVL_BOX.e}&WIDTH=${Math.round((OVL_BOX.e-OVL_BOX.w)*OVL_BOX.ppd)}&HEIGHT=${Math.round((OVL_BOX.n-OVL_BOX.s)*OVL_BOX.ppd)}&FORMAT=image/png&TRANSPARENT=true&TIME=${date}`;
+const loadImg=u=>new Promise((ok,no)=>{ const i=new Image(); i.crossOrigin="anonymous"; i.onload=()=>ok(i); i.onerror=()=>no(new Error("image")); i.src=u; });
+function cmapFor(name){ return cmapCache[name]||(cmapCache[name]=fetch(`https://gibs.earthdata.nasa.gov/colormaps/v1.3/${name}.xml`).then(r=>{ if(!r.ok) throw new Error("colormap"); return r.text(); }).then(ovlParseColormap)); }
+function nearestValue(list,r,g,b){ let best=null,bd=900; for(const e of list){ const d=(e[0]-r)**2+(e[1]-g)**2+(e[2]-b)**2; if(d<bd){ bd=d; best=e[3]; } } return best; }
+async function ovlBuild(kind){
+  const L=OVL[kind], cm=L.recolor?await cmapFor(L.cmap):null;
+  for(const date of ovlDates(L.cadence,new Date())){
+    let img; try{ img=await loadImg(gibsUrl(L.layer,date)); }catch(e){ continue; }
+    const c=document.createElement("canvas"); c.width=img.naturalWidth; c.height=img.naturalHeight;
+    const x=c.getContext("2d",{willReadFrequently:true}); x.drawImage(img,0,0);
+    const d=x.getImageData(0,0,c.width,c.height), p=d.data, near=new Map(); let filled=0;
+    for(let i=0;i<p.length;i+=4){
+      if(p[i+3]<8){ p[i+3]=0; continue; } filled++;
+      if(!cm) continue;
+      const k=p[i]+","+p[i+1]+","+p[i+2]; let v=cm.get(k);
+      if(v===undefined){ v=near.get(k); if(v===undefined){ v=nearestValue(cm.list,p[i],p[i+1],p[i+2]); near.set(k,v); } }
+      const col=v==null?null:ovlPaint(kind,v); if(!col){ p[i+3]=0; continue; }
+      p[i]=col[0]; p[i+1]=col[1]; p[i+2]=col[2]; p[i+3]=255;
+    }
+    if(filled/(p.length/4) < (kind==="rain"?0.002:0.03)) continue;   // no data yet for this date
+    x.putImageData(d,0,0);
+    const crop=(lon0,lon1)=>{ const a=Math.round((lon0-OVL_BOX.w)*OVL_BOX.ppd), b=Math.round((lon1-OVL_BOX.w)*OVL_BOX.ppd), k=document.createElement("canvas");
+      k.width=b-a; k.height=c.height; k.getContext("2d").drawImage(c,a,0,b-a,c.height,0,0,b-a,c.height); return k.toDataURL("image/png"); };
+    return {date, pen:crop(OVL_BOX.w,OVL_BOX.penE), bor:crop(OVL_BOX.borW,OVL_BOX.e)};
+  }
+  throw new Error("no recent image");
+}
+function ovlWhen(L,date){ const d=new Date(date+"T00:00:00Z"); return L.cadence==="monthly"?d.toLocaleDateString([],{month:"long",year:"numeric",timeZone:"UTC"}):d.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}); }
+function ovlGrad(L){ return L.grad||`linear-gradient(90deg,${L.stops.map(([s,c],i)=>`rgb(${c.join(",")}) ${Math.round(i/(L.stops.length-1)*100)}%`).join(",")})`; }
+function ovlKey(L,state,date){
+  return `<b>${L.what}</b><span class="when">${state==="loading"?"Loading from NASA…":state==="error"?"Couldn't load this layer just now.":ovlWhen(L,date)+". "+L.note}</span>
+    <div class="bar" style="background:${ovlGrad(L)}"></div><div class="ticks">${L.ticks.map(x=>`<span>${x}</span>`).join("")}</div>
+    <span class="src">${L.src} · <a href="https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api" target="_blank" rel="noopener">NASA GIBS</a></span>`;
+}
+let ovlTok=0;
+async function applyLayer(){
+  const k=state.layer||"off", g=document.getElementById("ovl"), key=document.getElementById("ovlkey"), tok=++ovlTok;
+  document.querySelectorAll("[data-layer]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layer===k)));
+  if(!g||!key) return;
+  if(k==="off"||!OVL[k]){ g.innerHTML=""; key.hidden=true; return; }
+  const L=OVL[k]; key.hidden=false; key.className="ovlkey loading"; key.innerHTML=ovlKey(L,"loading");
+  try{
+    const r=await (ovlCache[k]||(ovlCache[k]=ovlBuild(k).catch(e=>{ delete ovlCache[k]; throw e; })));
+    if(tok!==ovlTok) return;
+    const [x0,y0]=proj(OVL_BOX.w,OVL_BOX.n), [x1,y1]=proj(OVL_BOX.penE,OVL_BOX.s), [x2]=proj(OVL_BOX.borW,0), [x3]=proj(OVL_BOX.e,0);
+    g.innerHTML=`<image href="${r.pen}" x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" preserveAspectRatio="none"/><image href="${r.bor}" x="${x2}" y="${y0}" width="${x3-x2}" height="${y1-y0}" preserveAspectRatio="none"/>`;
+    key.className="ovlkey"; key.innerHTML=ovlKey(L,"ready",r.date);
+  }catch(e){ if(tok!==ovlTok) return; g.innerHTML=""; key.className="ovlkey"; key.innerHTML=ovlKey(L,"error"); }
+}
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-layer]"); if(!b) return; state.layer=b.dataset.layer; save(); applyLayer(); });
 
 // ---------- satellite view ----------
 // Tiles load straight from EOX's public Sentinel-2 cloudless service in the viewer's browser (no key).
