@@ -43,3 +43,13 @@ test("the Lender desk has a daily nature debrief kept for 24 hours", () => {
   assert.match(app, /rel="noopener"/);
   assert.doesNotMatch(app, /sk-or-|OPENROUTER_API_KEY|openrouter\.ai\/api/i, "no key or direct model call in the page");
 });
+
+test("debrief and satellite viewer polish from review", () => {
+  assert.match(app, /function openLoan[^\n]*state\.region="all"/, "a loan chip shows the loan even under a region filter");
+  assert.match(app, /REFRESH_GAP=600000/, "the page also limits Refresh to once every 10 minutes");
+  assert.match(app, /const \{throttled,cached,refreshFailed,\.\.\.keep\}=/, "notices are not saved with the debrief");
+  assert.match(app, /r\.status===401/, "an expired session gets a plain message");
+  assert.match(app, /if\(state\.screen!=="map"\) closeSat\(\)/, "the satellite viewer closes when leaving the map");
+  assert.match(app, /CC BY-NC-SA 4\.0/);
+  assert.doesNotMatch(grab(/function satImg\([\s\S]*?\n\}\n/), /<div/, "satImg builds spans, so it is valid inside a button");
+});

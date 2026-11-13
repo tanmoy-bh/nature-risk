@@ -80,3 +80,14 @@ test("the fallback lists the top headlines without analysis", () => {
   assert.ok(f.stories.length >= 1 && f.stories.length <= 5);
   assert.equal(f.stories[0].why, undefined);
 });
+
+test("summaries drop entity-encoded HTML, and article dates count as known numbers", () => {
+  const xml = `<rss><channel><item><title>Rain returns to Sabah palm estates</title><link>https://x.example/r</link><pubDate>${day(0.1)}</pubDate>
+<description>&lt;p&gt;Rain is back. &lt;img width=&quot;768&quot; src=&quot;a.jpg&quot;&gt;&lt;/p&gt;</description></item></channel></rss>`;
+  const [item] = parseFeed(xml, "Mongabay");
+  assert.equal(item.summary, "Rain is back.");
+  const cands = rankItems([item], NOW), d = new Date(cands[0].date);
+  const reply = { summary: "Rain.", stories: [{ n: 1, channel: "Drought and water", direction: "lowers risk", regions: ["Malaysia"], commodities: ["Palm oil"], why: `Reported on ${d.getUTCDate()} November ${d.getUTCFullYear()}.` }] };
+  assert.equal(checkBrief(reply, cands, results).ok, true);
+  assert.equal(checkBrief({ ...reply, stories: [{ ...reply.stories[0], why: "Rain over 768 hectares." }] }, cands, results).ok, false);
+});

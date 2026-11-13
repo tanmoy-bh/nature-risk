@@ -30,14 +30,17 @@ export async function onRequestPost({ request, env }) {
 
   const cacheKey = new Request(`https://brief-cache.invalid/${await shortHash(text)}/${encodeURIComponent(model)}`);
   const hit = await caches.default.match(cacheKey);
+  let good = null; // a model debrief still inside its 24 hours: kept if a refresh fails
   if (hit) {
     const prev = await hit.json(), age = now - prev.generatedAtMs, ttl = prev.source === "model" ? DAY : HEADLINES_TTL;
     if (!body.again && age < ttl) return json({ ...prev, cached: true });
     if (body.again && age < REFRESH_GAP) return json({ ...prev, cached: true, throttled: true });
+    if (prev.source === "model" && age < DAY) good = prev;
   }
+  const keepGood = () => json({ ...good, cached: true, refreshFailed: true });
 
   const items = (await Promise.all(FEEDS.map(readFeed))).flat();
-  if (!items.length) return json({ error: "Couldn't reach the news sources right now. Try again in a few minutes." }, 502);
+  if (!items.length) return good ? keepGood() : json({ error: "Couldn't reach the news sources right now. Try again in a few minutes." }, 502);
   const cands = rankItems(items, now);
 
   let brief = null, reason = "";
@@ -53,9 +56,10 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
+  if (!brief && good) return keepGood();
   const base = { generatedAt: new Date(now).toISOString(), generatedAtMs: now, read: cands.length, sources: FEEDS.map((f) => f.name) };
   const out = brief ? { ...brief, ...base, source: "model", model } : { ...fallbackBrief(cands), ...base, source: "headlines", reason };
-  await caches.default.put(cacheKey, new Response(JSON.stringify(out), { headers: { "Cache-Control": `max-age=${brief ? 86400 : 900}` } }));
+  try { await caches.default.put(cacheKey, new Response(JSON.stringify(out), { headers: { "Cache-Control": `max-age=${brief ? 86400 : 900}` } })); } catch {}
   return json(out);
 }
 

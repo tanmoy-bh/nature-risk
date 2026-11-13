@@ -99,3 +99,31 @@ test("when every feed is down it says so", async () => {
   assert.match(o.error, /news/i);
   assert.equal(calls.model, 0);
 });
+
+test("a failed refresh keeps the good debrief", async () => {
+  await post();
+  clock = 11 * 60000;
+  model = () => ({ summary: "S.", stories: [{ n: 1, channel: "Fire and haze", direction: "raises risk", regions: [], commodities: [], why: "9,999 hectares." }] });
+  const [s, o] = await post({ again: true });
+  assert.equal(s, 200);
+  assert.equal(o.source, "model");
+  assert.equal(o.refreshFailed, true);
+  const [, again] = await post();
+  assert.equal(again.source, "model", "the cache still holds the good debrief");
+});
+
+test("feeds down on refresh keeps the good debrief", async () => {
+  await post();
+  clock = 11 * 60000; feedsDown = true;
+  const [s, o] = await post({ again: true });
+  assert.equal(s, 200);
+  assert.equal(o.refreshFailed, true);
+  assert.equal(o.stories.length, 2);
+});
+
+test("a malformed story does not crash the function", async () => {
+  model = () => ({ summary: "S.", stories: [null] });
+  const [s, o] = await post();
+  assert.equal(s, 200);
+  assert.equal(o.source, "headlines");
+});
