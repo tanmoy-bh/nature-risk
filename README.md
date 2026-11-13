@@ -95,3 +95,11 @@ The Model lab's **Draft committee note** button calls the site's own `/api/note`
 - The key lives only in the GitHub secret `OPENROUTER_API_KEY`, which the deploy workflow copies into the Pages secret of the same name. Without it, the note uses the template.
 - The model defaults to `google/gemini-3.8-flash`; set the Pages variable `OPENROUTER_MODEL` to change it.
 - Set a spending limit on the OpenRouter key itself.
+
+## Explain this chart
+
+Every chart in the Model lab has a sparkle button at its top-right. It posts the experiment, the place and the chart's current settings to `/api/explain` (`functions/api/explain.js`), which builds the facts for that chart from `lab-results.json` (`lib/explain.mjs`) and asks the same model through `lib/openrouter.mjs`. The reading has three parts: what you're looking at, what it shows here, and why it matters to a bank.
+
+- Every number in a reading must appear in the chart's facts; otherwise the draft is rejected, and after two tries a plain summary from the model results is shown instead.
+- Readings are cached for 24 hours on the server (per results version, model, chart, place and settings) and in the browser's IndexedDB. Refresh asks for a fresh one.
+- It uses the same `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` settings as the committee note.
