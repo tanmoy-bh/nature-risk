@@ -49,3 +49,16 @@ test("the number check rejects invented numbers", () => {
   assert.equal(chk.ok, false);
   assert.ok(chk.bad.includes("999"));
 });
+
+test("fallback text reads cleanly for every experiment", () => {
+  const d = fallbackExplain(explainFacts(results, "exp-d", "A19", {}));
+  assert.doesNotMatch(d.shows, /:[^.]*:/, "no double colon in D");
+  const g = fallbackExplain(explainFacts(results, "exp-g", "A19", {}));
+  assert.match(g.shows, /without nature data/);
+});
+
+test("the risk map's facts count loans that change zone", () => {
+  const h = explainFacts(results, "exp-h", "A19", { hv: "move", hs: "base" });
+  assert.match(h.text, /Loans that change zone: \d+/);
+  assert.doesNotMatch(h.text, /safer ground|riskier ground/);
+});

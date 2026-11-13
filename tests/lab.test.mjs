@@ -35,3 +35,12 @@ test("every Model lab chart can be explained", async () => {
   assert.match(lab, /createObjectStore\("explain"\)/);
   assert.doesNotMatch(lab, /openrouter/i);
 });
+
+test("the explain panel behaves well on touch and keyboard, and IndexedDB never blocks", async () => {
+  const lab = await read("src/lab.html");
+  assert.match(lab, /@media \(hover: ?hover\)\{[^}]*\.aibtn:hover \.tl/);
+  assert.match(lab, /key==="Escape"[^\n]*closeExplain/);
+  assert.match(lab, /aria-controls="\$\{k\}-explain"/);
+  assert.match(lab, /onblocked=/);
+  assert.match(lab, /onversionchange=/);
+});

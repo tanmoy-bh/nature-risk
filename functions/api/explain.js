@@ -31,8 +31,9 @@ export async function onRequestPost({ request, env }) {
   else {
     for (let i = 0; i < 2 && !explain; i++) {
       const user = `Chart guide:\n${facts.guide}\n\nFacts:\n${facts.text}\n\nExplain this chart.${i ? " Use only numbers that appear in the guide or the facts, copied exactly." : ""}`;
-      const { reply, error } = await askJSON(env, { system: EXPLAIN_SYSTEM, user, schema: EXPLAIN_SCHEMA, name: "chart_explanation" });
-      if (error) { reason = error; continue; }
+      // 12 s per try, and no retry after an error: the reader gets the fallback quickly instead of a long skeleton.
+      const { reply, error } = await askJSON(env, { system: EXPLAIN_SYSTEM, user, schema: EXPLAIN_SCHEMA, name: "chart_explanation", timeoutMs: 12000 });
+      if (error) { reason = error; break; }
       const chk = checkExplain(reply, facts);
       if (chk.ok) explain = Object.fromEntries(EXPLAIN_KEYS.map((k) => [k, String(reply[k]).slice(0, 500)]));
       else reason = chk.bad.length ? `numbers not in the model: ${chk.bad.join(", ")}` : "incomplete draft";

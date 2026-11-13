@@ -87,3 +87,11 @@ test("the committee note still works through the shared helper", async () => {
   assert.equal(o.source, "model");
   assert.equal(calls, 1);
 });
+
+test("does not retry after a model error, so the fallback comes quickly", async () => {
+  globalThis.fetch = async () => { calls++; return new Response("{}", { status: 500 }); };
+  const [s, o] = await post(onRequestPost, A);
+  assert.equal(s, 200);
+  assert.equal(o.source, "fallback");
+  assert.equal(calls, 1);
+});
