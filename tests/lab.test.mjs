@@ -44,3 +44,11 @@ test("the explain panel behaves well on touch and keyboard, and IndexedDB never 
   assert.match(lab, /onblocked=/);
   assert.match(lab, /onversionchange=/);
 });
+
+test("drafting shows an AI shimmer around the note and the chart reading", async () => {
+  const lab = await read("src/lab.html");
+  assert.match(lab, /\.busy::before/);
+  assert.match(lab, /@property --ai-a/);
+  assert.match(lab, /box\.classList\.add\("busy"\)/);
+  assert.match(lab, /card\.classList\.add\("busy"\)/);
+});

@@ -225,6 +225,16 @@ details.more .tablebox{margin-top:10px}
 .note .badge:empty{display:none}
 .note .nfoot button{font:inherit;font-size:13px;font-weight:500;border:0;border-radius:9px;padding:6px 12px;background:var(--fill);color:var(--ink);cursor:pointer}
 .note .nfoot .sp{margin-left:auto}
+/* AI at work: a slowly turning gradient border and a soft glow while the model drafts. */
+@property --ai-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+.explain .card.busy{position:relative}
+.busy::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:2;
+  background:conic-gradient(from var(--ai-a),#7D7AFF,#30B0C7,#34C759,#7D7AFF 45%,rgba(125,122,255,0) 62%,rgba(125,122,255,0) 88%,#7D7AFF);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:aispin 2.4s linear infinite}
+.note.busy,.explain .card.busy{animation:aiglow 2.4s ease-in-out infinite}
+@keyframes aispin{to{--ai-a:360deg}}
+@keyframes aiglow{0%,100%{box-shadow:0 18px 48px rgba(0,0,0,.22),0 0 0 .5px var(--line),0 0 0 0 rgba(125,122,255,0)}50%{box-shadow:0 18px 48px rgba(0,0,0,.22),0 0 0 .5px var(--line),0 0 26px 2px rgba(125,122,255,.35)}}
+@media (prefers-reduced-motion: reduce){ .busy::before,.note.busy,.explain .card.busy{animation:none} }
 
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .tile{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -859,7 +869,7 @@ async function writeNote(again){
   const sc=st.view==="exp-a"?st.a:"base", s=site();
   box.hidden=false; btn.disabled=true; badge.textContent=""; badge.className="badge";
   document.getElementById("note-sub").textContent=`${s.name} · ${SC[sc]}`;
-  body.innerHTML='<p class="wait">Drafting…</p>';
+  body.innerHTML='<p class="wait">Drafting with AI…</p><div class="ex-skel" aria-hidden="true"><i></i><i></i><i></i><i></i></div>'; box.classList.add("busy");
   try{
     const r=await fetch("api/note",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:s.id,scenario:sc,again:!!again})});
     const out=await r.json(); if(!r.ok) throw new Error(out.error||("HTTP "+r.status));
@@ -869,7 +879,7 @@ async function writeNote(again){
     badge.textContent=fromModel?"✓ Every number matches the model":"Template: the AI draft was not usable";
     badge.className="badge"+(fromModel?"":" tpl"); badge.title=fromModel?`Drafted by ${out.model}${out.cached?" (saved copy)":""}`:(out.reason||"");
   }catch(e){ noteLast=null; body.innerHTML=`<p class="wait">The note could not be drafted (${esc(e.message)}). Try again in a moment.</p>`; }
-  btn.disabled=false;
+  box.classList.remove("busy"); btn.disabled=false;
 }
 function initNote(){
   const box=document.getElementById("note");
@@ -913,11 +923,12 @@ async function openExplain(view,opts={}){
   let out=opts.again?undefined:await exGet(key);
   if(tok!==exToken) return;
   if(!out){
-    badge.hidden=true; meta.textContent="Reading the chart…"; body.innerHTML='<div class="ex-skel" aria-hidden="true"><i></i><i></i><i></i><i></i></div>';
+    const card=box.querySelector(".card"); card.classList.add("busy"); badge.hidden=true; meta.textContent="Reading the chart…"; body.innerHTML='<div class="ex-skel" aria-hidden="true"><i></i><i></i><i></i><i></i></div>';
     try{ const r=await fetch("api/explain",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({experiment:view,id:st.id,state:explainState(view),again:!!opts.again})});
       const j=await r.json(); if(!r.ok) throw new Error(j.error||("HTTP "+r.status)); out=j; if(j.source==="model") exPut(key,j);
-    }catch(e){ if(tok!==exToken) return; meta.textContent=""; body.innerHTML='<p class="ex-err">Couldn\'t read this chart just now. <button type="button" class="ex-retry">Try again</button></p>'; return; }
+    }catch(e){ if(tok===exToken) card.classList.remove("busy"); if(tok!==exToken) return; meta.textContent=""; body.innerHTML='<p class="ex-err">Couldn\'t read this chart just now. <button type="button" class="ex-retry">Try again</button></p>'; return; }
     if(tok!==exToken) return;
+    card.classList.remove("busy");
   }
   const fromModel=out.source==="model";
   badge.hidden=!fromModel; meta.textContent=fromModel?ago(out.written):"Summary from the model results";
