@@ -248,6 +248,46 @@ details[open] summary::after{content:"Hide"}
 
 /* trends */
 .trendpanel{padding:20px;display:flex;flex-direction:column;gap:16px}
+/* Satellite view: one cloud-free Sentinel-2 image a year, same scale, centred on the site. */
+.satpanel{padding:20px;display:flex;flex-direction:column;gap:14px}
+.satpanel .thead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:flex-end;justify-content:space-between}
+.satpanel .thead p{color:var(--muted);font-size:14px;margin-top:4px;max-width:70ch}
+.satstrip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.satcard{display:flex;flex-direction:column;gap:8px;border:0;padding:0;background:none;font:inherit;color:inherit;cursor:zoom-in;text-align:left;min-width:0}
+.satimg{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--soft);box-shadow:inset 0 0 0 .5px var(--line);transition:transform .2s ease,box-shadow .2s ease}
+.satcard:hover .satimg{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.2)}
+.satcard:focus-visible{outline:none} .satcard:focus-visible .satimg{outline:2px solid var(--accent);outline-offset:2px}
+.satgrid{position:absolute;display:grid;grid-template-columns:repeat(3,1fr);opacity:0;transition:opacity .5s ease}
+.satgrid img{width:100%;aspect-ratio:1;display:block}
+.satimg.ready .satgrid{opacity:1}
+.satimg:not(.ready):not(.err)::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,var(--fill) 30%,rgba(255,255,255,.28) 50%,var(--fill) 70%);background-size:250% 100%;animation:satsk 1.4s linear infinite}
+@keyframes satsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.satimg.err::before{content:"Imagery unavailable";position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;color:var(--muted)}
+.satpin{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(0,0,0,.25);z-index:2;opacity:0;transition:opacity .3s}
+.satimg.ready .satpin,.satimg.ready .satkm,.satimg.ready .satkml{opacity:1}
+.satkm{position:absolute;left:10px;bottom:10px;height:3px;border-radius:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.35);z-index:2;opacity:0;transition:opacity .3s}
+.satkml{position:absolute;left:10px;bottom:16px;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);z-index:2;opacity:0;transition:opacity .3s}
+.satyear{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.satnew{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--fill);color:var(--muted)}
+.satnote{font-size:12px;color:var(--muted);line-height:1.5}
+.satnote a{color:inherit}
+@media (max-width:760px){.satstrip{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.satcard{scroll-snap-align:start}}
+.satbox{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.74);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px;animation:satin .2s ease}
+.satbox[hidden]{display:none}
+@keyframes satin{from{opacity:0}to{opacity:1}}
+.satbox .frame{width:min(76vh,92vw);display:flex;flex-direction:column;gap:12px;color:#fff}
+.satbox .sh{display:flex;align-items:center;gap:10px}
+.satbox .sh b{font-size:17px} .satbox .sh span{color:rgba(255,255,255,.7);font-size:13px}
+.satbox .sh .sp{margin-left:auto}
+.satbox .satimg{border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.satbox .satkm{height:4px;left:14px;bottom:14px} .satbox .satkml{left:14px;bottom:22px;font-size:13px}
+.satbox .rb{width:36px;height:36px;border:0;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:inline-grid;place-items:center}
+.satbox .rb:hover{background:rgba(255,255,255,.24)} .satbox .rb:disabled{opacity:.35;cursor:default}
+.satbox .rb:focus-visible,.satbox .yrs button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.satbox .yrs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.satbox .yrs button{font:inherit;font-size:13.5px;font-weight:600;border:0;border-radius:999px;padding:6px 14px;background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
+.satbox .yrs button[aria-pressed="true"]{background:#fff;color:#000}
+@media (prefers-reduced-motion: reduce){.satimg:not(.ready)::before{animation:none}.satgrid,.satimg,.satbox{transition:none;animation:none}}
 .trendpanel .thead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
 .trendgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .tchart.wide{grid-column:1/-1}
@@ -531,6 +571,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
   </section>
 
   <!-- PAGE 2 -->
+  <div class="satbox" id="satbox" hidden role="dialog" aria-modal="true" aria-label="Satellite image"></div>
   <section class="page" id="screen-map" hidden>
     <div class="pagehead">
       <div><h1>Nature map</h1><p class="lede">What the data says about each place in Malaysia and Singapore: forest, vegetation, water, biodiversity and livelihoods. No loans, no pricing.</p><p class="bmeta" style="white-space:normal;margin-top:8px">Nature indicators and 5-year trends are real<span class="dp real" title="Pulled from public open data">Real</span> Livelihoods and confidence depend on partner data, so they are samples<span class="dp sample" title="Sample value, not real data">Sample</span></p></div>
@@ -559,6 +600,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       </div>
       <aside class="card" id="ndetail" aria-live="polite"></aside>
     </div>
+    <section class="panel satpanel" id="nsat" aria-label="Satellite view"></section>
     <section class="panel trendpanel" id="ntrends" aria-live="polite"></section>
     <div class="panel">
       <div class="tablehead"><h2>Data sources</h2><span class="bmeta" style="white-space:normal">Nature data on the map is real, pulled from these sources on 28 Oct 2026. Livelihoods and traceability need partner data, so they stay as samples. Hansen forest loss counts any tree cover removal, including plantation harvest cycles, so planted estates can trip the deforestation trigger.</span></div>
@@ -1125,7 +1167,68 @@ function renderMap(){
     ${bars(e)}
     ${evidenceBlock(a,e)}`;
   document.getElementById("ntrends").innerHTML = trendPanel(a);
+  const sp=document.getElementById("nsat"); if(sp && sp.dataset.id!==a.id){ sp.dataset.id=a.id; sp.innerHTML=satPanel(a); satWire(sp); }
 }
+
+// ---------- satellite view ----------
+// Tiles load straight from EOX's public Sentinel-2 cloudless service in the viewer's browser (no key).
+// The frame is two tiles wide at zoom 14 (about 5 km at the equator), centred on the site.
+const SAT_Z=14, SAT_YEARS=[2021,2022,2023,2024,2025];
+function satFrame(lat,lon){
+  const z=SAT_Z, n=2**z, r=lat*Math.PI/180, S=2;
+  const fx=(lon+180)/360*n, fy=(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n;
+  const x0=Math.floor(fx)-1, y0=Math.floor(fy)-1, tiles=[];
+  for(let j=0;j<3;j++) for(let i=0;i<3;i++) tiles.push({x:x0+i,y:y0+j});
+  const mPerPx=156543.03392*Math.cos(r)/n;
+  return {z,tiles,left:-((fx-x0)-S/2)/S*100,top:-((fy-y0)-S/2)/S*100,width:150,kmPct:1000/(mPerPx*256*S)*100};
+}
+const satUrl=(y,t,z)=>`https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-${y}_3857/default/g/${z}/${t.y}/${t.x}.jpg`;
+function satImg(f,y){
+  return `<div class="satimg" data-year="${y}"><div class="satgrid" style="left:${f.left.toFixed(2)}%;top:${f.top.toFixed(2)}%;width:${f.width}%">${
+    f.tiles.map(t=>`<img alt="" decoding="async" src="${satUrl(y,t,f.z)}">`).join("")}</div><span class="satpin" aria-hidden="true"></span><i class="satkm" style="width:${f.kmPct.toFixed(1)}%" aria-hidden="true"></i><span class="satkml" aria-hidden="true">1 km</span></div>`;
+}
+// Fade each image in once all nine tiles have arrived; show a quiet message if none did.
+function satWire(root){
+  root.querySelectorAll(".satimg").forEach(box=>{
+    const imgs=[...box.querySelectorAll("img")]; let done=0, bad=0;
+    const tick=ok=>{ done++; if(!ok) bad++; if(done===imgs.length) box.classList.add(bad===imgs.length?"err":"ready"); };
+    imgs.forEach(im=>{ if(im.complete&&im.naturalWidth) tick(true); else { im.addEventListener("load",()=>tick(true),{once:true}); im.addEventListener("error",()=>tick(false),{once:true}); } });
+  });
+}
+function satPanel(a){
+  const f=satFrame(a.lat,a.lon);
+  return `<div class="thead"><div><h2>Satellite view</h2><p>${place(a)} from above: one cloud-free image a year, all at the same scale. The ring marks the site.</p></div><span class="bmeta">Sentinel-2 · 10 m · ${SAT_YEARS[0]}–${SAT_YEARS[SAT_YEARS.length-1]}</span></div>
+    <div class="satstrip">${SAT_YEARS.map((y,i)=>`<button type="button" class="satcard" data-sat="${i}" aria-label="Open the ${y} image of ${place(a)}">${satImg(f,y)}<span class="satyear">${y}${i===SAT_YEARS.length-1?'<span class="satnew">Latest</span>':""}</span></button>`).join("")}</div>
+    <p class="satnote">Imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH, containing modified Copernicus Sentinel data ${SAT_YEARS[0]}–${SAT_YEARS[SAT_YEARS.length-1]}; licensed for non-commercial use. Each image blends a whole year of cloud-free passes, so it shows the year overall rather than a single day.</p>`;
+}
+let satAt=null, satFrom=null;
+function openSat(i){
+  const a=mapSites().find(x=>x.id===state.nsel); if(!a) return;
+  const box=document.getElementById("satbox"), f=satFrame(a.lat,a.lon), y=SAT_YEARS[i]; satAt=i;
+  box.innerHTML=`<div class="frame"><div class="sh"><div><b>${place(a)}</b><br><span>Sentinel-2 cloudless ${y} · about 5 km across</span></div><span class="sp"></span>
+      <button class="rb" type="button" data-sat-step="-1" aria-label="Previous year"${i===0?" disabled":""}><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="rb" type="button" data-sat-step="1" aria-label="Next year"${i===SAT_YEARS.length-1?" disabled":""}><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="rb sat-x" type="button" aria-label="Close"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    ${satImg(f,y)}
+    <div class="yrs" role="group" aria-label="Year">${SAT_YEARS.map((yy,j)=>`<button type="button" data-sat-go="${j}" aria-pressed="${j===i}">${yy}</button>`).join("")}</div></div>`;
+  satWire(box);
+  if(box.hidden){ satFrom=document.activeElement; box.hidden=false; }
+  (box.querySelector(`[data-sat-go="${i}"]`)||box.querySelector(".sat-x")).focus();
+}
+function closeSat(){ const box=document.getElementById("satbox"); if(box.hidden) return; box.hidden=true; box.innerHTML=""; satAt=null; if(satFrom&&satFrom.focus) satFrom.focus(); }
+document.addEventListener("click",ev=>{
+  const c=ev.target.closest("[data-sat]"); if(c){ openSat(+c.dataset.sat); return; }
+  const box=document.getElementById("satbox"); if(box.hidden) return;
+  const go=ev.target.closest("[data-sat-go]"); if(go){ openSat(+go.dataset.satGo); return; }
+  const st=ev.target.closest("[data-sat-step]"); if(st){ const j=satAt+(+st.dataset.satStep); if(j>=0&&j<SAT_YEARS.length) openSat(j); return; }
+  if(ev.target.closest(".sat-x")||ev.target===box) closeSat();
+});
+document.addEventListener("keydown",ev=>{
+  if(satAt===null) return;
+  if(ev.key==="Escape"){ ev.preventDefault(); closeSat(); }
+  else if(ev.key==="ArrowLeft"&&satAt>0){ ev.preventDefault(); openSat(satAt-1); }
+  else if(ev.key==="ArrowRight"&&satAt<SAT_YEARS.length-1){ ev.preventDefault(); openSat(satAt+1); }
+});
 
 // ---------- render ----------
 function render(){

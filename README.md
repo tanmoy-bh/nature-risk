@@ -103,3 +103,10 @@ Every chart in the Model lab has a sparkle button at its top-right. It posts the
 - Every number in a reading must appear in the chart's facts; otherwise the draft is rejected, and after two tries a plain summary from the model results is shown instead.
 - Readings are cached for 24 hours on the server (per results version, model, chart, place and settings) and in the browser's IndexedDB. Refresh asks for a fresh one.
 - It uses the same `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` settings as the committee note.
+
+## Satellite view (Nature map)
+
+Right below the map, the selected site is shown from above in five yearly cloud-free Sentinel-2 images (2021–2025), all at the same scale (about 5 km across, zoom 14) with a 1 km bar. Click any year to open it large and step through the years with the arrow keys.
+
+- Tiles load in the viewer's browser straight from EOX's public [Sentinel-2 cloudless](https://s2maps.eu) service; no key is needed. The tile maths is `satFrame()` in `src/app.html`, tested in `tests/satellite.test.mjs`.
+- Licence: EOX licenses these mosaics for non-commercial use, with attribution (shown under the strip). A commercial product would need an EOX licence or another source.
