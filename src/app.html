@@ -1266,7 +1266,14 @@ function briefView(b){
   <p class="bf-foot">Sources: ${BRIEF_SRC}. Open a story to read it at the source; loan matches are by country and crop.</p>`; }
 // Refresh stays off for 10 minutes after a debrief was made (the server limits it too), then switches on by itself.
 function briefShow(el,b){ el.innerHTML=briefView(b); const btn=el.querySelector('[data-brief="refresh"]'), wait=REFRESH_GAP-(Date.now()-Date.parse(b.generatedAt));
-  if(btn&&wait>0){ btn.title="Fresh news can be fetched every 10 minutes"; setTimeout(()=>{ if(btn.isConnected){ btn.disabled=false; btn.title="Get fresh news"; } },wait); } }
+  if(!btn||wait<=0) return;
+  // Say when Refresh comes back, counting down each minute, then switch it on.
+  const label=btn.lastChild, until=Date.now()+wait;
+  btn.title="Fresh news can be fetched every 10 minutes, to keep AI costs down";
+  const tick=()=>{ if(!btn.isConnected) return; const left=until-Date.now();
+    if(left<=0){ btn.disabled=false; btn.title="Get fresh news"; label.textContent="Refresh"; return; }
+    const m=Math.ceil(left/60000); label.textContent=`Refresh in ${m} min`; setTimeout(tick,Math.min(left,(left%60000)||60000)); };
+  tick(); }
 async function loadBrief(again){
   const el=document.getElementById("brief"); if(!el) return; const tok=++briefTok;
   const shown=el.querySelector(".bf-grid,.bf-sum")?el.innerHTML:null;

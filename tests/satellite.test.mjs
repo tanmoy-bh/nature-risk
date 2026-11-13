@@ -53,3 +53,7 @@ test("debrief and satellite viewer polish from review", () => {
   assert.match(app, /CC BY-NC-SA 4\.0/);
   assert.doesNotMatch(grab(/function satImg\([\s\S]*?\n\}\n/), /<div/, "satImg builds spans, so it is valid inside a button");
 });
+
+test("a disabled Refresh says when it comes back", () => {
+  assert.match(app, /`Refresh in \$\{m\} min`/);
+});
