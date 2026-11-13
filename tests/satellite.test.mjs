@@ -57,3 +57,13 @@ test("debrief and satellite viewer polish from review", () => {
 test("a disabled Refresh says when it comes back", () => {
   assert.match(app, /`Refresh in \$\{m\} min`/);
 });
+
+test("the debrief folds away and every news topic has an animated glyph", async () => {
+  const { CHANNELS } = await import("../lib/brief.mjs");
+  const glyphs = grab(/const BF_GLYPH=\{[\s\S]*?\n\};\n/);
+  for (const c of CHANNELS) assert.ok(glyphs.includes(JSON.stringify(c)), `glyph for ${c}`);
+  assert.match(app, /data-brief-toggle[^>]*aria-expanded=/);
+  assert.match(app, /aria-controls="bf-body"/);
+  assert.match(app, /localStorage\.setItem\("nrd-brief-collapsed"/);
+  assert.match(app, /@media \(prefers-reduced-motion: reduce\)\{[^}]*\.bf-gl/);
+});

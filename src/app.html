@@ -283,6 +283,52 @@ details[open] summary::after{content:"Hide"}
 .bf-loan:hover{background:var(--fill)}
 .bf-more{font-size:12.5px;color:var(--muted)}
 .bf-foot{font-size:12px;color:var(--muted);margin:0}
+/* Folding: the body animates between 0 and its height; the header keeps a row of today's topic glyphs. */
+.bf-tog{width:30px;padding:0;justify-content:center}
+.bf-tog svg{transition:transform .25s ease}
+.brief.collapsed .bf-tog svg{transform:rotate(-90deg)}
+.bf-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .3s ease,opacity .25s ease;opacity:1}
+.bf-in{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:14px}
+.brief.collapsed .bf-body{grid-template-rows:0fr;opacity:0}
+.brief.collapsed{gap:0}
+.bf-head .bf-t{cursor:pointer}
+.bf-minis{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
+.bf-minis .bf-gl{width:22px;height:22px;border-radius:7px}
+.bf-minis .bf-gl svg{width:17px;height:17px}
+/* Animated topic glyphs */
+.bf-top{display:flex;align-items:center;gap:10px}
+.bf-gl{--c:#8E8E93;flex:none;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:var(--c);
+  background:color-mix(in srgb,var(--c) 15%,transparent);box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--c) 35%,transparent)}
+.bf-gl svg{width:27px;height:27px;overflow:visible}
+.bf-gl *{transform-box:fill-box}
+.g-fire{--c:#FF6B3D} .g-drop{--c:#30B0C7} .g-tree{--c:#34A853} .g-scale{--c:#AF52DE} .g-bfly{--c:#FF9F0A} .g-pin{--c:#A2845E} .g-coin{--c:#5E5CE6}
+.g-fire .a{transform-origin:50% 100%;animation:glFlick 1.6s ease-in-out infinite}
+.g-fire .b{transform-origin:50% 100%;animation:glFlick 1.1s ease-in-out infinite reverse}
+.g-drop .a{animation:glDrip 2.4s ease-in infinite}
+.g-drop .b{transform-origin:50% 50%;animation:glRipple 2.4s ease-out infinite}
+.g-tree .a{transform-origin:50% 100%;animation:glSway 3s ease-in-out infinite}
+.g-tree .b{animation:glLeaf 3s ease-in infinite}
+.g-scale .a{transform-origin:50% 0%;animation:glTip 3.2s ease-in-out infinite}
+.g-bfly .a{transform-origin:100% 50%;animation:glFlap .9s ease-in-out infinite}
+.g-bfly .b{transform-origin:0% 50%;animation:glFlap .9s ease-in-out infinite}
+.g-bfly svg{animation:glFloat 2.6s ease-in-out infinite}
+.g-pin .a{animation:glBounce 2s cubic-bezier(.3,0,.3,1) infinite}
+.g-pin .b{transform-origin:50% 50%;animation:glShadow 2s cubic-bezier(.3,0,.3,1) infinite}
+.g-coin .a{transform-origin:50% 50%;animation:glFlip 3s ease-in-out infinite}
+.bf-card:hover .bf-gl *{animation-duration:.8s}
+.bf-card:hover .g-tree *,.bf-card:hover .g-scale *,.bf-card:hover .g-coin *{animation-duration:1.4s}
+@keyframes glFlick{0%,100%{transform:scale(1,1) skewX(0)}30%{transform:scale(.94,1.08) skewX(-3deg)}60%{transform:scale(1.04,.95) skewX(3deg)}}
+@keyframes glDrip{0%{transform:translateY(-3px);opacity:0}15%{opacity:1}70%{transform:translateY(3px);opacity:1}85%,100%{transform:translateY(4px);opacity:0}}
+@keyframes glRipple{0%,60%{transform:scale(.3);opacity:0}75%{opacity:.9}100%{transform:scale(1.3);opacity:0}}
+@keyframes glSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes glLeaf{0%,40%{transform:translate(0,0) rotate(0);opacity:0}50%{opacity:1}100%{transform:translate(4px,9px) rotate(70deg);opacity:0}}
+@keyframes glTip{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes glFlap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.35)}}
+@keyframes glFloat{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
+@keyframes glBounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}60%{transform:translateY(0)}}
+@keyframes glShadow{0%,100%{transform:scale(1);opacity:.5}40%{transform:scale(.6);opacity:.25}60%{transform:scale(1);opacity:.5}}
+@keyframes glFlip{0%,35%{transform:scaleX(1)}50%{transform:scaleX(.1)}65%,100%{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){.bf-gl,.bf-gl *,.bf-gl svg{animation:none!important}.bf-body,.bf-tog svg{transition:none}}
 .bf-note{font-size:13px;color:var(--muted);margin:0}
 .bf-err{font-size:13.5px;color:var(--risk-ink);margin:0}
 .bf-skel{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
@@ -1228,7 +1274,12 @@ function renderMap(){
 const BRIEF_TTL=86400000, REFRESH_GAP=600000, BRIEF_SRC="Mongabay, Eco-Business, Dialogue Earth and Carbon Brief";
 const hx=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const BF_SPARK=(c)=>`<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="${c}" d="M10 2.5c.5 3.9 2.6 6 6.5 6.5-3.9.5-6 2.6-6.5 6.5-.5-3.9-2.6-6-6.5-6.5 3.9-.5 6-2.6 6.5-6.5Z"/><path fill="${c}" d="M18 13.5c.3 2 1.3 3 3.3 3.3-2 .3-3 1.3-3.3 3.3-.3-2-1.3-3-3.3-3.3 2-.3 3-1.3 3.3-3.3Z"/></svg>`;
-let briefDbP=null, briefTok=0;
+let briefDbP=null, briefTok=0, briefCollapsed=false;
+try{ briefCollapsed=localStorage.getItem("nrd-brief-collapsed")==="1"; }catch(e){}
+function briefFold(el,collapsed){ briefCollapsed=collapsed; el.classList.toggle("collapsed",collapsed);
+  const t=el.querySelector("[data-brief-toggle]"); if(t){ t.setAttribute("aria-expanded",String(!collapsed)); t.setAttribute("aria-label",(collapsed?"Show":"Hide")+" the debrief"); }
+  const body=el.querySelector("#bf-body"); if(body) body.inert=collapsed;
+  try{ localStorage.setItem("nrd-brief-collapsed",collapsed?"1":"0"); }catch(e){} }
 function briefDb(){ if(briefDbP) return briefDbP;
   briefDbP=new Promise((ok,no)=>{ try{ const r=indexedDB.open("nature-risk-desk",1);
     r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains("brief")) r.result.createObjectStore("brief"); };
@@ -1244,10 +1295,21 @@ function briefIdle(err){ return `<div class="bf-idle"><span class="bf-mark">${BF
   <button class="bf-load" type="button" data-brief="load"><span class="bf-sh"></span>${BF_SPARK("#fff")}<span>Load daily debrief</span></button></div>${err?`<p class="bf-err">${hx(err)}</p>`:""}`; }
 function briefLoading(){ return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>Reading today's nature news…</span></div></div>
   <div class="bf-skel" aria-hidden="true"><div></div><div></div><div></div></div>`; }
+// One animated glyph per news topic (shapes animate through CSS; see .g-* above).
+const BF_GLYPH={
+  "Fire and haze":["g-fire",'<path class="a" d="M12 21c-4 0-6.5-2.6-6.5-6 0-3.6 3-5.6 3.8-9 2.4 1.6 3.6 3.6 3.7 5.6.9-.8 1.5-1.9 1.6-3.1 2 1.8 3.9 4 3.9 6.5 0 3.4-2.5 6-6.5 6Z" fill="currentColor" opacity=".9"/><path class="b" d="M12 21c-1.8 0-3-1.2-3-2.9 0-1.8 1.6-2.7 2.1-4.6 1.7 1.2 3.9 2.7 3.9 4.6 0 1.7-1.2 2.9-3 2.9Z" fill="#FFD25A"/>'],
+  "Drought and water":["g-drop",'<path class="a" d="M12 3.5c2.8 3.6 4.6 6.3 4.6 8.6a4.6 4.6 0 0 1-9.2 0c0-2.3 1.8-5 4.6-8.6Z" fill="currentColor"/><ellipse class="b" cx="12" cy="20.5" rx="5" ry="1.4" fill="none" stroke="currentColor" stroke-width="1.4"/>'],
+  "Deforestation rules":["g-tree",'<g class="a"><path d="M12 3 6 12h3l-4 6h14l-4-6h3Z" fill="currentColor"/></g><rect x="11" y="18" width="2" height="3.5" rx="1" fill="currentColor" opacity=".7"/><path class="b" d="M17.5 9.5c1.2-.2 2 .4 2.2 1.4-1.2.2-2-.4-2.2-1.4Z" fill="currentColor"/>'],
+  "Buyer demand":["g-scale",'<path d="M12 4v16M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><g class="a"><path d="M4.5 7.5h15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 7.5 2.5 13h4Zm15 0-2 5.5h4Z" fill="currentColor"/></g>'],
+  "Protected areas and biodiversity":["g-bfly",'<path class="a" d="M12 12C9 6 4 5 3.5 8.2 3 11 6.5 13 12 12Zm0 0c-4 1-6.5 3.2-5.6 5.4.9 2 4 .8 5.6-5.4Z" fill="currentColor"/><path class="b" d="M12 12c3-6 8-7 8.5-3.8.5 2.8-3 4.8-8.5 3.8Zm0 0c4 1 6.5 3.2 5.6 5.4-.9 2-4 .8-5.6-5.4Z" fill="currentColor" opacity=".85"/><rect x="11.3" y="8" width="1.4" height="9" rx=".7" fill="currentColor"/>'],
+  "Land and collateral":["g-pin",'<ellipse class="b" cx="12" cy="20.5" rx="4.5" ry="1.3" fill="currentColor" opacity=".5"/><path class="a" d="M12 18s-5.5-5-5.5-9a5.5 5.5 0 0 1 11 0c0 4-5.5 9-5.5 9Zm0-7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" fill="currentColor" fill-rule="evenodd"/>'],
+  "Carbon and finance policy":["g-coin",'<g class="a"><circle cx="12" cy="12" r="8" fill="currentColor"/><path d="M14.6 9.3a3.3 3.3 0 1 0 0 5.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></g>'],
+};
+function bfGlyph(ch){ const g=BF_GLYPH[ch]; if(!g) return ""; return `<span class="bf-gl ${g[0]}" aria-hidden="true"><svg viewBox="0 0 24 24">${g[1]}</svg></span>`; }
 const BF_DIR={"raises risk":["up","↑ Raises risk"],"lowers risk":["down","↓ Lowers risk"],"mixed":["mix","↕ Mixed"]};
 function briefCard(s){
   const d=BF_DIR[s.direction], loans=s.loans||[], more=loans.length-4;
-  return `<article class="bf-card">${s.channel?`<div class="bf-tags"><span class="bf-chip">${hx(s.channel)}</span>${d?`<span class="bf-dir ${d[0]}">${d[1]}</span>`:""}</div>`:""}
+  return `<article class="bf-card">${s.channel?`<div class="bf-top">${bfGlyph(s.channel)}<div class="bf-tags"><span class="bf-chip">${hx(s.channel)}</span>${d?`<span class="bf-dir ${d[0]}">${d[1]}</span>`:""}</div></div>`:""}
     <a class="bf-h" href="${hx(s.link)}" target="_blank" rel="noopener">${hx(s.title)}</a>
     <span class="bf-src">${hx(s.source)} · ${bfAgo(s.date)}</span>
     ${s.why?`<p class="bf-why">${hx(s.why)}</p>`:""}
@@ -1255,17 +1317,20 @@ function briefCard(s){
   </article>`; }
 function briefView(b){
   const ai=b.source==="model", at=new Date(b.generatedAt);
-  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t"><b>Daily nature debrief</b><span>${ai?`${b.stories.length} ${b.stories.length===1?"story":"stories"} picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
+  const minis=[...new Set(b.stories.map(s=>s.channel).filter(Boolean))].map(bfGlyph).join("");
+  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t" data-brief-toggle-area><b>Daily nature debrief${minis?`<span class="bf-minis">${minis}</span>`:""}</b><span>${ai?`${b.stories.length} ${b.stories.length===1?"story":"stories"} picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
     <span class="bf-meta">Updated ${at.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}, ${at.toLocaleDateString([],{day:"numeric",month:"short"})}
-    <button class="bf-ib" type="button" data-brief="refresh" title="Get fresh news"${Date.now()-Date.parse(b.generatedAt)<REFRESH_GAP?" disabled":""}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh</button></span></div>
+    <button class="bf-ib" type="button" data-brief="refresh" title="Get fresh news"${Date.now()-Date.parse(b.generatedAt)<REFRESH_GAP?" disabled":""}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh</button>
+    <button class="bf-ib bf-tog" type="button" data-brief-toggle aria-controls="bf-body" aria-expanded="${!briefCollapsed}" aria-label="${briefCollapsed?"Show":"Hide"} the debrief"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>
+  <div class="bf-body" id="bf-body"><div class="bf-in">
   ${b.throttled?`<p class="bf-note">This debrief was refreshed a few minutes ago, so it's still current.</p>`:""}
   ${b.refreshFailed?`<p class="bf-note">Couldn't get fresh news just now, so this is the debrief from ${new Date(b.generatedAt).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}.</p>`:""}
   ${ai&&b.summary?`<p class="bf-sum">${hx(b.summary)}</p>`:""}
   ${!ai?`<p class="bf-note">The AI reading isn't available right now, so these are the most relevant headlines from ${BRIEF_SRC}.</p>`:""}
   ${b.stories.length?`<div class="bf-grid">${b.stories.map(briefCard).join("")}</div>`:`<p class="bf-note">No nature stories relevant to this book in the last three days.</p>`}
-  <p class="bf-foot">Sources: ${BRIEF_SRC}. Open a story to read it at the source; loan matches are by country and crop.</p>`; }
+  <p class="bf-foot">Sources: ${BRIEF_SRC}. Open a story to read it at the source; loan matches are by country and crop.</p></div></div>`; }
 // Refresh stays off for 10 minutes after a debrief was made (the server limits it too), then switches on by itself.
-function briefShow(el,b){ el.innerHTML=briefView(b); const btn=el.querySelector('[data-brief="refresh"]'), wait=REFRESH_GAP-(Date.now()-Date.parse(b.generatedAt));
+function briefShow(el,b){ el.innerHTML=briefView(b); briefFold(el,briefCollapsed); const btn=el.querySelector('[data-brief="refresh"]'), wait=REFRESH_GAP-(Date.now()-Date.parse(b.generatedAt));
   if(!btn||wait<=0) return;
   // Say when Refresh comes back, counting down each minute, then switch it on.
   const label=btn.lastChild, until=Date.now()+wait;
@@ -1277,7 +1342,7 @@ function briefShow(el,b){ el.innerHTML=briefView(b); const btn=el.querySelector(
 async function loadBrief(again){
   const el=document.getElementById("brief"); if(!el) return; const tok=++briefTok;
   const shown=el.querySelector(".bf-grid,.bf-sum")?el.innerHTML:null;
-  el.classList.add("busy"); el.innerHTML=briefLoading();
+  el.classList.add("busy"); el.classList.remove("collapsed"); el.innerHTML=briefLoading();
   try{ const r=await fetch("api/brief",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({again:!!again})});
     if(r.status===401) throw new Error("Your session has expired. Reload the page and enter the passphrase again.");
     let j; try{ j=await r.json(); }catch(_){ throw new Error("The debrief couldn't load. Try again in a moment."); }
@@ -1294,6 +1359,7 @@ function openLoan(id){ if(!ASSETS.some(a=>a.id===id)) return; state.screen="desk
   const d=document.getElementById("detail"); if(d) d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("[data-brief]"); if(b){ loadBrief(b.dataset.brief==="refresh"); return; }
+  if(ev.target.closest("[data-brief-toggle],[data-brief-toggle-area]")){ const el=document.getElementById("brief"); if(el&&el.querySelector("#bf-body")) briefFold(el,!briefCollapsed); return; }
   const l=ev.target.closest("[data-brief-loan]"); if(l) openLoan(l.dataset.briefLoan);
 });
 initBrief();
