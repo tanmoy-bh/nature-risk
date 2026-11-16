@@ -52,3 +52,13 @@ test("drafting shows an AI shimmer around the note and the chart reading", async
   assert.match(lab, /box\.classList\.add\("busy"\)/);
   assert.match(lab, /card\.classList\.add\("busy"\)/);
 });
+
+test("the nature-to-revenue steps define every symbol, and the crop weight is not confused with traceability", async () => {
+  const lab = await read("src/lab.html");
+  for (const t of ["Probability of exclusion", "Forest loss", "Trigger threshold", "Traceability weight", "Sensitive-buyer share",
+    "Price premium", "Yield loss", "Drought sensitivity", "Rainfall deficit", "Water stress", "Revenue impact", "Revenue drop",
+    "Drought cost", "Greenness change", "Vegetation sensitivity", "Crop vegetation weight"]) assert.match(lab, new RegExp(t));
+  assert.match(lab, /w_\{\\\\text\{crop\}\}/);
+  assert.doesNotMatch(lab, /\\\\Delta\\\\text\{NDVI\}\\\\cdot v\\\\cdot w"/);
+  assert.match(lab, /class="terms"/);
+});

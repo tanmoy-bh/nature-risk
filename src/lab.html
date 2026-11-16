@@ -138,6 +138,10 @@ details.more .tablebox{margin-top:10px}
 .eqrow .exp p{font-size:14px;color:var(--ink)}
 .eqrow .vals{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .eqrow .vals b{color:var(--ink);font-weight:600}
+.eqrow .terms{display:grid;grid-template-columns:4.4em minmax(0,1fr);gap:6px 12px;margin-top:6px;padding-top:10px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--muted);align-items:baseline}
+.eqrow .terms dt{color:var(--ink);white-space:nowrap;font-size:14px;line-height:1.3}
+.eqrow .terms dd{margin:0}
+.eqrow .terms dd b{color:var(--ink);font-weight:600}
 .stage{display:flex;flex-direction:column;gap:10px}
 .stage + .stage{margin-top:8px}
 .stage .sth{display:flex;align-items:baseline;gap:10px}
@@ -375,7 +379,7 @@ function css(n){ return getComputedStyle(document.documentElement).getPropertyVa
 // ---------------- building blocks ----------------
 function eqRow(e,i){
   return `<div class="eqrow"><div class="math">${i!=null?`<span class="n">STEP ${i}</span>`:""}<div class="k">${tex(e.tex)}</div></div>
-    <div class="exp"><span class="name">${e.name}</span><p>${e.explain}</p>${e.vals?`<span class="vals">${e.vals}</span>`:""}</div></div>`;
+    <div class="exp"><span class="name">${e.name}</span><p>${e.explain}</p>${e.vals?`<span class="vals">${e.vals}</span>`:""}${e.terms?`<dl class="terms" aria-label="What each symbol means">${e.terms.map(([k,n,d])=>`<dt>${tex(k)}</dt><dd><b>${n}</b>${d?` · ${d}`:""}</dd>`).join("")}</dl>`:""}</div></div>`;
 }
 function dataItems(items){ return `<div class="datalist">${items.map(d=>`<div class="dataitem"><b>${d.t} ${d.p||""}</b><span class="d">${d.d}</span></div>`).join("")}</div>`; }
 function weakList(items){ return `<ul class="weak">${items.map(w=>`<li><span>${w}</span></li>`).join("")}</ul>`; }
@@ -390,16 +394,16 @@ function modelSteps(){
   const sgn=v=>v>=0?pct(v,2)+" lost":pct(-v,2)+" gained";
   return [
     {stage:"From nature to revenue",steps:[
-      {name:"Chance buyers turn the borrower away",tex:"p_{\\text{ex}}=\\dfrac{1}{1+e^{-(L-T)\\,/\\,(T/4)}}",
+      {name:"Chance buyers turn the borrower away",terms:[["p_{\\text{ex}}","Probability of exclusion","buyers reject the supply"],["L","Forest loss","% of the estate cleared, from satellite data"],["T","Trigger threshold","2% forest loss"],["e","Euler’s number","the base of the S-curve"],["T/4","Curve steepness","how fast the risk rises past the trigger"]],tex:"p_{\\text{ex}}=\\dfrac{1}{1+e^{-(L-T)\\,/\\,(T/4)}}",
        explain:"Buyers with deforestation-free rules start rejecting supply as forest loss L passes the trigger T. Below the trigger the chance is near zero, at the trigger it is 50%, and at twice the trigger it is near certain.",
        vals:`Here: L = <b>${n.loss.toFixed(1)}%</b> ${REAL} · T = <b>2%</b> → p<sub>ex</sub> = <b>${pct(m.pEx,0)}</b>`},
-      {name:"Premium for clean, traceable supply",tex:"c=w_{\\text{trace}}\\cdot\\max\\!\\big(0,\\ 1-L/(T/2)\\big),\\qquad \\text{premium}=c\\,s\\,\\pi",
+      {name:"Premium for clean, traceable supply",terms:[["c","Clean-supply share","how verifiably deforestation-free the supply is"],["w_{\\text{trace}}","Traceability weight","plot 1, mill 0.5, district 0.2"],["\\max(\\cdot)","Cleanliness score","max(0, 1 − L/(T/2)): 1 with no clearing, 0 once loss reaches half the trigger"],["s","Sensitive-buyer share","sales to buyers with deforestation-free rules"],["\\pi","Price premium","3% extra on clean sales"],["\\text{premium}","Revenue gained","c × s × π"]],tex:"c=w_{\\text{trace}}\\cdot\\max\\!\\big(0,\\ 1-L/(T/2)\\big),\\qquad \\text{premium}=c\\,s\\,\\pi",
        explain:"The upside. An estate with little or no clearing, whose supply buyers can verify, keeps its deforestation-free buyers and can earn a premium π on those sales. w is how well buyers can trace the supply: plot 1, mill 0.5, district 0.2.",
        vals:`Here: traced to <b>${n.trace}</b> ${SAMPLE} (w = ${tw}) → c = <b>${pct(m.clean,0)}</b> → premium <b>${pct(m.prem,2)}</b> of revenue`},
-      {name:"Harvest lost in a drought year",tex:"y=\\min\\!\\big(0.6,\\ \\beta\\,D\\,(1+W/5)\\big)",
+      {name:"Harvest lost in a drought year",terms:[["y","Yield loss","share of the harvest lost, capped at 60%"],["\\beta","Drought sensitivity","by crop, e.g. palm 0.40, coffee 0.50"],["D","Rainfall deficit","% drop in the driest year since 2001"],["W","Water stress","WRI Aqueduct score, 0 to 5"],["0.6","Loss cap","a harvest is never treated as more than 60% lost"]],tex:"y=\\min\\!\\big(0.6,\\ \\beta\\,D\\,(1+W/5)\\big)",
        explain:"If the driest year since 2001 came back, the harvest would fall by the rainfall deficit D times the crop's sensitivity β, more where water is already scarce (W).",
        vals:`Here: β = <b>${p.inputs.beta.toFixed(2)}</b> ${SAMPLE} · D = <b>${n.deficit.toFixed(1)}%</b> ${REAL} · W = <b>${n.stress.toFixed(2)}</b> ${REAL} → y = <b>${pct(m.y,1)}</b>`},
-      {name:"Revenue impact of nature",tex:"r=p_{\\text{ex}}\\,s\\,d\\;-\\;\\text{premium}\\;+\\;r_{\\text{drought}}\\;-\\;\\Delta\\text{NDVI}\\cdot v\\cdot w",
+      {name:"Revenue impact of nature",terms:[["r","Revenue impact","net share of revenue lost; negative means a gain"],["p_{\\text{ex}}\\,s\\,d","Buyer-loss cost","probability × exposed share × revenue drop"],["d","Revenue drop","8% of affected sales lost when buyers walk away"],["r_{\\text{drought}}","Drought cost","yield loss spread over the 4-year loan, only in the drought scenario"],["\\Delta\\text{NDVI}","Greenness change","vegetation trend, either sign, capped at ±10%"],["v","Vegetation sensitivity","0.15: how much greenness moves revenue"],["w_{\\text{crop}}","Crop vegetation weight","1 for tree crops, 0.25 for rice and sugar, 0 for aquaculture"]],tex:"r=p_{\\text{ex}}\\,s\\,d\\;-\\;\\text{premium}\\;+\\;r_{\\text{drought}}\\;-\\;\\Delta\\text{NDVI}\\cdot v\\cdot w_{\\text{crop}}",
        explain:"Buyers walking away cost revenue; the premium adds it back; a drought year costs revenue only in the drought scenario; the land's health trend works either way. A negative r is a gain.",
        vals:`Here: r = <b>${sgn(m.r)}</b>`},
     ]},
