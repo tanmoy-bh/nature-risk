@@ -1348,10 +1348,17 @@ function briefCard(s){
     ${s.why?`<p class="bf-why">${hx(s.why)}</p>`:""}
     ${loans.length?`<div class="bf-book"><span>In your book</span>${loans.slice(0,4).map(l=>`<button class="bf-loan" type="button" data-brief-loan="${hx(l.id)}" title="${hx(l.commodity)}: open on the desk">${hx(l.name)}</button>`).join("")}${more>0?`<span class="bf-more">+${more} more</span>`:""}</div>`:""}
   </article>`; }
+// "google/gemini-3.8-flash" -> "Gemini 3.8 Flash", shown on every AI output.
+function modelName(id){
+  if(!id) return "AI";
+  const parts=String(id).split("/").pop().split("-"), out=[];
+  for(const p of parts){ if(/^\d+(\.\d+)?$/.test(p) && out.length && /^\d+(\.\d+)?$/.test(out[out.length-1])) out[out.length-1]+="."+p; else out.push(p); }
+  return out.map(w=>/^\d/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+}
 function briefView(b){
   const ai=b.source==="model", at=new Date(b.generatedAt);
   const minis=[...new Set(b.stories.map(s=>s.channel).filter(Boolean))].map(bfGlyph).join("");
-  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t" data-brief-toggle-area><b>Daily nature debrief${minis?`<span class="bf-minis">${minis}</span>`:""}</b><span>${ai?`${b.stories.length} ${b.stories.length===1?"story":"stories"} picked by AI from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
+  return `<div class="bf-head"><span class="bf-mark">${BF_SPARK("#7D7AFF")}</span><div class="bf-t" data-brief-toggle-area><b>Daily nature debrief${minis?`<span class="bf-minis">${minis}</span>`:""}</b><span>${ai?`${b.stories.length} ${b.stories.length===1?"story":"stories"} picked by ${modelName(b.model)} from ${b.read} articles`:"Headlines, not yet analysed by AI"}</span></div>
     <span class="bf-meta">Updated ${at.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}, ${at.toLocaleDateString([],{day:"numeric",month:"short"})}
     <button class="bf-ib" type="button" data-brief="refresh" title="Get fresh news"${Date.now()-Date.parse(b.generatedAt)<REFRESH_GAP?" disabled":""}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Refresh</button>
     <button class="bf-ib bf-tog" type="button" data-brief-toggle aria-controls="bf-body" aria-expanded="${!briefCollapsed}" aria-label="${briefCollapsed?"Show":"Hide"} the debrief"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>
