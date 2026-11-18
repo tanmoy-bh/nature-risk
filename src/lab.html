@@ -129,7 +129,7 @@ details.more .tablebox{margin-top:10px}
 
 .eqs{display:flex;flex-direction:column;gap:10px}
 .eqrow{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:0;border-radius:12px;overflow:hidden;box-shadow:0 0 0 .5px var(--line)}
-.eqrow .math{background:var(--eqbg);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;overflow-x:auto;min-width:0}
+.eqrow .math{background:var(--eqbg);padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:6px;overflow-x:auto;min-width:0}
 .eqrow .math .n{font-size:11px;font-weight:700;color:var(--nat);letter-spacing:.04em}
 .eqrow .math .k{font-size:17px;line-height:1.4}
 .eqrow .math math{font-size:1.06em}
@@ -138,7 +138,7 @@ details.more .tablebox{margin-top:10px}
 .eqrow .exp p{font-size:14px;color:var(--ink)}
 .eqrow .vals{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .eqrow .vals b{color:var(--ink);font-weight:600}
-.eqrow .terms{display:grid;grid-template-columns:4.4em minmax(0,1fr);gap:6px 12px;margin-top:6px;padding-top:10px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--muted);align-items:baseline}
+.eqrow .terms{align-self:stretch;display:grid;grid-template-columns:4.4em minmax(0,1fr);gap:6px 12px;margin-top:8px;padding-top:12px;border-top:.5px solid var(--line);font-size:12.5px;color:var(--muted);align-items:baseline}
 .eqrow .terms dt{color:var(--ink);white-space:nowrap;font-size:14px;line-height:1.3}
 .eqrow .terms dd{margin:0}
 .eqrow .terms dd b{color:var(--ink);font-weight:600}
@@ -379,8 +379,8 @@ function css(n){ return getComputedStyle(document.documentElement).getPropertyVa
 
 // ---------------- building blocks ----------------
 function eqRow(e,i){
-  return `<div class="eqrow"><div class="math">${i!=null?`<span class="n">STEP ${i}</span>`:""}<div class="k">${tex(e.tex)}</div></div>
-    <div class="exp"><span class="name">${e.name}</span><p>${e.explain}</p>${e.vals?`<span class="vals">${e.vals}</span>`:""}${e.terms?`<dl class="terms" aria-label="What each symbol means">${e.terms.map(([k,n,d])=>`<dt>${tex(k)}</dt><dd><b>${n}</b>${d?` · ${d}`:""}</dd>`).join("")}</dl>`:""}</div></div>`;
+  return `<div class="eqrow"><div class="math">${i!=null?`<span class="n">STEP ${i}</span>`:""}<div class="k">${tex(e.tex)}</div>${e.terms?`<dl class="terms" aria-label="What each symbol means">${e.terms.map(([k,n,d])=>`<dt>${tex(k)}</dt><dd><b>${n}</b>${d?` · ${d}`:""}</dd>`).join("")}</dl>`:""}</div>
+    <div class="exp"><span class="name">${e.name}</span><p>${e.explain}</p>${e.vals?`<span class="vals">${e.vals}</span>`:""}</div></div>`;
 }
 function dataItems(items){ return `<div class="datalist">${items.map(d=>`<div class="dataitem"><b>${d.t} ${d.p||""}</b><span class="d">${d.d}</span></div>`).join("")}</div>`; }
 function weakList(items){ return `<ul class="weak">${items.map(w=>`<li><span>${w}</span></li>`).join("")}</ul>`; }
