@@ -4,6 +4,7 @@ import { readFile, writeFile, mkdir, cp, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { creditTable } from "../lib/credit.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -19,12 +20,14 @@ const [app, geo, arch, archDefs, archSystem, archSequence, archRefresh, archAi] 
   readFile(join(root, "src/arch-ai.svg"), "utf8"),
 ]);
 
-const placeholders = ["/*__PATHS__*/[]", "/*__ARCH__*/", "/*__ARCH_DEFS__*/", "/*__ARCH_SYSTEM__*/", "/*__ARCH_SEQUENCE__*/", "/*__ARCH_REFRESH__*/", "/*__ARCH_AI__*/"];
+const credit = creditTable(JSON.parse(await readFile(join(root, "analysis/results.json"), "utf8")));
+const placeholders = ["/*__CREDIT__*/{}", "/*__PATHS__*/[]", "/*__ARCH__*/", "/*__ARCH_DEFS__*/", "/*__ARCH_SYSTEM__*/", "/*__ARCH_SEQUENCE__*/", "/*__ARCH_REFRESH__*/", "/*__ARCH_AI__*/"];
 const missing = placeholders.filter((p) => !app.includes(p));
 if (missing.length) throw new Error(`src/app.html is missing placeholders: ${missing.join(", ")}`);
 JSON.parse(geo); // fail the build on broken map data
 
 const body = app
+  .replace("/*__CREDIT__*/{}", JSON.stringify(credit))
   .replace("/*__PATHS__*/[]", geo.trim())
   .replace("/*__ARCH__*/", arch.trim())
   .replace("/*__ARCH_DEFS__*/", archDefs.trim())

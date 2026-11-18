@@ -659,7 +659,7 @@ footer{max-width:1180px;margin:40px auto 0;font-size:12px;color:var(--muted);dis
       <div class="stat"><span class="label">Exposure by label<span class="dp sample" title="Sample value, not real data">Sample</span></span><div class="mixbar" id="mixbar" role="img"></div><div class="keys" id="mixkeys"></div></div>
       <div class="stat"><span class="label">Book<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-total"></span><span class="sub" id="s-count"></span></div>
       <div class="stat"><span class="label">In Nature Risk<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-risk"></span><span class="sub" id="s-riskshare"></span></div>
-      <div class="stat"><span class="label">Pricing signal<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-bps"></span><span class="sub">bps, exposure-weighted</span></div>
+      <div class="stat"><span class="label">Pricing signal<span class="dp sample" title="Sample value, not real data">Sample</span></span><span class="big" id="s-bps"></span><span class="sub" id="s-bpssub">bps vs financials alone, exposure-weighted</span></div>
     </div>
     <section class="panel brief" id="brief" aria-live="polite" aria-label="Daily nature debrief"></section>
     <div class="desk">
@@ -894,6 +894,8 @@ ASSETS.forEach(a=>{
 });
 
 
+// Repricing per farm loan from the credit model (the Model lab), filled in by the build.
+const CREDIT = /*__CREDIT__*/{};
 const SCEN = {
   base:{label:"Baseline",desc:"Current indicator values. A site is Nature Risk if 2% or more of its area lost tree cover in 2021–2024.",stress:0,slope:0,trigger:2},
   drought:{label:"Repeat of driest year",desc:"Each site relives its driest year since 2001 from ERA5 rainfall. Water stress rises by up to 2 points and vegetation trend falls in proportion to that year's rainfall deficit.",site:true,stress:0,slope:0,trigger:2},
@@ -927,12 +929,11 @@ function evaluate(asset,scenKey){
   else { label="stable"; reason="score"; }
   const confVal = 0.6*{plot:1,mill:0.6,district:0.35}[r.trace] + 0.4*r.cloud;
   const conf = confVal>=0.75?"High":confVal>=0.5?"Medium":"Low";
-  let bps = 0;
-  if (label==="risk") bps = Math.min(60, 25 + Math.round(Math.max(0,60-score)*0.8));
-  if (label==="gain") bps = -Math.min(20, 10 + Math.round((score-62)*0.5));
+  const credit = CREDIT[asset.id]?.[scenKey] || null;
+  const bps = credit ? credit.bps : null, stage = credit ? credit.stage : null;   // null: no credit model for this book yet
   const weakest = Object.keys(subs).reduce((a,b)=>subs[a]<=subs[b]?a:b);
   const greenOnGreen = asset.kind==="renew" && (label==="risk" || subs.biodiversity<40);
-  return {r,subs,score,label,reason,conf,bps,weakest,greenOnGreen};
+  return {r,subs,score,label,reason,conf,bps,stage,weakest,greenOnGreen};
 }
 
 // ---------- state ----------
@@ -966,7 +967,7 @@ function fromHash(){
 fromHash();
 const save = ()=>{ try{ localStorage.setItem("nrd-state5", JSON.stringify(state)); }catch(e){} };
 const fmtM = v=>"$"+(Math.round(v*10)/10).toLocaleString("en-US")+"m";
-const fmtBps = v=> v===0 ? "0" : (v>0?"+":"−")+Math.abs(v);
+const fmtBps = (v,dp=0)=>{ if(v==null) return "—"; const x=Math.round(v*10**dp)/10**dp; return x===0 ? "0" : (x>0?"+":"−")+Math.abs(x).toFixed(dp); };
 const isMYSG = a=> a.cc==="MY"||a.cc==="SG";
 const short = l=>LABELNAME[l].replace("Nature ","");
 const place = a=> a.where.split(" (")[0];
@@ -1098,11 +1099,14 @@ function evidenceBlock(a,e){
 
 // ---------- page 1: lender desk ----------
 function action(a,e){
+  const b = e.bps==null ? null : Math.round(e.bps);
+  const price = b==null ? "" : b>0 ? `Price ${b} bps above pricing on financials alone. ` : b<0 ? `Supports a price ${-b} bps below pricing on financials alone. ` : "Pricing unchanged. ";
   let t;
-  if (e.label==="risk" && e.reason==="trigger") t = `Price ${fmtBps(e.bps)} bps. Require a time-bound no-deforestation plan with plot-level geolocation before renewal.`;
-  else if (e.label==="risk") t = `Price ${fmtBps(e.bps)} bps. Add a covenant on ${SUBNAME[e.weakest].toLowerCase()}, reviewed annually.`;
-  else if (e.label==="gain") t = `Eligible for a ${Math.abs(e.bps)} bps sustainability-linked step-down while the Gain label holds.`;
-  else t = `Hold pricing. Monitor quarterly and engage on ${SUBNAME[e.weakest].toLowerCase()}.`;
+  if (e.label==="risk" && e.reason==="trigger") t = `${price}Require a time-bound no-deforestation plan with plot-level geolocation before renewal.`;
+  else if (e.label==="risk") t = `${price}Add a covenant on ${SUBNAME[e.weakest].toLowerCase()}, reviewed annually.`;
+  else if (e.label==="gain") t = `${price}Eligible for a sustainability-linked margin while the Gain label holds.`;
+  else t = `${price||"Hold pricing. "}Monitor quarterly and engage on ${SUBNAME[e.weakest].toLowerCase()}.`;
+  if (e.stage===2) t += " IFRS 9 Stage 2: provision for the loan's lifetime.";
   if (e.conf==="Low") t += " Request plot-level data first: confidence is low.";
   if (e.greenOnGreen) t += " Green-on-green: ask for a biodiversity plan and siting review before drawdown.";
   return t;
@@ -1122,7 +1126,8 @@ function renderDesk(){
   const by = {risk:0,stable:0,gain:0}; evals.forEach(x=>by[x.e.label]+=x.a.exp);
   const baseRisk = evals.filter(x=>x.b.label==="risk").reduce((t,x)=>t+x.a.exp,0);
   const moved = evals.filter(x=>x.e.label==="risk" && x.b.label!=="risk").length;
-  const wbps = total ? evals.reduce((t,x)=>t+x.e.bps*x.a.exp,0)/total : 0;
+  const priced = evals.filter(x=>x.e.bps!=null), ptot = priced.reduce((t,x)=>t+x.a.exp,0);
+  const wbps = ptot ? priced.reduce((t,x)=>t+x.e.bps*x.a.exp,0)/ptot : null;
   const mb = document.getElementById("mixbar");
   mb.innerHTML = ["risk","stable","gain"].map(k=>`<span style="width:${total?by[k]/total*100:0}%;background:${COLORS[k]}"></span>`).join("");
   mb.setAttribute("aria-label", ["risk","stable","gain"].map(k=>`${LABELNAME[k]} ${total?Math.round(by[k]/total*100):0}%`).join(", "));
@@ -1133,7 +1138,8 @@ function renderDesk(){
   const rs = document.getElementById("s-riskshare");
   if (state.scen!=="base" && by.risk>baseRisk){ rs.textContent = `+${fmtM(by.risk-baseRisk)} · ${moved} moved in`; rs.className="sub up"; }
   else { rs.textContent = `${total?Math.round(by.risk/total*100):0}% of book`; rs.className="sub"; }
-  document.getElementById("s-bps").textContent = fmtBps(Math.round(wbps*10)/10);
+  document.getElementById("s-bps").textContent = fmtBps(wbps,1);
+  document.getElementById("s-bpssub").textContent = wbps==null ? "Not modelled for this book yet" : "bps vs financials alone, exposure-weighted";
 
   const shown = evals.filter(x=>state.filter==="all" || x.e.label===state.filter).sort((p,q)=>q.a.exp-p.a.exp);
   if (!book.some(a=>a.id===state.sel)) state.sel = [...evals].sort((p,q)=>q.a.exp-p.a.exp)[0].a.id;
