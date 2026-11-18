@@ -62,3 +62,11 @@ test("the nature-to-revenue steps define every symbol, and the crop weight is no
   assert.doesNotMatch(lab, /\\\\Delta\\\\text\{NDVI\}\\\\cdot v\\\\cdot w"/);
   assert.match(lab, /class="terms"/);
 });
+
+test("every equation in the Model lab defines its symbols", async () => {
+  const lab = await read("src/lab.html");
+  const eqs = lab.match(/\{name:"[^"]+",(?:terms:\[.*?\],)?tex:"/g);
+  assert.ok(eqs.length >= 34, `found ${eqs.length}`);
+  const bare = eqs.filter((e) => !e.includes("terms:["));
+  assert.deepEqual(bare, []);
+});
